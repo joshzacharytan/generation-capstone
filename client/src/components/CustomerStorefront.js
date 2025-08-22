@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { storeAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
 import ShoppingCart from './ShoppingCart';
@@ -9,6 +9,7 @@ import CustomerAccount from './CustomerAccount';
 import NetworkStatus from './NetworkStatus';
 import StoreHeader from './StoreHeader';
 import StoreFooter from './StoreFooter';
+import HeroBannerDisplay from './HeroBannerDisplay';
 import { CustomerProvider, useCustomer } from '../contexts/CustomerContext';
 
 const CustomerStorefront = () => {
@@ -23,9 +24,8 @@ const CustomerStorefront = () => {
 
 const CustomerStorefrontContent = () => {
   const { tenantDomain } = useParams();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { customer, login, logout, isAuthenticated } = useCustomer();
+  const { customer, login, isAuthenticated } = useCustomer();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(() => {
@@ -54,11 +54,11 @@ const CustomerStorefrontContent = () => {
 
   useEffect(() => {
     fetchStoreData();
-  }, [tenantDomain, selectedCategory]);
+  }, [tenantDomain, selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     applyFiltersAndSort();
-  }, [products, priceRange, sortBy, inStockOnly]);
+  }, [products, priceRange, sortBy, inStockOnly]); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -212,7 +212,7 @@ const CustomerStorefrontContent = () => {
     if (categoryFromUrl !== selectedCategory) {
       setSelectedCategory(categoryFromUrl);
     }
-  }, [searchParams]);
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) {
     return (
@@ -270,6 +270,9 @@ const CustomerStorefrontContent = () => {
       />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+        
+        {/* Hero Banner */}
+        <HeroBannerDisplay tenantDomain={tenantDomain} />
 
 
         {/* Category Filter */}

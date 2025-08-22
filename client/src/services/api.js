@@ -224,6 +224,16 @@ export const storeAPI = {
       console.error('Failed to get tenant info:', error);
       throw error;
     }
+  },
+  getHeroBanners: async (tenantDomain) => {
+    try {
+      return await api.get(`/hero-banners/public/${tenantDomain}`, {
+        timeout: 5000
+      });
+    } catch (error) {
+      console.error('Failed to get hero banners:', error);
+      throw error;
+    }
   }
 };
 
@@ -254,6 +264,20 @@ export const adminAPI = {
   getUsers: () => api.get('/admin/users'),
   updateUserRole: (userId, role) =>
     api.put(`/admin/users/${userId}/role`, { role })
+};
+
+// Hero Banner API
+export const heroBannerAPI = {
+  getAll: (activeOnly = false) => api.get(`/hero-banners?active_only=${activeOnly}`),
+  getById: (id) => api.get(`/hero-banners/${id}`),
+  create: (formData) => api.post('/hero-banners', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  update: (id, formData) => api.put(`/hero-banners/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  delete: (id) => api.delete(`/hero-banners/${id}`),
+  getPublic: (tenantDomain) => api.get(`/hero-banners/public/${tenantDomain}`)
 };
 
 export default api;

@@ -35,6 +35,7 @@ class Tenant(Base):
     customers = relationship("Customer", back_populates="tenant")
     orders = relationship("Order", back_populates="tenant")
     categories = relationship("Category", back_populates="tenant")
+    hero_banners = relationship("HeroBanner", back_populates="tenant")
 
 class User(Base):
     __tablename__ = "users"
@@ -166,3 +167,23 @@ class Category(Base):
 
     tenant = relationship("Tenant", back_populates="categories")
     products = relationship("Product", back_populates="category_obj")
+
+class HeroBanner(Base):
+    __tablename__ = "hero_banners"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=True)  # Banner title/headline
+    subtitle = Column(String(500), nullable=True)  # Banner subtitle/description
+    image_url = Column(String, nullable=False)  # URL to banner image
+    image_filename = Column(String, nullable=True)  # Original filename
+    link_url = Column(String, nullable=True)  # Optional link when banner is clicked
+    link_text = Column(String(100), nullable=True)  # Text for the action button
+    is_active = Column(sa.Boolean, default=True, nullable=False)  # Enable/disable banner
+    show_title = Column(sa.Boolean, default=False, nullable=True)  # Show/hide title on storefront
+    sort_order = Column(Integer, default=0)  # For multiple banners ordering
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
+
+    created_at = Column(DateTime, server_default=sa.text('now()'), nullable=False)
+    updated_at = Column(DateTime, server_default=sa.text('now()'), onupdate=sa.text('now()'), nullable=False)
+
+    tenant = relationship("Tenant", back_populates="hero_banners")

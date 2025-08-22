@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware # Import CORSMiddleware
 
 from .database import engine, Base
 from . import models
-from .routers import auth, products, ai, admin, profile, orders, store, payment, categories, branding
+from .routers import auth, products, ai, admin, profile, orders, store, payment, categories, branding, hero_banners
 
 # Create all database tables
 models.Base.metadata.create_all(bind=engine)
@@ -51,4 +51,5 @@ app.include_router(store.router, prefix="/store", tags=["Customer Store"])
 app.include_router(payment.router, prefix="/payment", tags=["Payment Processing"])
 app.include_router(categories.router, prefix="/categories", tags=["Categories"])
 app.include_router(branding.router, prefix="/branding", tags=["Tenant Branding"])
+app.include_router(hero_banners.router, prefix="/hero-banners", tags=["Hero Banners"])
 

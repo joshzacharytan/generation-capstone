@@ -34,6 +34,12 @@ venv.bak/
 # Uploaded Files
 app/static/uploads/
 uploads/
+static/uploads/
+
+# Configuration files with secrets
+.env.*
+!.env.example
+config.local.*
 
 # Node.js / React
 client/node_modules/

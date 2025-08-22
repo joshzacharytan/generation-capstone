@@ -25,7 +25,7 @@ class ProductBase(BaseModel):
 class ProductCreate(ProductBase):
     pass
 
-class ProductUpdate(ProductBase):
+class ProductUpdate(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     price: Optional[float] = None
@@ -64,9 +64,6 @@ class User(UserBase):
 
 class UserWithTenant(User):
     tenant: 'TenantBase'
-
-    class Config:
-        from_attributes = True
 
 class UserRoleUpdate(BaseModel):
     role: Role
@@ -264,3 +261,39 @@ class DescriptionRequest(BaseModel):
 
 class DescriptionResponse(BaseModel):
     description: str
+
+# --- Hero Banner Schemas ---
+class HeroBannerBase(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    link_url: Optional[str] = None
+    link_text: Optional[str] = None
+    is_active: bool = True
+    show_title: bool = False
+    sort_order: int = 0
+
+class HeroBannerCreate(HeroBannerBase):
+    image_url: str  # Required for creation
+    image_filename: Optional[str] = None
+
+class HeroBannerUpdate(BaseModel):
+    title: Optional[str] = None
+    subtitle: Optional[str] = None
+    image_url: Optional[str] = None
+    image_filename: Optional[str] = None
+    link_url: Optional[str] = None
+    link_text: Optional[str] = None
+    is_active: Optional[bool] = None
+    show_title: Optional[bool] = None
+    sort_order: Optional[int] = None
+
+class HeroBanner(HeroBannerBase):
+    id: int
+    image_url: str
+    image_filename: Optional[str] = None
+    tenant_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

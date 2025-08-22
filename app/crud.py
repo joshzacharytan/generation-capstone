@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
+from typing import Optional
 from . import models, schemas, security
 
 # --- User and Tenant CRUD ---
@@ -45,7 +46,7 @@ def create_user(db: Session, user: schemas.UserCreate):
 def update_user_password(db: Session, user_id: int, hashed_password: str):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user:
-        db_user.hashed_password = hashed_password
+        db_user.hashed_password = hashed_password  # type: ignore
         db.commit()
         db.refresh(db_user)
     return db_user
@@ -53,7 +54,7 @@ def update_user_password(db: Session, user_id: int, hashed_password: str):
 def update_user_email(db: Session, user_id: int, new_email: str):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if db_user:
-        db_user.email = new_email
+        db_user.email = new_email  # type: ignore
         db.commit()
         db.refresh(db_user)
     return db_user
@@ -75,11 +76,11 @@ def get_products_with_filters(
     tenant_id: int, 
     skip: int = 0, 
     limit: int = 100,
-    search: str = None,
-    category: str = None,
-    stock_filter: str = None,
-    min_price: float = None,
-    max_price: float = None,
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    stock_filter: Optional[str] = None,
+    min_price: Optional[float] = None,
+    max_price: Optional[float] = None,
     sort_by: str = "name",
     sort_order: str = "asc"
 ):
@@ -154,16 +155,16 @@ def get_product_analytics(db: Session, tenant_id: int):
     avg_price = sum(p.price for p in products) / total_products if total_products > 0 else 0
     
     # Smart suggestions
-    low_stock = [p for p in products if 0 < p.quantity <= 5][:5]
-    no_image = [p for p in products if not p.image_url][:5]
-    no_description = [p for p in products if not p.description or len(p.description.strip()) < 10][:5]
-    high_value = sorted([p for p in products if p.price > 100], key=lambda x: x.price, reverse=True)[:5]
-    recently_added = sorted(products, key=lambda x: x.created_at, reverse=True)[:5]
+    low_stock = [p for p in products if 0 < p.quantity <= 5][:5]  # type: ignore
+    no_image = [p for p in products if not p.image_url][:5]  # type: ignore
+    no_description = [p for p in products if not p.description or len(p.description.strip()) < 10][:5]  # type: ignore
+    high_value = sorted([p for p in products if p.price > 100], key=lambda x: x.price, reverse=True)[:5]  # type: ignore
+    recently_added = sorted(products, key=lambda x: x.created_at, reverse=True)[:5]  # type: ignore
     
     # Stock distribution
-    in_stock = len([p for p in products if p.quantity > 10])
-    low_stock_count = len([p for p in products if 0 < p.quantity <= 10])
-    out_of_stock = len([p for p in products if p.quantity == 0])
+    in_stock = len([p for p in products if p.quantity > 10])  # type: ignore
+    low_stock_count = len([p for p in products if 0 < p.quantity <= 10])  # type: ignore
+    out_of_stock = len([p for p in products if p.quantity == 0])  # type: ignore
     
     return {
         "total_products": total_products,
@@ -233,7 +234,7 @@ def get_user_by_id(db: Session, user_id: int):
 def update_user_role(db: Session, user_id: int, new_role: models.Role):
     db_user = db.get(models.User, user_id)
     if db_user:
-        db_user.role = new_role
+        db_user.role = new_role  # type: ignore
         db.commit()
         db.refresh(db_user)
     return db_user
@@ -299,7 +300,7 @@ def delete_category(db: Session, category_id: int, tenant_id: int):
         
         if products_count > 0:
             # Soft delete - just mark as inactive
-            db_category.is_active = False
+            db_category.is_active = False  # type: ignore
             db.commit()
             db.refresh(db_category)
             return {"deleted": False, "deactivated": True, "products_count": products_count}
@@ -600,7 +601,7 @@ def update_order_status(db: Session, order_id: int, status: models.OrderStatus, 
     print(f"📋 Order {db_order.order_number}: {previous_status.value} → {status.value}")
     
     # Update the order status
-    db_order.status = status
+    db_order.status = status  # type: ignore
     
     # Handle inventory restoration when order is cancelled
     if status == models.OrderStatus.CANCELLED and previous_status != models.OrderStatus.CANCELLED:
@@ -647,3 +648,47 @@ def update_order_status(db: Session, order_id: int, status: models.OrderStatus, 
     db.commit()
     db.refresh(db_order)
     return db_order
+
+# --- Hero Banner CRUD ---
+
+def get_hero_banners_by_tenant(db: Session, tenant_id: int, active_only: bool = False):
+    """Get all hero banners for a tenant"""
+    query = db.query(models.HeroBanner).filter(models.HeroBanner.tenant_id == tenant_id)
+    
+    if active_only:
+        query = query.filter(models.HeroBanner.is_active == True)
+    
+    return query.order_by(models.HeroBanner.sort_order.asc(), models.HeroBanner.created_at.desc()).all()
+
+def get_hero_banner_by_id(db: Session, banner_id: int, tenant_id: int):
+    """Get a specific hero banner by ID for a tenant"""
+    return db.query(models.HeroBanner).filter(
+        models.HeroBanner.id == banner_id,
+        models.HeroBanner.tenant_id == tenant_id
+    ).first()
+
+def create_hero_banner(db: Session, banner: schemas.HeroBannerCreate, tenant_id: int):
+    """Create a new hero banner for a tenant"""
+    db_banner = models.HeroBanner(**banner.model_dump(), tenant_id=tenant_id)
+    db.add(db_banner)
+    db.commit()
+    db.refresh(db_banner)
+    return db_banner
+
+def update_hero_banner(db: Session, banner_id: int, banner_update: schemas.HeroBannerUpdate, tenant_id: int):
+    """Update a hero banner"""
+    db_banner = get_hero_banner_by_id(db, banner_id, tenant_id)
+    if db_banner:
+        for key, value in banner_update.model_dump(exclude_unset=True).items():
+            setattr(db_banner, key, value)
+        db.commit()
+        db.refresh(db_banner)
+    return db_banner
+
+def delete_hero_banner(db: Session, banner_id: int, tenant_id: int):
+    """Delete a hero banner"""
+    db_banner = get_hero_banner_by_id(db, banner_id, tenant_id)
+    if db_banner:
+        db.delete(db_banner)
+        db.commit()
+    return db_banner

@@ -8,12 +8,14 @@ import shutil
 # Configuration
 UPLOAD_DIR = Path("app/static/uploads/products")
 LOGO_UPLOAD_DIR = Path("app/static/uploads/logos")
+BANNER_UPLOAD_DIR = Path("app/static/uploads/banners")
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"}
 
 # Ensure upload directories exist
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 LOGO_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+BANNER_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 class FileUploadService:
     @staticmethod
@@ -21,6 +23,12 @@ class FileUploadService:
         """Validate uploaded image file"""
         
         # Check file extension
+        if not file.filename:
+            raise HTTPException(
+                status_code=400,
+                detail="No filename provided"
+            )
+            
         file_extension = Path(file.filename).suffix.lower()
         if file_extension not in ALLOWED_EXTENSIONS:
             raise HTTPException(
@@ -29,7 +37,7 @@ class FileUploadService:
             )
         
         # Check file size (this is approximate, actual size check happens during upload)
-        if hasattr(file, 'size') and file.size > MAX_FILE_SIZE:
+        if hasattr(file, 'size') and file.size and file.size > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=400, 
                 detail=f"File too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
@@ -47,6 +55,8 @@ class FileUploadService:
     @staticmethod
     def generate_unique_filename(original_filename: str) -> str:
         """Generate unique filename to prevent conflicts"""
+        if not original_filename:
+            original_filename = "upload.jpg"  # Default fallback
         file_extension = Path(original_filename).suffix.lower()
         unique_id = str(uuid.uuid4())
         return f"{unique_id}{file_extension}"
@@ -63,6 +73,8 @@ class FileUploadService:
         tenant_dir.mkdir(exist_ok=True)
         
         # Generate unique filename
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="File must have a filename")
         unique_filename = FileUploadService.generate_unique_filename(file.filename)
         file_path = tenant_dir / unique_filename
         
@@ -170,6 +182,8 @@ class FileUploadService:
         tenant_dir.mkdir(exist_ok=True)
         
         # Generate unique filename
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="File must have a filename")
         unique_filename = FileUploadService.generate_unique_filename(file.filename)
         file_path = tenant_dir / unique_filename
         
@@ -222,5 +236,74 @@ class FileUploadService:
             
         except Exception as e:
             print(f"Error deleting logo: {e}")
+        
+        return False
+    
+    @staticmethod
+    async def save_hero_banner(file: UploadFile, tenant_id: int) -> dict:
+        """Save uploaded hero banner image and return file info"""
+        
+        # Validate file
+        FileUploadService.validate_image_file(file)
+        
+        # Create tenant-specific banner directory
+        tenant_dir = BANNER_UPLOAD_DIR / str(tenant_id)
+        tenant_dir.mkdir(exist_ok=True)
+        
+        # Generate unique filename
+        if not file.filename:
+            raise HTTPException(status_code=400, detail="File must have a filename")
+        unique_filename = FileUploadService.generate_unique_filename(file.filename)
+        file_path = tenant_dir / unique_filename
+        
+        try:
+            # Save file
+            with open(file_path, "wb") as buffer:
+                content = await file.read()
+                
+                # Check actual file size
+                if len(content) > MAX_FILE_SIZE:
+                    raise HTTPException(
+                        status_code=400, 
+                        detail=f"File too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
+                    )
+                
+                buffer.write(content)
+            
+            # Generate URL path (relative to static directory)
+            relative_path = f"uploads/banners/{tenant_id}/{unique_filename}"
+            image_url = f"/static/{relative_path}"
+            
+            return {
+                "success": True,
+                "image_url": image_url,
+                "image_filename": unique_filename,
+                "original_filename": file.filename,
+                "file_size": len(content)
+            }
+            
+        except Exception as e:
+            # Clean up file if something went wrong
+            if file_path.exists():
+                file_path.unlink()
+            raise HTTPException(status_code=500, detail=f"Failed to save banner: {str(e)}")
+    
+    @staticmethod
+    def delete_hero_banner(image_url: str, tenant_id: int) -> bool:
+        """Delete hero banner image file"""
+        try:
+            if not image_url:
+                return True
+            
+            # Extract filename from URL
+            filename = Path(image_url).name
+            file_path = BANNER_UPLOAD_DIR / str(tenant_id) / filename
+            
+            if file_path.exists():
+                file_path.unlink()
+                return True
+            
+        except Exception as e:
+            print(f"Error deleting banner: {e}")
         
         return False

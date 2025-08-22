@@ -9,6 +9,7 @@ import OrdersManagement from './OrdersManagement';
 import PaymentTest from './PaymentTest';
 import CategoriesManagement from './CategoriesManagement';
 import BrandingManagement from './BrandingManagement';
+import HeroBannerManagement from './HeroBannerManagement';
 import { useUser } from '../contexts/UserContext';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -55,6 +56,7 @@ const AdminDashboard = () => {
     { id: 'products', label: 'Products', icon: '📦' },
     { id: 'categories', label: 'Categories', icon: '🏷️' },
     { id: 'orders', label: 'Orders', icon: '📋' },
+    { id: 'hero-banners', label: 'Hero Banners', icon: '🎭' },
     { id: 'branding', label: 'Branding', icon: '🎨' },
     { id: 'payment-test', label: 'Payment Test', icon: '💳' },
     ...(isSuperAdmin ? [{ id: 'admin', label: 'System Admin', icon: '⚙️' }] : []),
@@ -156,6 +158,12 @@ const AdminDashboard = () => {
           <div>
             <h2 style={{ marginBottom: '2rem', color: '#333' }}>Order Management</h2>
             <OrdersManagement />
+          </div>
+        )}
+
+        {activeTab === 'hero-banners' && (
+          <div>
+            <HeroBannerManagement />
           </div>
         )}
 
