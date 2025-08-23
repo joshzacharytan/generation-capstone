@@ -271,6 +271,7 @@ class HeroBannerBase(BaseModel):
     is_active: bool = True
     show_title: bool = False
     sort_order: int = 0
+    rotation_interval: int = 5  # Rotation interval in seconds
 
 class HeroBannerCreate(HeroBannerBase):
     image_url: str  # Required for creation
@@ -286,6 +287,7 @@ class HeroBannerUpdate(BaseModel):
     is_active: Optional[bool] = None
     show_title: Optional[bool] = None
     sort_order: Optional[int] = None
+    rotation_interval: Optional[int] = None
 
 class HeroBanner(HeroBannerBase):
     id: int

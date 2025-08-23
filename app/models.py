@@ -181,6 +181,7 @@ class HeroBanner(Base):
     is_active = Column(sa.Boolean, default=True, nullable=False)  # Enable/disable banner
     show_title = Column(sa.Boolean, default=False, nullable=True)  # Show/hide title on storefront
     sort_order = Column(Integer, default=0)  # For multiple banners ordering
+    rotation_interval = Column(Integer, default=5, nullable=False)  # Rotation interval in seconds
     tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False)
 
     created_at = Column(DateTime, server_default=sa.text('now()'), nullable=False)

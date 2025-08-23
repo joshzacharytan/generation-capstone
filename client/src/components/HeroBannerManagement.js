@@ -9,6 +9,182 @@ const getFullImageUrl = (imageUrl) => {
   return `http://localhost:8000${imageUrl}`;
 };
 
+// Mini Hero Banner Preview Component for Admin
+const HeroBannerPreview = ({ banners }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setCurrentIndex((prev) => prev === banners.length - 1 ? 0 : prev + 1);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }, 3000); // Faster preview rotation (3 seconds)
+
+    return () => clearInterval(interval);
+  }, [banners]);
+
+  if (banners.length === 0) {
+    return (
+      <div style={{
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f8f9fa',
+        color: '#6c757d',
+        fontSize: '0.9rem'
+      }}>
+        No active banners to preview
+      </div>
+    );
+  }
+
+  const currentBanner = banners[currentIndex] || banners[0];
+
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden'
+    }}>
+      {/* Carousel Container */}
+      <div style={{
+        display: 'flex',
+        width: `${banners.length * 100}%`,
+        height: '100%',
+        transform: `translateX(${-currentIndex * (100 / banners.length)}%)`,
+        transition: isTransitioning ? 'transform 0.3s ease-in-out' : 'none'
+      }}>
+        {banners.map((banner, index) => (
+          <div
+            key={banner.id}
+            style={{
+              width: `${100 / banners.length}%`,
+              height: '100%',
+              position: 'relative',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            {/* Background Image */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `url(${getFullImageUrl(banner.image_url)})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }} />
+            
+            {/* Overlay */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'rgba(0,0,0,0.3)'
+            }} />
+            
+            {/* Content */}
+            <div style={{
+              position: 'relative',
+              zIndex: 2,
+              padding: '1rem',
+              color: 'white',
+              maxWidth: '60%'
+            }}>
+              {banner.title && banner.show_title && (
+                <h4 style={{
+                  fontSize: '1.2rem',
+                  fontWeight: 'bold',
+                  margin: '0 0 0.5rem 0',
+                  textShadow: '2px 2px 4px rgba(0,0,0,0.7)'
+                }}>
+                  {banner.title}
+                </h4>
+              )}
+              
+              {banner.subtitle && (
+                <p style={{
+                  fontSize: '0.85rem',
+                  margin: '0 0 0.75rem 0',
+                  textShadow: '1px 1px 2px rgba(0,0,0,0.7)',
+                  opacity: 0.95
+                }}>
+                  {banner.subtitle}
+                </p>
+              )}
+              
+              {banner.link_text && (
+                <div style={{
+                  padding: '0.4rem 1rem',
+                  backgroundColor: 'rgba(255,255,255,0.9)',
+                  color: '#333',
+                  border: 'none',
+                  borderRadius: '15px',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  display: 'inline-block',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                }}>
+                  {banner.link_text}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Preview Dots */}
+      {banners.length > 1 && (
+        <div style={{
+          position: 'absolute',
+          bottom: '0.5rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          gap: '0.25rem'
+        }}>
+          {banners.map((_, index) => (
+            <div
+              key={index}
+              style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: index === currentIndex ? 'white' : 'rgba(255,255,255,0.5)'
+              }}
+            />
+          ))}
+        </div>
+      )}
+      
+      {/* Preview Label */}
+      <div style={{
+        position: 'absolute',
+        top: '0.5rem',
+        right: '0.5rem',
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        color: 'white',
+        padding: '0.2rem 0.5rem',
+        borderRadius: '10px',
+        fontSize: '0.7rem'
+      }}>
+        Preview
+      </div>
+    </div>
+  );
+};
+
 function HeroBannerManagement() {
   const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +198,8 @@ function HeroBannerManagement() {
     link_text: '',
     is_active: true,
     show_title: false,
-    sort_order: 0
+    sort_order: 0,
+    rotation_interval: 5
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -112,7 +289,8 @@ function HeroBannerManagement() {
       link_text: banner.link_text || '',
       is_active: banner.is_active,
       show_title: banner.show_title || false,
-      sort_order: banner.sort_order
+      sort_order: banner.sort_order,
+      rotation_interval: banner.rotation_interval || 5
     });
     setPreviewUrl(getFullImageUrl(banner.image_url));
     setSelectedFile(null);
@@ -143,7 +321,8 @@ function HeroBannerManagement() {
       link_text: '',
       is_active: true,
       show_title: false,
-      sort_order: 0
+      sort_order: 0,
+      rotation_interval: 5
     });
     setSelectedFile(null);
     setPreviewUrl('');
@@ -159,7 +338,8 @@ function HeroBannerManagement() {
       link_text: '',
       is_active: true,
       show_title: false,
-      sort_order: 0
+      sort_order: 0,
+      rotation_interval: 5
     });
     setSelectedFile(null);
     setPreviewUrl('');
@@ -212,6 +392,46 @@ function HeroBannerManagement() {
           border: '1px solid #f5c6cb'
         }}>
           {error}
+        </div>
+      )}
+
+      {/* Hero Banner Preview */}
+      {banners.length > 0 && (
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          padding: '1.5rem',
+          borderRadius: '8px',
+          marginBottom: '2rem',
+          border: '1px solid #dee2e6'
+        }}>
+          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+            🔍 Storefront Preview
+          </h3>
+          <p style={{ color: '#6c757d', fontSize: '0.9rem', marginBottom: '1rem' }}>
+            This is how your hero banners will appear to customers on your storefront:
+          </p>
+          
+          {/* Mini Hero Banner Display */}
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            maxWidth: '800px',
+            height: '200px',
+            overflow: 'hidden',
+            borderRadius: '8px',
+            boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+            border: '2px solid #007bff'
+          }}>
+            <HeroBannerPreview banners={banners.filter(b => b.is_active)} />
+          </div>
+          
+          <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: '#6c757d' }}>
+            💡 <strong>Tip:</strong> Only active banners are shown in the preview. 
+            {banners.filter(b => b.is_active).length > 1 ? 
+              `Auto-rotation every ${banners.find(b => b.is_active)?.rotation_interval || 5} seconds.` : 
+              'Add more active banners to see rotation effects.'
+            }
+          </div>
         </div>
       )}
 
@@ -328,6 +548,30 @@ function HeroBannerManagement() {
                 />
                 Show title on storefront
               </label>
+            </div>
+
+            <div>
+              <label>Rotation Interval (seconds):</label>
+              <input
+                type="number"
+                name="rotation_interval"
+                value={formData.rotation_interval}
+                onChange={handleInputChange}
+                min="1"
+                max="30"
+                placeholder="5"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid #ced4da',
+                  borderRadius: '4px',
+                  fontSize: '1rem',
+                  marginBottom: '1rem'
+                }}
+              />
+              <small style={{ color: '#6c757d', marginTop: '0.25rem', display: 'block' }}>
+                How often banners rotate automatically (1-30 seconds). Only applies when multiple banners are active.
+              </small>
             </div>
 
             <div style={{ marginBottom: '1.5rem' }}>
@@ -491,7 +735,8 @@ function HeroBannerManagement() {
                         {banner.link_url && (
                           <span style={{ marginRight: '1rem' }}>🔗 {banner.link_text || 'Link'}</span>
                         )}
-                        <span>📊 Order: {banner.sort_order}</span>
+                        <span style={{ marginRight: '1rem' }}>📊 Order: {banner.sort_order}</span>
+                        <span>⏱️ Rotates: {banner.rotation_interval || 5}s</span>
                       </div>
                     </div>
                     

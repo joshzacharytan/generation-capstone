@@ -55,6 +55,7 @@ async def create_hero_banner(
     is_active: bool = Form(True),
     show_title: bool = Form(False),
     sort_order: int = Form(0),
+    rotation_interval: int = Form(5),
     image: UploadFile = File(...),
     db_and_user = Depends(get_tenant_admin_db)
 ):
@@ -78,7 +79,8 @@ async def create_hero_banner(
             link_text=link_text,
             is_active=is_active,
             show_title=show_title,
-            sort_order=sort_order
+            sort_order=sort_order,
+            rotation_interval=rotation_interval
         )
         
         # Create banner in database
@@ -99,6 +101,7 @@ async def update_hero_banner(
     is_active: Optional[bool] = Form(None),
     show_title: Optional[bool] = Form(None),
     sort_order: Optional[int] = Form(None),
+    rotation_interval: Optional[int] = Form(None),
     image: Optional[UploadFile] = File(None),
     db_and_user = Depends(get_tenant_admin_db)
 ):
@@ -131,6 +134,8 @@ async def update_hero_banner(
             update_data["show_title"] = show_title
         if sort_order is not None:
             update_data["sort_order"] = sort_order
+        if rotation_interval is not None:
+            update_data["rotation_interval"] = rotation_interval
         
         # Handle image upload if provided
         if image and image.filename:
