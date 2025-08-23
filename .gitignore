@@ -37,10 +37,10 @@ uploads/
 static/uploads/
 
 # Test Pictures
-test_pictures/
+# test_pictures/
 
 # Database backups
-backups/
+# backups/
 *.sql
 *.dump
 
