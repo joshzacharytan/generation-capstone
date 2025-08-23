@@ -36,6 +36,14 @@ app/static/uploads/
 uploads/
 static/uploads/
 
+# Test Pictures
+test_pictures/
+
+# Database backups
+backups/
+*.sql
+*.dump
+
 # Configuration files with secrets
 .env.*
 !.env.example
