@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 
 from .. import crud, schemas, security, models
@@ -126,15 +126,97 @@ def get_current_customer_profile(
 @router.get("/{tenant_domain}/customer/orders", response_model=List[schemas.Order])
 def get_customer_orders(
     tenant_domain: str,
+    skip: int = 0,
+    limit: int = 20,
+    status: Optional[str] = None,
+    search: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
     db: Session = Depends(get_db),
     current_customer: models.Customer = Depends(security.get_current_customer)
 ):
-    """Get current customer's order history"""
-    orders = db.query(models.Order).filter(
+    """Get current customer's order history with pagination and filtering"""
+    from datetime import datetime
+    
+    query = db.query(models.Order).filter(
         models.Order.customer_id == current_customer.id,
         models.Order.tenant_id == current_customer.tenant_id
-    ).order_by(models.Order.created_at.desc()).all()
+    )
+    
+    # Apply status filter
+    if status and status.lower() != 'all':
+        query = query.filter(models.Order.status == status.lower())
+    
+    # Apply search filter (order number or customer name)
+    if search:
+        search_term = f"%{search.lower()}%"
+        query = query.filter(
+            models.Order.order_number.ilike(search_term)
+        )
+    
+    # Apply date filters
+    if date_from:
+        try:
+            from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+            query = query.filter(models.Order.created_at >= from_date)
+        except ValueError:
+            pass  # Invalid date format, ignore filter
+    
+    if date_to:
+        try:
+            to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+            query = query.filter(models.Order.created_at <= to_date)
+        except ValueError:
+            pass  # Invalid date format, ignore filter
+    
+    # Apply pagination and ordering
+    orders = query.order_by(models.Order.created_at.desc()).offset(skip).limit(limit).all()
     return orders
+
+@router.get("/{tenant_domain}/customer/orders/count")
+def get_customer_orders_count(
+    tenant_domain: str,
+    status: Optional[str] = None,
+    search: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_customer: models.Customer = Depends(security.get_current_customer)
+):
+    """Get total count of customer orders for pagination"""
+    from datetime import datetime
+    
+    query = db.query(models.Order).filter(
+        models.Order.customer_id == current_customer.id,
+        models.Order.tenant_id == current_customer.tenant_id
+    )
+    
+    # Apply same filters as main orders endpoint
+    if status and status.lower() != 'all':
+        query = query.filter(models.Order.status == status.lower())
+    
+    if search:
+        search_term = f"%{search.lower()}%"
+        query = query.filter(
+            models.Order.order_number.ilike(search_term)
+        )
+    
+    if date_from:
+        try:
+            from_date = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+            query = query.filter(models.Order.created_at >= from_date)
+        except ValueError:
+            pass
+    
+    if date_to:
+        try:
+            to_date = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+            query = query.filter(models.Order.created_at <= to_date)
+        except ValueError:
+            pass
+    
+    total_count = query.count()
+    return {"total": total_count}
 
 # Customer order endpoints
 @router.post("/{tenant_domain}/orders", response_model=Dict[str, Any])

@@ -114,7 +114,26 @@ export const profileAPI = {
 
 // Orders API
 export const ordersAPI = {
-  getAll: () => api.get('/orders'),
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+    const queryString = queryParams.toString();
+    return api.get(`/orders${queryString ? `?${queryString}` : ''}`);
+  },
+  getCount: (params = {}) => {
+    const queryParams = new URLSearchParams();
+    Object.keys(params).forEach(key => {
+      if (params[key] !== null && params[key] !== undefined && params[key] !== '') {
+        queryParams.append(key, params[key]);
+      }
+    });
+    const queryString = queryParams.toString();
+    return api.get(`/orders/count${queryString ? `?${queryString}` : ''}`);
+  },
   getById: (id) => api.get(`/orders/${id}`),
   updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status })
 };
