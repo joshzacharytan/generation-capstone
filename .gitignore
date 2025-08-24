@@ -39,10 +39,12 @@ static/uploads/
 # Test Pictures
 # test_pictures/
 
-# Database backups
+# Database backups - allow backups folder but ignore SQL files elsewhere
 # backups/
 *.sql
+!backups/*.sql
 *.dump
+!backups/*.dump
 
 # Configuration files with secrets
 .env.*
