@@ -198,6 +198,178 @@ npm start
 
 ### 4. Access the Application
 
+## 🐳 Docker & Production Deployment
+
+### Development with Docker
+
+```bash
+# Start all services (backend, frontend, database, redis)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+**Services available at:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- Database: localhost:5432
+- Redis: localhost:6379
+
+### Production Deployment
+
+#### 1. Create Production Environment
+```bash
+# Copy production template
+cp .env.prod.example .env.prod
+
+# Edit with your production values
+nano .env.prod
+```
+
+#### 2. Deploy with Docker Compose
+```bash
+# Build and start production services
+docker-compose -f docker-compose.prod.yml up -d
+
+# View production logs
+docker-compose -f docker-compose.prod.yml logs -f
+```
+
+#### 3. Production Environment Variables
+
+Required variables in `.env.prod`:
+```env
+POSTGRES_DB=ecommerce_db_prod
+POSTGRES_USER=ecommerce_user
+POSTGRES_PASSWORD=secure-password-here
+SECRET_KEY=generate-with-openssl-rand-hex-32
+REDIS_PASSWORD=secure-redis-password
+```
+
+### Docker Architecture
+
+```mermaid
+graph TB
+    subgraph "Docker Containers"
+        subgraph "Frontend Container"
+            React[React App]
+            Nginx[Nginx Server]
+        end
+        
+        subgraph "Backend Container"
+            FastAPI[FastAPI App]
+            Uvicorn[Uvicorn Server]
+        end
+        
+        subgraph "Database Container"
+            Postgres[(PostgreSQL)]
+        end
+        
+        subgraph "Cache Container"
+            Redis[(Redis Cache)]
+        end
+    end
+    
+    React --> FastAPI
+    FastAPI --> Postgres
+    FastAPI --> Redis
+    
+    style React fill:#61dafb
+    style FastAPI fill:#009688
+    style Postgres fill:#336791
+    style Redis fill:#dc382d
+```
+
+### Build Individual Images
+
+```bash
+# Build backend image
+docker build -f docker/Dockerfile.backend -t ecommerce-backend .
+
+# Build frontend image
+docker build -f docker/Dockerfile.frontend -t ecommerce-frontend .
+
+# Run individual containers
+docker run -d -p 8000:8000 ecommerce-backend
+docker run -d -p 3000:80 ecommerce-frontend
+```
+
+## 🔄 CI/CD Pipeline
+
+Automated pipeline with GitHub Actions:
+
+### Pipeline Stages
+1. **Test Backend**: Run Python tests with PostgreSQL
+2. **Test Frontend**: Run React tests with coverage
+3. **Build Images**: Create optimized Docker images
+4. **Security Scan**: Vulnerability scanning with Trivy
+5. **Deploy**: Push to container registry
+
+### Triggering Deployment
+```bash
+# Push to main branch triggers production deployment
+git push origin main
+
+# Create release for tagged deployment
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### Container Registry
+Images are automatically pushed to GitHub Container Registry:
+- `ghcr.io/your-username/generation-capstone-backend:latest`
+- `ghcr.io/your-username/generation-capstone-frontend:latest`
+
+## 📊 Monitoring & Health Checks
+
+### Health Endpoints
+- **Backend**: `GET /health` - API health status
+- **Database**: Automatic PostgreSQL health checks
+- **Frontend**: `GET /health` - Nginx health status
+
+### Resource Monitoring
+```bash
+# View container resource usage
+docker stats
+
+# View container logs
+docker-compose logs -f [service-name]
+
+# Check container health
+docker ps
+```
+
+### Production Monitoring
+- **Resource Limits**: Memory and CPU limits configured
+- **Restart Policies**: Automatic restart on failure
+- **Health Checks**: Built-in health monitoring
+- **Log Aggregation**: Structured logging for analysis
+
+## 🔒 Security Features
+
+### Container Security
+- **Non-root User**: Containers run as non-privileged users
+- **Minimal Images**: Alpine-based images for reduced attack surface
+- **Security Headers**: CORS, XSS protection, content type validation
+- **Vulnerability Scanning**: Automated security scanning in CI/CD
+
+### Network Security
+- **Internal Networks**: Isolated backend and frontend networks
+- **Port Restriction**: Only necessary ports exposed
+- **Reverse Proxy**: Nginx handles SSL termination and routing
+
+### Data Security
+- **Environment Variables**: Sensitive data via environment variables
+- **Secret Management**: Production secrets via external secret stores
+- **Database Encryption**: PostgreSQL encryption at rest
+- **JWT Security**: Signed tokens with configurable expiration
+
+### 4. Access the Application
+
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
