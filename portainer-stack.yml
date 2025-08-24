@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Changed from 5432 to avoid conflict
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -28,7 +28,7 @@ services:
     container_name: ecommerce_redis
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "6380:6379"  # Changed from 6379 to avoid conflict
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
@@ -40,20 +40,34 @@ services:
       timeout: 5s
       retries: 5
 
-  # FastAPI Backend (using pre-built image or build from source)
+  # pgAdmin - Database Administration Tool
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: ecommerce_pgadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@ecommerce.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - ecommerce_network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # FastAPI Backend - Using your pushed GHCR image
   backend:
-    # Option A: Use your local built image (if available)
-    # image: generation-capstone-backend:test
-    
-    # Option B: Build from your repository
-    build:
-      context: https://github.com/YOUR_USERNAME/generation_capstone.git
-      dockerfile: docker/Dockerfile.backend
+    image: ghcr.io/joshzacharytan/generation-capstone-backend:latest
     
     container_name: ecommerce_backend
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "8001:8000"  # Changed from 8000 to avoid FastAPI conflict
     environment:
       - DATABASE_URL=postgresql://postgres:postgres123@db:5432/ecommerce_db
       - SECRET_KEY=your-super-secret-jwt-key-for-testing-12345
@@ -77,15 +91,9 @@ services:
       retries: 3
       start_period: 40s
 
-  # React Frontend with Nginx
+  # React Frontend - Using your pushed GHCR image
   frontend:
-    # Option A: Use your local built image (if available)
-    # image: generation-capstone-frontend:test
-    
-    # Option B: Build from your repository  
-    build:
-      context: https://github.com/YOUR_USERNAME/generation_capstone.git
-      dockerfile: docker/Dockerfile.frontend
+    image: ghcr.io/joshzacharytan/generation-capstone-frontend:latest
     
     container_name: ecommerce_frontend
     restart: unless-stopped
@@ -108,6 +116,8 @@ volumes:
   redis_data:
     driver: local
   backend_uploads:
+    driver: local
+  pgadmin_data:
     driver: local
 
 networks:
