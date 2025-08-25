@@ -14,8 +14,10 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 ## 📋 Table of Contents
 
 - [Features](#-features)
+- [Theme System](#-theme-system)
 - [Technology Stack](#-technology-stack)
 - [System Architecture](#-system-architecture)
+- [Recent Updates](#-recent-updates)
 - [Prerequisites](#-prerequisites)
 - [Installation & Setup](#-installation--setup)
 - [Usage](#-usage)
@@ -70,11 +72,52 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 - **Password Security**: Bcrypt hashing with salt
 - **Session Management**: Automatic token refresh and logout
 
-### 📱 Responsive Design
+### 📱 Responsive Design & Theme System
 - **Mobile-First**: Optimized for all device sizes
 - **Modern UI**: Clean, professional interface
 - **Touch-Friendly**: Gesture support for mobile interactions
 - **Cross-Browser**: Compatible with all modern browsers
+- **Theme System**: Light/Dark/System preference themes with smooth transitions
+- **Persistent Preferences**: User theme choices saved across sessions
+- **Accessibility**: Proper contrast ratios and focus indicators
+
+## 🎨 Theme System
+
+The platform features a comprehensive theme system supporting multiple visual modes:
+
+### Available Themes
+- **Light Theme**: Clean, modern light interface optimized for daytime use
+- **Dark Theme**: Eye-friendly dark mode with proper contrast ratios
+- **System Theme**: Automatically follows user's system preference
+
+### Features
+- **Seamless Switching**: Smooth transitions between theme modes
+- **Persistent Storage**: User preferences saved across browser sessions
+- **CSS Variables Architecture**: Centralized theme management for maintainability
+- **Accessibility Compliance**: WCAG-compliant contrast ratios and focus indicators
+- **Component Coverage**: All UI components fully themed
+
+### Theme Toggle Locations
+- **Admin Dashboard**: Top-right corner of navigation bar
+- **Customer Storefront**: Far-right position in store header
+- **Multiple Variants**: Button, icon-only, and dropdown styles available
+
+### Implementation
+```jsx
+// Theme Toggle Component Usage
+import ThemeToggle from './components/ThemeToggle';
+
+// Icon variant (recommended for headers)
+<ThemeToggle variant="icon" />
+
+// Button variant with label
+<ThemeToggle variant="button" showLabel={true} />
+
+// Dropdown with all options
+<ThemeToggle variant="dropdown" />
+```
+
+> **📖 Complete Theme Documentation**: See [THEME_SYSTEM.md](./THEME_SYSTEM.md) for detailed implementation guide, CI/CD pipeline documentation, and maintenance instructions.
 
 ## 🛠 Technology Stack
 
@@ -91,7 +134,8 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 - **Routing**: React Router v6
 - **State Management**: Context API with hooks
 - **HTTP Client**: Axios with interceptors
-- **Styling**: Inline styles with responsive design
+- **Styling**: CSS Variables with responsive design and theme system
+- **Theme System**: Light/Dark/System preference support with Context API
 - **Build Tool**: Create React App
 
 ### DevOps & Infrastructure
@@ -201,6 +245,27 @@ GET /orders/analytics/revenue-trend # Daily revenue and order trends  \nGET /ord
 - **Node.js 16+** (Recommended: 18+)
 - **PostgreSQL 12+** (Recommended: 15+)
 - **Google Gemini API Key** (for AI features)
+
+## 🆕 Recent Updates
+
+### 🎨 Theme System (v1.2.0)
+- **Light/Dark Mode**: Complete theme system with automatic system preference detection
+- **Seamless Switching**: Smooth transitions between theme modes
+- **Universal Coverage**: All components fully themed with CSS variables
+- **CI/CD Pipeline**: Advanced deployment pipeline with rollback capabilities
+- **Accessibility**: WCAG-compliant contrast ratios and focus indicators
+
+### 🔍 Search Enhancements
+- **Enhanced Search Suggestions**: Improved dropdown with images and categories
+- **Smart Filtering**: Brand, category, and product-specific suggestions
+- **Performance Optimizations**: Debounced API calls and efficient rendering
+- **Known Issue**: Search suggestions dropdown persistence (documented for future resolution)
+
+### 🔧 Infrastructure Improvements
+- **Docker Support**: Complete containerization for all environments
+- **CI/CD Automation**: GitHub Actions with automated testing and deployment
+- **Security Enhancements**: Updated authentication and data validation
+- **Documentation**: Comprehensive API documentation and setup guides
 
 ## 🚀 Installation & Setup
 
