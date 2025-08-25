@@ -142,6 +142,11 @@ graph TB
 
 ### 1. Clone the Repository
 ```bash
+# From GitHub (Public)
+git clone https://github.com/joshzacharytan/generation-capstone.git
+cd generation-capstone
+
+# Or from Gitea (Private)
 git clone http://100.66.17.68:3000/joshzacharytan/generation_capstone.git
 cd generation_capstone
 ```
@@ -288,14 +293,30 @@ graph TB
 
 ```bash
 # Build backend image
-docker build -f docker/Dockerfile.backend -t ecommerce-backend .
+docker build -f docker/Dockerfile.backend -t generation-capstone-backend:v1.0.0 .
 
 # Build frontend image
-docker build -f docker/Dockerfile.frontend -t ecommerce-frontend .
+docker build -f docker/Dockerfile.frontend -t generation-capstone-frontend:v1.0.0 .
 
 # Run individual containers
-docker run -d -p 8000:8000 ecommerce-backend
-docker run -d -p 3000:80 ecommerce-frontend
+docker run -d -p 8000:8000 generation-capstone-backend:v1.0.0
+docker run -d -p 3000:80 generation-capstone-frontend:v1.0.0
+```
+
+### Pull from GitHub Container Registry
+
+```bash
+# Pull pre-built images from GHCR
+docker pull ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
+docker pull ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
+
+# Run using GHCR images
+docker run -d -p 8000:8000 \
+  -e DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/ecommerce_db" \
+  -e SECRET_KEY="your-secret-key" \
+  ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
+
+docker run -d -p 3000:80 ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
 ```
 
 ## 🔄 CI/CD Pipeline
@@ -320,9 +341,24 @@ git push origin v1.0.0
 ```
 
 ### Container Registry
-Images are automatically pushed to GitHub Container Registry:
-- `ghcr.io/your-username/generation-capstone-backend:latest`
-- `ghcr.io/your-username/generation-capstone-frontend:latest`
+Images are available on GitHub Container Registry:
+- `ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0`
+- `ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0`
+
+### Manual Image Push to GHCR
+
+```bash
+# Login to GitHub Container Registry
+echo $GITHUB_TOKEN | docker login ghcr.io -u joshzacharytan --password-stdin
+
+# Tag images for GHCR
+docker tag generation-capstone-backend:v1.0.0 ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
+docker tag generation-capstone-frontend:v1.0.0 ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
+
+# Push to registry
+docker push ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
+docker push ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
+```
 
 ## 📊 Monitoring & Health Checks
 
@@ -592,8 +628,10 @@ npm test
 ## 📞 Support & Contact
 
 For questions, issues, or contributions:
-- **Repository**: http://100.66.17.68:3000/joshzacharytan/generation_capstone
-- **Issues**: Submit issues through the repository issue tracker
+- **GitHub Repository**: https://github.com/joshzacharytan/generation-capstone
+- **Gitea Repository**: http://100.66.17.68:3000/joshzacharytan/generation_capstone
+- **Container Registry**: https://github.com/joshzacharytan/generation-capstone/pkgs/container/generation-capstone-backend
+- **Issues**: Submit issues through the GitHub repository issue tracker
 - **Documentation**: API docs available at `/docs` endpoint
 
 ## 🎯 Future Enhancements
