@@ -53,3 +53,17 @@ app.include_router(categories.router, prefix="/categories", tags=["Categories"])
 app.include_router(branding.router, prefix="/branding", tags=["Tenant Branding"])
 app.include_router(hero_banners.router, prefix="/hero-banners", tags=["Hero Banners"])
 
+# Root endpoint
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "title": "Multi-Tenant E-Commerce Platform",
+        "version": "0.1.0"
+    })
+
+# Health check endpoint
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "message": "Multi-Tenant E-Commerce Platform is running"}
+
