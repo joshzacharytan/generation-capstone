@@ -241,7 +241,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
     >
       <div 
         style={{
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
           maxWidth: '900px',
           width: '90%',
@@ -250,23 +250,24 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          boxShadow: 'var(--shadow-xl)',
+          border: '1px solid var(--border-primary)'
         }}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
       >
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: '1px solid var(--border-primary)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
           <div>
-            <h3 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
               My Orders
             </h3>
-            <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+            <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
               {totalOrders > 0 ? `${totalOrders} order${totalOrders !== 1 ? 's' : ''} found` : 'No orders found'}
               {statusFilter !== 'all' && ` • Filtered by: ${statusFilter}`}
               {dateFilter !== 'all' && ` • ${getDateFilterLabel(dateFilter)}`}
@@ -279,7 +280,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -287,8 +288,8 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
         </div>
 
         {/* Customer Info */}
-        <div style={{ padding: '1rem 1.5rem', backgroundColor: '#f8f9fa', borderBottom: '1px solid #dee2e6' }}>
-          <p style={{ margin: 0, color: '#333' }}>
+        <div style={{ padding: '1rem 1.5rem', backgroundColor: 'var(--bg-tertiary)', borderBottom: '1px solid var(--border-primary)' }}>
+          <p style={{ margin: 0, color: 'var(--text-primary)' }}>
             <strong>{customer.first_name} {customer.last_name}</strong> • {customer.email}
           </p>
         </div>
@@ -296,8 +297,8 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
         {/* Filters Section */}
         <div style={{ 
           padding: '1rem 1.5rem', 
-          backgroundColor: '#ffffff', 
-          borderBottom: '2px solid #f8f9fa'
+          backgroundColor: 'var(--bg-elevated)', 
+          borderBottom: '2px solid var(--border-secondary)'
         }}>
           {/* Status Filter Tabs */}
           <div style={{ marginBottom: '1rem' }}>
@@ -316,9 +317,9 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                   onClick={() => setStatusFilter(status.key)}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: statusFilter === status.key ? '#007bff' : 'white',
-                    color: statusFilter === status.key ? 'white' : '#495057',
-                    border: '1px solid #dee2e6',
+                    backgroundColor: statusFilter === status.key ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                    color: statusFilter === status.key ? 'var(--text-inverse)' : 'var(--text-primary)',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '20px',
                     cursor: 'pointer',
                     fontSize: '0.85rem',
@@ -352,17 +353,19 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                   style={{
                     flex: 1,
                     padding: '0.5rem',
-                    border: '1px solid #ced4da',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    fontSize: '0.9rem'
+                    fontSize: '0.9rem',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
                 <button
                   type="submit"
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: '#007bff',
-                    color: 'white',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -380,10 +383,12 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
               onChange={(e) => setDateFilter(e.target.value)}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ced4da',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
                 fontSize: '0.9rem',
-                minWidth: '120px'
+                minWidth: '120px',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             >
               <option value="all">All Time</option>
@@ -403,8 +408,8 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
+                  backgroundColor: 'var(--text-secondary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -511,13 +516,13 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                     key={order.id}
                     style={{
                       padding: '1.25rem 1.5rem',
-                      borderBottom: '1px solid #f8f9fa',
+                      borderBottom: '1px solid var(--border-primary)',
                       cursor: 'pointer',
                       transition: 'background-color 0.2s ease'
                     }}
                     onClick={() => setSelectedOrder(order)}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8f9fa';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent';
@@ -525,10 +530,10 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                       <div>
-                        <h5 style={{ margin: '0 0 0.25rem 0', color: '#333' }}>
+                        <h5 style={{ margin: '0 0 0.25rem 0', color: 'var(--text-primary)' }}>
                           Order #{order.order_number}
                         </h5>
-                        <p style={{ margin: 0, fontSize: '0.875rem', color: '#6c757d' }}>
+                        <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                           {formatDateTime(order.created_at)}
                         </p>
                       </div>
@@ -536,7 +541,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                         <div style={{
                           fontSize: '1.1rem',
                           fontWeight: 'bold',
-                          color: '#28a745',
+                          color: 'var(--color-success)',
                           marginBottom: '0.25rem'
                         }}>
                           ${parseFloat(order.total_amount).toFixed(2)}
@@ -544,7 +549,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                         <span style={{
                           fontSize: '0.75rem',
                           backgroundColor: getStatusColor(order.status),
-                          color: 'white',
+                          color: 'var(--text-inverse)',
                           padding: '0.25rem 0.5rem',
                           borderRadius: '12px',
                           textTransform: 'uppercase'
@@ -553,7 +558,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                         </span>
                       </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#6c757d' }}>
+                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                       {order.order_items?.length || 0} item(s) • Click to view details
                     </p>
                   </div>
@@ -565,7 +570,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                 <div style={{ 
                   padding: '1.5rem', 
                   textAlign: 'center', 
-                  borderTop: '1px solid #f8f9fa',
+                  borderTop: '1px solid var(--border-primary)',
                   marginTop: 'auto' // Push to bottom
                 }}>
                   <button
@@ -573,8 +578,8 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                     disabled={loadingMore}
                     style={{
                       padding: '0.75rem 2rem',
-                      backgroundColor: loadingMore ? '#6c757d' : '#007bff',
-                      color: 'white',
+                      backgroundColor: loadingMore ? 'var(--text-secondary)' : 'var(--color-primary)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '25px',
                       cursor: loadingMore ? 'not-allowed' : 'pointer',
@@ -607,9 +612,9 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
                 <div style={{ 
                   padding: '1rem', 
                   textAlign: 'center', 
-                  color: '#6c757d', 
+                  color: 'var(--text-secondary)', 
                   fontSize: '0.85rem', 
-                  borderTop: '1px solid #f8f9fa',
+                  borderTop: '1px solid var(--border-primary)',
                   marginTop: 'auto' // Push to bottom
                 }}>
                   ✓ All orders loaded ({totalOrders} total)
@@ -647,16 +652,18 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
       zIndex: 1100
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
         maxWidth: '600px',
         width: '90%',
         maxHeight: '80vh',
         overflow: 'auto',
-        padding: '2rem'
+        padding: '2rem',
+        border: '1px solid var(--border-primary)',
+        boxShadow: 'var(--shadow-xl)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h4 style={{ margin: 0, color: '#333' }}>
+          <h4 style={{ margin: 0, color: 'var(--text-primary)' }}>
             Order #{order.order_number}
           </h4>
           <button
@@ -666,7 +673,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -681,7 +688,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
               <p><strong>Status:</strong>{' '}
                 <span style={{
                   backgroundColor: getStatusColor(order.status),
-                  color: 'white',
+                  color: 'var(--text-inverse)',
                   padding: '0.25rem 0.5rem',
                   borderRadius: '12px',
                   fontSize: '0.75rem',
@@ -701,8 +708,8 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
         {/* Shipping Address */}
         {order.shipping_address && (
           <div style={{ marginBottom: '1.5rem' }}>
-            <h5 style={{ color: '#333', marginBottom: '0.5rem' }}>Shipping Address</h5>
-            <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: '4px' }}>
+            <h5 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Shipping Address</h5>
+            <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '4px' }}>
               <p style={{ margin: '0 0 0.25rem 0' }}>{order.shipping_address.address_line1}</p>
               {order.shipping_address.address_line2 && (
                 <p style={{ margin: '0 0 0.25rem 0' }}>{order.shipping_address.address_line2}</p>
@@ -716,7 +723,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
 
         {/* Order Items */}
         <div>
-          <h5 style={{ color: '#333', marginBottom: '1rem' }}>Order Items</h5>
+          <h5 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Order Items</h5>
           <div style={{ display: 'grid', gap: '0.5rem' }}>
             {order.order_items?.map((item) => (
               <div
@@ -726,13 +733,13 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '0.75rem',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--bg-tertiary)',
                   borderRadius: '4px'
                 }}
               >
                 <div>
                   <strong>{item.product?.name || `Product ID: ${item.product_id}`}</strong>
-                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#6c757d' }}>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     Quantity: {item.quantity} × ${parseFloat(item.unit_price).toFixed(2)}
                   </p>
                 </div>

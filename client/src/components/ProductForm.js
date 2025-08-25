@@ -170,25 +170,51 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--bg-elevated)',
       padding: '2rem',
       borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+      boxShadow: 'var(--shadow-lg)',
       maxWidth: '600px',
-      margin: '0 auto'
+      margin: '0 auto',
+      border: '1px solid var(--border-primary)'
     }}>
-      <h3 style={{ marginBottom: '1.5rem', color: '#333' }}>
-        {product ? 'Edit Product' : 'Add New Product'}
-      </h3>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem'
+      }}>
+        <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+          {product ? 'Edit Product' : 'Add New Product'}
+        </h3>
+        <button
+          type="button"
+          onClick={onCancel}
+          style={{
+            padding: '0.5rem 1rem',
+            backgroundColor: 'var(--bg-tertiary)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-primary)',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}
+        >
+          ← Back to Products
+        </button>
+      </div>
 
       {error && (
         <div style={{
-          color: '#dc3545',
-          backgroundColor: '#f8d7da',
+          color: 'var(--color-danger)',
+          backgroundColor: 'var(--bg-danger-subtle)',
           padding: '0.75rem',
           borderRadius: '4px',
           marginBottom: '1rem',
-          border: '1px solid #f5c6cb'
+          border: '1px solid var(--border-danger)'
         }}>
           {error}
         </div>
@@ -204,9 +230,11 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: errors.name ? '1px solid #dc3545' : '1px solid #ddd',
+              border: errors.name ? '1px solid var(--color-danger)' : '1px solid var(--border-primary)',
               borderRadius: '4px',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
             placeholder="Enter product name"
           />
@@ -219,15 +247,15 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
         <div style={{ marginBottom: '1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-            <label style={{ fontWeight: '500' }}>Product Description</label>
+            <label style={{ fontWeight: '500', color: 'var(--text-primary)' }}>Product Description</label>
             <button
               type="button"
               onClick={generateDescription}
               disabled={aiLoading || !watchedName.trim()}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: aiLoading ? '#6c757d' : '#28a745',
-                color: 'white',
+                backgroundColor: aiLoading ? 'var(--text-secondary)' : 'var(--color-success)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: aiLoading || !watchedName.trim() ? 'not-allowed' : 'pointer',
@@ -251,9 +279,11 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               style={{
                 width: '100%',
                 padding: '0.5rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '0.875rem'
+                fontSize: '0.875rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             />
           </div>
@@ -264,10 +294,12 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-primary)',
               borderRadius: '4px',
               fontSize: '1rem',
-              resize: 'vertical'
+              resize: 'vertical',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
             placeholder="Enter product description or use AI to generate one"
           />
@@ -275,7 +307,12 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
         {/* Image Upload Section */}
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: '0.5rem', 
+            fontWeight: '500',
+            color: 'var(--text-primary)'
+          }}>
             Product Image
           </label>
           
@@ -288,12 +325,14 @@ const ProductForm = ({ product, onSave, onCancel }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
-              <p style={{ fontSize: '0.875rem', color: '#6c757d', margin: '0.5rem 0 0 0' }}>
+              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0.5rem 0 0 0' }}>
                 Supported formats: JPEG, PNG, GIF, WebP (Max 5MB)
               </p>
             </div>
@@ -302,13 +341,13 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               <div style={{ 
                 width: '120px', 
                 height: '120px', 
-                border: '1px solid #ddd', 
+                border: '1px solid var(--border-primary)', 
                 borderRadius: '4px',
                 overflow: 'hidden',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: 'var(--bg-tertiary)'
               }}>
                 <img
                   src={imagePreview}
@@ -325,7 +364,12 @@ const ProductForm = ({ product, onSave, onCancel }) => {
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+          <label style={{ 
+            display: 'block', 
+            marginBottom: '0.5rem', 
+            fontWeight: '500',
+            color: 'var(--text-primary)'
+          }}>
             Category *
           </label>
           <select
@@ -333,10 +377,11 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: errors.category ? '1px solid #dc3545' : '1px solid #ddd',
+              border: errors.category ? '1px solid var(--color-danger)' : '1px solid var(--border-primary)',
               borderRadius: '4px',
               fontSize: '1rem',
-              backgroundColor: 'white'
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
           >
             {categorySuggestions.map((category) => (
@@ -346,7 +391,7 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             ))}
           </select>
           {errors.category && (
-            <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+            <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
               {errors.category.message}
             </span>
           )}
@@ -354,7 +399,12 @@ const ProductForm = ({ product, onSave, onCancel }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '0.5rem', 
+              fontWeight: '500',
+              color: 'var(--text-primary)'
+            }}>
               Price ($) *
             </label>
             <input
@@ -368,21 +418,28 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: errors.price ? '1px solid #dc3545' : '1px solid #ddd',
+                border: errors.price ? '1px solid var(--color-danger)' : '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
               placeholder="0.00"
             />
             {errors.price && (
-              <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+              <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                 {errors.price.message}
               </span>
             )}
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '0.5rem', 
+              fontWeight: '500',
+              color: 'var(--text-primary)'
+            }}>
               Quantity *
             </label>
             <input
@@ -395,14 +452,16 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: errors.quantity ? '1px solid #dc3545' : '1px solid #ddd',
+                border: errors.quantity ? '1px solid var(--color-danger)' : '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
               placeholder="0"
             />
             {errors.quantity && (
-              <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+              <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                 {errors.quantity.message}
               </span>
             )}
@@ -415,8 +474,8 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             onClick={onCancel}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#6c757d',
-              color: 'white',
+              backgroundColor: 'var(--text-secondary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -430,8 +489,8 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             disabled={loading}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: loading ? '#6c757d' : '#007bff',
-              color: 'white',
+              backgroundColor: loading ? 'var(--text-secondary)' : 'var(--color-primary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: loading ? 'not-allowed' : 'pointer',

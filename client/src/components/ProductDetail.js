@@ -151,9 +151,9 @@ const ProductDetailContent = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8f9fa'
+        backgroundColor: 'var(--bg-primary)'
       }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-primary)' }}>
           <LoadingSpinner />
           <p>Loading product...</p>
         </div>
@@ -168,28 +168,29 @@ const ProductDetailContent = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8f9fa'
+        backgroundColor: 'var(--bg-primary)'
       }}>
         <NetworkStatus />
         <div style={{
           textAlign: 'center',
           padding: '2rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-lg)'
         }}>
-          <h2 style={{ color: '#dc3545' }}>Product Not Found</h2>
-          <p style={{ color: '#6c757d' }}>{error}</p>
+          <h2 style={{ color: 'var(--color-danger)' }}>Product Not Found</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>{error}</p>
           <button
             onClick={handleBackToStore}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#007bff',
-              color: 'white',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              transition: 'var(--theme-transition)'
             }}
           >
             Back to Store
@@ -204,7 +205,7 @@ const ProductDetailContent = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
       <NetworkStatus />
       
       <StoreHeader
@@ -225,9 +226,9 @@ const ProductDetailContent = () => {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
           gap: '3rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+          boxShadow: 'var(--shadow-lg)',
           overflow: 'hidden'
         }}>
           {/* Product Image */}
@@ -240,7 +241,7 @@ const ProductDetailContent = () => {
                   width: '100%',
                   height: '500px',
                   objectFit: 'cover',
-                  backgroundColor: '#f8f9fa'
+                  backgroundColor: 'var(--bg-tertiary)'
                 }}
                 onError={(e) => {
                   e.target.style.display = 'none';
@@ -251,11 +252,11 @@ const ProductDetailContent = () => {
             <div style={{
               width: '100%',
               height: '500px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-tertiary)',
               display: product.image_url ? 'none' : 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#6c757d',
+              color: 'var(--text-secondary)',
               fontSize: '1.2rem'
             }}>
               No Image Available
@@ -268,8 +269,8 @@ const ProductDetailContent = () => {
             <div style={{ marginBottom: '1rem' }}>
               <span style={{
                 fontSize: '0.875rem',
-                backgroundColor: '#e9ecef',
-                color: '#495057',
+                backgroundColor: 'var(--bg-tertiary)',
+                color: 'var(--text-secondary)',
                 padding: '0.5rem 1rem',
                 borderRadius: '20px'
               }}>
@@ -280,7 +281,7 @@ const ProductDetailContent = () => {
             {/* Product Name */}
             <h1 style={{
               margin: '0 0 1rem 0',
-              color: '#333',
+              color: 'var(--text-primary)',
               fontSize: '2.5rem',
               fontWeight: 'bold'
             }}>
@@ -291,7 +292,7 @@ const ProductDetailContent = () => {
             <div style={{
               fontSize: '2rem',
               fontWeight: 'bold',
-              color: '#28a745',
+              color: 'var(--color-success)',
               marginBottom: '1.5rem'
             }}>
               ${product.price.toFixed(2)}
@@ -301,10 +302,10 @@ const ProductDetailContent = () => {
             <div style={{
               marginBottom: '1.5rem',
               padding: '0.75rem',
-              backgroundColor: product.quantity > 0 ? '#d4edda' : '#f8d7da',
-              color: product.quantity > 0 ? '#155724' : '#721c24',
+              backgroundColor: product.quantity > 0 ? 'var(--bg-success-subtle)' : 'var(--bg-danger-subtle)',
+              color: product.quantity > 0 ? 'var(--color-success)' : 'var(--color-danger)',
               borderRadius: '4px',
-              border: `1px solid ${product.quantity > 0 ? '#c3e6cb' : '#f5c6cb'}`
+              border: `1px solid ${product.quantity > 0 ? 'var(--border-success)' : 'var(--border-danger)'}`
             }}>
               {product.quantity > 0 ? (
                 <span>✅ In Stock ({product.quantity} available)</span>
@@ -315,9 +316,9 @@ const ProductDetailContent = () => {
 
             {/* Description */}
             <div style={{ marginBottom: '2rem' }}>
-              <h3 style={{ color: '#333', marginBottom: '0.5rem' }}>Description</h3>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Description</h3>
               <p style={{
-                color: '#6c757d',
+                color: 'var(--text-secondary)',
                 lineHeight: '1.6',
                 fontSize: '1.1rem'
               }}>
@@ -329,9 +330,9 @@ const ProductDetailContent = () => {
             {product.quantity > 0 && (
               <div style={{
                 padding: '1.5rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-tertiary)',
                 borderRadius: '8px',
-                border: '1px solid #dee2e6'
+                border: '1px solid var(--border-primary)'
               }}>
                 <div style={{
                   display: 'flex',
@@ -341,7 +342,7 @@ const ProductDetailContent = () => {
                 }}>
                   <label style={{
                     fontWeight: '500',
-                    color: '#333'
+                    color: 'var(--text-primary)'
                   }}>
                     Quantity:
                   </label>
@@ -350,10 +351,12 @@ const ProductDetailContent = () => {
                     onChange={(e) => setQuantity(parseInt(e.target.value))}
                     style={{
                       padding: '0.5rem',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-primary)',
                       borderRadius: '4px',
                       fontSize: '1rem',
-                      minWidth: '80px'
+                      minWidth: '80px',
+                      backgroundColor: 'var(--input-bg)',
+                      color: 'var(--text-primary)'
                     }}
                   >
                     {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
@@ -370,8 +373,8 @@ const ProductDetailContent = () => {
                   style={{
                     width: '100%',
                     padding: '1rem',
-                    backgroundColor: addingToCart ? '#6c757d' : '#007bff',
-                    color: 'white',
+                    backgroundColor: addingToCart ? 'var(--color-secondary)' : 'var(--color-primary)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: addingToCart ? 'not-allowed' : 'pointer',
@@ -380,7 +383,8 @@ const ProductDetailContent = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '0.5rem'
+                    gap: '0.5rem',
+                    transition: 'var(--theme-transition)'
                   }}
                 >
                   {addingToCart && <LoadingSpinner size={20} />}
@@ -392,15 +396,15 @@ const ProductDetailContent = () => {
             {product.quantity === 0 && (
               <div style={{
                 padding: '1.5rem',
-                backgroundColor: '#f8d7da',
+                backgroundColor: 'var(--bg-danger-subtle)',
                 borderRadius: '8px',
-                border: '1px solid #f5c6cb',
+                border: '1px solid var(--border-danger)',
                 textAlign: 'center'
               }}>
-                <h4 style={{ color: '#721c24', margin: '0 0 0.5rem 0' }}>
+                <h4 style={{ color: 'var(--color-danger)', margin: '0 0 0.5rem 0' }}>
                   Out of Stock
                 </h4>
-                <p style={{ color: '#721c24', margin: 0 }}>
+                <p style={{ color: 'var(--color-danger)', margin: 0 }}>
                   This product is currently unavailable.
                 </p>
               </div>

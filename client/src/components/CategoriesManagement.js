@@ -68,7 +68,7 @@ const CategoriesManagement = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-primary)' }}>
         <LoadingSpinner />
         <p>Loading categories...</p>
       </div>
@@ -79,11 +79,11 @@ const CategoriesManagement = () => {
     <div>
       {error && (
         <div style={{
-          color: '#dc3545',
-          backgroundColor: '#f8d7da',
+          color: 'var(--color-danger)',
+          backgroundColor: 'var(--bg-danger-subtle)',
           padding: '1rem',
           borderRadius: '4px',
-          border: '1px solid #f5c6cb',
+          border: '1px solid var(--border-danger)',
           marginBottom: '1rem'
         }}>
           {error}
@@ -98,7 +98,7 @@ const CategoriesManagement = () => {
             alignItems: 'center',
             marginBottom: '2rem'
           }}>
-            <h3 style={{ margin: 0, color: '#333' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
               Category Management ({categories.length} categories)
             </h3>
             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -107,8 +107,8 @@ const CategoriesManagement = () => {
                   onClick={handleInitializeDefaults}
                   style={{
                     padding: '0.75rem 1.5rem',
-                    backgroundColor: '#17a2b8',
-                    color: 'white',
+                    backgroundColor: 'var(--color-info)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: 'pointer'
@@ -121,8 +121,8 @@ const CategoriesManagement = () => {
                 onClick={handleAddCategory}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: '#28a745',
-                  color: 'white',
+                  backgroundColor: 'var(--color-success)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer'
@@ -137,12 +137,12 @@ const CategoriesManagement = () => {
             <div style={{
               textAlign: 'center',
               padding: '3rem',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-elevated)',
               borderRadius: '8px',
-              border: '1px solid #dee2e6'
+              border: '1px solid var(--border-primary)'
             }}>
-              <h4 style={{ color: '#6c757d' }}>No categories yet</h4>
-              <p style={{ color: '#6c757d' }}>Create categories to organize your products better.</p>
+              <h4 style={{ color: 'var(--text-secondary)' }}>No categories yet</h4>
+              <p style={{ color: 'var(--text-secondary)' }}>Create categories to organize your products better.</p>
             </div>
           ) : (
             <div style={{ display: 'grid', gap: '1rem' }}>
@@ -150,11 +150,11 @@ const CategoriesManagement = () => {
                 <div
                   key={category.id}
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: 'var(--bg-elevated)',
                     padding: '1.5rem',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    border: '1px solid #dee2e6',
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--border-primary)',
                     opacity: category.is_active ? 1 : 0.6
                   }}
                 >
@@ -167,17 +167,17 @@ const CategoriesManagement = () => {
                             height: '20px',
                             backgroundColor: category.color,
                             borderRadius: '4px',
-                            border: '1px solid #dee2e6'
+                            border: '1px solid var(--border-primary)'
                           }}
                         />
-                        <h4 style={{ margin: 0, color: '#333' }}>
+                        <h4 style={{ margin: 0, color: 'var(--text-primary)' }}>
                           {category.name}
                           {!category.is_active && (
                             <span style={{
                               marginLeft: '0.5rem',
                               fontSize: '0.75rem',
-                              backgroundColor: '#6c757d',
-                              color: 'white',
+                              backgroundColor: 'var(--text-secondary)',
+                              color: 'var(--text-inverse)',
                               padding: '0.25rem 0.5rem',
                               borderRadius: '12px'
                             }}>
@@ -188,12 +188,12 @@ const CategoriesManagement = () => {
                       </div>
                       
                       {category.description && (
-                        <p style={{ color: '#6c757d', fontSize: '0.9rem', margin: '0 0 0.5rem 0' }}>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 0.5rem 0' }}>
                           {category.description}
                         </p>
                       )}
                       
-                      <div style={{ fontSize: '0.875rem', color: '#6c757d' }}>
+                      <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                         <span>Order: {category.sort_order}</span>
                         <span style={{ margin: '0 1rem' }}>•</span>
                         <span>Created: {formatDateTime(category.created_at)}</span>
@@ -205,8 +205,8 @@ const CategoriesManagement = () => {
                         onClick={() => handleEditCategory(category)}
                         style={{
                           padding: '0.5rem 1rem',
-                          backgroundColor: '#007bff',
-                          color: 'white',
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'var(--text-inverse)',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -219,8 +219,8 @@ const CategoriesManagement = () => {
                         onClick={() => handleDeleteCategory(category.id)}
                         style={{
                           padding: '0.5rem 1rem',
-                          backgroundColor: '#dc3545',
-                          color: 'white',
+                          backgroundColor: 'var(--color-danger)',
+                          color: 'var(--text-inverse)',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: 'pointer',
@@ -313,25 +313,26 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
 
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--bg-elevated)',
       padding: '2rem',
       borderRadius: '8px',
-      boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+      boxShadow: 'var(--shadow-lg)',
       maxWidth: '600px',
-      margin: '0 auto'
+      margin: '0 auto',
+      border: '1px solid var(--border-primary)'
     }}>
-      <h3 style={{ marginBottom: '1.5rem', color: '#333' }}>
+      <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
         {category ? 'Edit Category' : 'Add New Category'}
       </h3>
 
       {error && (
         <div style={{
-          color: '#dc3545',
-          backgroundColor: '#f8d7da',
+          color: 'var(--color-danger)',
+          backgroundColor: 'var(--bg-danger-subtle)',
           padding: '0.75rem',
           borderRadius: '4px',
           marginBottom: '1rem',
-          border: '1px solid #f5c6cb'
+          border: '1px solid var(--border-danger)'
         }}>
           {error}
         </div>
@@ -339,7 +340,7 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
             Category Name *
           </label>
           <input
@@ -351,16 +352,18 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-primary)',
               borderRadius: '4px',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
             placeholder="Enter category name"
           />
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
             Description
           </label>
           <textarea
@@ -371,9 +374,11 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
             style={{
               width: '100%',
               padding: '0.75rem',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-primary)',
               borderRadius: '4px',
               fontSize: '1rem',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)',
               resize: 'vertical'
             }}
             placeholder="Optional description for this category"
@@ -382,7 +387,7 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
               Color
             </label>
             <select
@@ -392,10 +397,11 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
                 fontSize: '1rem',
-                backgroundColor: 'white'
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             >
               {colorOptions.map((option) => (
@@ -407,7 +413,7 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
               Sort Order
             </label>
             <input
@@ -419,9 +425,11 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             />
           </div>
@@ -435,9 +443,9 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
               checked={formData.is_active}
               onChange={handleInputChange}
             />
-            <span style={{ fontWeight: '500' }}>Active</span>
+            <span style={{ fontWeight: '500', color: 'var(--text-primary)' }}>Active</span>
           </label>
-          <p style={{ fontSize: '0.875rem', color: '#6c757d', margin: '0.25rem 0 0 1.5rem' }}>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0.25rem 0 0 1.5rem' }}>
             Inactive categories won't appear in product forms
           </p>
         </div>
@@ -448,12 +456,13 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
             onClick={onCancel}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#6c757d',
-              color: 'white',
+              backgroundColor: 'var(--color-secondary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
-              fontSize: '1rem'
+              fontSize: '1rem',
+              transition: 'var(--theme-transition)'
             }}
           >
             Cancel
@@ -463,15 +472,16 @@ const CategoryForm = ({ category, onSave, onCancel }) => {
             disabled={loading}
             style={{
               padding: '0.75rem 1.5rem',
-              backgroundColor: loading ? '#6c757d' : '#007bff',
-              color: 'white',
+              backgroundColor: loading ? 'var(--color-secondary)' : 'var(--color-primary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: loading ? 'not-allowed' : 'pointer',
               fontSize: '1rem',
               display: 'flex',
               alignItems: 'center',
-              gap: '0.5rem'
+              gap: '0.5rem',
+              transition: 'var(--theme-transition)'
             }}
           >
             {loading && <LoadingSpinner size={20} />}

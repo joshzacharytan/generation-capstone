@@ -391,9 +391,11 @@ def get_search_suggestions(
     for product in products:
         suggestions.append({
             "type": "product",
+            "id": product.id,
             "text": product.name,
             "subtitle": f"${product.price:.2f}",
-            "count": None
+            "count": None,
+            "image_url": product.image_url
         })
     
     # Category suggestions

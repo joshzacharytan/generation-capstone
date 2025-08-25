@@ -221,9 +221,10 @@ const CustomerStorefrontContent = () => {
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        backgroundColor: 'var(--bg-secondary)'
       }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-primary)' }}>
           <LoadingSpinner />
           <p>Loading store...</p>
         </div>
@@ -238,17 +239,18 @@ const CustomerStorefrontContent = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8f9fa'
+        backgroundColor: 'var(--bg-secondary)'
       }}>
         <div style={{
           textAlign: 'center',
           padding: '2rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-lg)',
+          border: '1px solid var(--border-primary)'
         }}>
-          <h2 style={{ color: '#dc3545' }}>Store Not Found</h2>
-          <p style={{ color: '#6c757d' }}>{error}</p>
+          <h2 style={{ color: 'var(--color-danger)' }}>Store Not Found</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>{error}</p>
         </div>
       </div>
     );
@@ -257,7 +259,7 @@ const CustomerStorefrontContent = () => {
 
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-secondary)' }}>
       <NetworkStatus />
 
       <StoreHeader
@@ -284,12 +286,13 @@ const CustomerStorefrontContent = () => {
                 onClick={() => handleCategoryChange('')}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: selectedCategory === '' ? '#007bff' : 'white',
-                  color: selectedCategory === '' ? 'white' : '#333',
-                  border: '1px solid #dee2e6',
+                  backgroundColor: selectedCategory === '' ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                  color: selectedCategory === '' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '20px',
                   cursor: 'pointer',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  transition: 'var(--theme-transition)'
                 }}
               >
                 All Products
@@ -300,12 +303,13 @@ const CustomerStorefrontContent = () => {
                   onClick={() => handleCategoryChange(category)}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: selectedCategory === category ? '#007bff' : 'white',
-                    color: selectedCategory === category ? 'white' : '#333',
-                    border: '1px solid #dee2e6',
+                    backgroundColor: selectedCategory === category ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                    color: selectedCategory === category ? 'var(--text-inverse)' : 'var(--text-primary)',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '20px',
                     cursor: 'pointer',
-                    fontSize: '0.875rem'
+                    fontSize: '0.875rem',
+                    transition: 'var(--theme-transition)'
                   }}
                 >
                   {category}
@@ -318,11 +322,12 @@ const CustomerStorefrontContent = () => {
         {/* Filter and Sort Controls */}
         {products.length > 0 && (
           <div style={{
-            backgroundColor: 'white',
+            backgroundColor: 'var(--bg-elevated)',
             padding: '1.5rem',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            marginBottom: '2rem'
+            boxShadow: 'var(--shadow-md)',
+            marginBottom: '2rem',
+            border: '1px solid var(--border-primary)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               {/* Left side - Filter controls */}
@@ -331,15 +336,16 @@ const CustomerStorefrontContent = () => {
                   onClick={() => setShowFilters(!showFilters)}
                   style={{
                     padding: '0.5rem 1rem',
-                    backgroundColor: showFilters ? '#007bff' : '#f8f9fa',
-                    color: showFilters ? 'white' : '#333',
-                    border: '1px solid #dee2e6',
+                    backgroundColor: showFilters ? 'var(--color-primary)' : 'var(--bg-tertiary)',
+                    color: showFilters ? 'var(--text-inverse)' : 'var(--text-primary)',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
                     cursor: 'pointer',
                     fontSize: '0.875rem',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem'
+                    gap: '0.5rem',
+                    transition: 'var(--theme-transition)'
                   }}
                 >
                   🎛️ Filters {showFilters ? '▲' : '▼'}
@@ -350,35 +356,38 @@ const CustomerStorefrontContent = () => {
                     onClick={clearFilters}
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
+                      backgroundColor: 'var(--color-danger)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                      fontSize: '0.875rem'
+                      fontSize: '0.875rem',
+                      transition: 'var(--theme-transition)'
                     }}
                   >
                     Clear Filters
                   </button>
                 )}
 
-                <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+                <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                   {filteredProducts.length} of {products.length} products
                 </span>
               </div>
 
               {/* Right side - Sort control */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <label style={{ fontSize: '0.875rem', color: '#333' }}>Sort by:</label>
+                <label style={{ fontSize: '0.875rem', color: 'var(--text-primary)' }}>Sort by:</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   style={{
                     padding: '0.5rem',
-                    border: '1px solid #dee2e6',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
                     fontSize: '0.875rem',
-                    backgroundColor: 'white'
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)',
+                    transition: 'var(--theme-transition)'
                   }}
                 >
                   <option value="name">Name A-Z</option>
@@ -394,11 +403,12 @@ const CustomerStorefrontContent = () => {
               <div style={{
                 marginTop: '1rem',
                 padding: '1rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-tertiary)',
                 borderRadius: '4px',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '1.5rem'
+                gap: '1.5rem',
+                border: '1px solid var(--border-secondary)'
               }}>
                 {/* Price Range Filter */}
                 <div style={{ minHeight: '60px' }}>
@@ -466,9 +476,9 @@ const CustomerStorefrontContent = () => {
                       onClick={() => setPriceRange({ min: '', max: '50' })}
                       style={{
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: 'white',
-                        color: '#333',
-                        border: '1px solid #dee2e6',
+                        backgroundColor: 'var(--bg-elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-primary)',
                         borderRadius: '12px',
                         cursor: 'pointer',
                         fontSize: '0.75rem'
@@ -480,9 +490,9 @@ const CustomerStorefrontContent = () => {
                       onClick={() => setPriceRange({ min: '50', max: '200' })}
                       style={{
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: 'white',
-                        color: '#333',
-                        border: '1px solid #dee2e6',
+                        backgroundColor: 'var(--bg-elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-primary)',
                         borderRadius: '12px',
                         cursor: 'pointer',
                         fontSize: '0.75rem'
@@ -494,9 +504,9 @@ const CustomerStorefrontContent = () => {
                       onClick={() => setPriceRange({ min: '200', max: '' })}
                       style={{
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: 'white',
-                        color: '#333',
-                        border: '1px solid #dee2e6',
+                        backgroundColor: 'var(--bg-elevated)',
+                        color: 'var(--text-primary)',
+                        border: '1px solid var(--border-primary)',
                         borderRadius: '12px',
                         cursor: 'pointer',
                         fontSize: '0.75rem'
@@ -516,12 +526,13 @@ const CustomerStorefrontContent = () => {
           <div style={{
             textAlign: 'center',
             padding: '3rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-primary)'
           }}>
-            <h3 style={{ color: '#6c757d' }}>No products match your filters</h3>
-            <p style={{ color: '#6c757d' }}>
+            <h3 style={{ color: 'var(--text-secondary)' }}>No products match your filters</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>
               Try adjusting your price range or other filters to see more products.
             </p>
             {hasActiveFilters && (
@@ -529,13 +540,14 @@ const CustomerStorefrontContent = () => {
                 onClick={clearFilters}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontSize: '1rem',
-                  marginTop: '1rem'
+                  marginTop: '1rem',
+                  transition: 'var(--theme-transition)'
                 }}
               >
                 Clear All Filters
@@ -546,12 +558,13 @@ const CustomerStorefrontContent = () => {
           <div style={{
             textAlign: 'center',
             padding: '3rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-primary)'
           }}>
-            <h3 style={{ color: '#6c757d' }}>No products available</h3>
-            <p style={{ color: '#6c757d' }}>
+            <h3 style={{ color: 'var(--text-secondary)' }}>No products available</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>
               {selectedCategory ? `No products in "${selectedCategory}" category` : 'This store has no products yet'}
             </p>
           </div>
@@ -644,16 +657,23 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
 
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--bg-elevated)',
       borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      boxShadow: 'var(--shadow-md)',
       overflow: 'hidden',
-      transition: 'transform 0.2s ease',
-      cursor: 'pointer'
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      cursor: 'pointer',
+      border: '1px solid var(--border-primary)'
     }}
       onClick={handleProductClick}
-      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+      }}
     >
       {/* Product Image */}
       {product.image_url ? (
@@ -674,11 +694,11 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
         <div style={{
           width: '100%',
           height: '200px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-tertiary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#6c757d'
+          color: 'var(--text-secondary)'
         }}>
           No Image
         </div>
@@ -688,8 +708,8 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
         <div style={{ marginBottom: '0.5rem' }}>
           <span style={{
             fontSize: '0.75rem',
-            backgroundColor: '#e9ecef',
-            color: '#495057',
+            backgroundColor: 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
             padding: '0.25rem 0.5rem',
             borderRadius: '12px'
           }}>
@@ -699,7 +719,7 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
 
         <h3 style={{
           margin: '0 0 0.5rem 0',
-          color: '#333',
+          color: 'var(--text-primary)',
           fontSize: '1.1rem',
           transition: 'color 0.2s ease'
         }}>
@@ -707,7 +727,7 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
         </h3>
 
         <p style={{
-          color: '#6c757d',
+          color: 'var(--text-secondary)',
           fontSize: '0.9rem',
           margin: '0 0 0.5rem 0',
           lineHeight: '1.4',
@@ -721,7 +741,7 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
 
         <div style={{
           fontSize: '0.8rem',
-          color: '#007bff',
+          color: 'var(--color-primary)',
           marginBottom: '1rem',
           fontWeight: '500'
         }}>
@@ -737,12 +757,12 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
           <span style={{
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#28a745'
+            color: 'var(--color-success)'
           }}>
             ${product.price.toFixed(2)}
           </span>
           <span style={{
-            color: product.quantity > 0 ? '#28a745' : '#dc3545',
+            color: product.quantity > 0 ? 'var(--color-success)' : 'var(--color-danger)',
             fontSize: '0.9rem',
             fontWeight: '500'
           }}>
@@ -760,9 +780,11 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
               }}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '0.9rem'
+                fontSize: '0.9rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             >
               {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
@@ -776,13 +798,14 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
               style={{
                 flex: 1,
                 padding: '0.75rem',
-                backgroundColor: '#007bff',
-                color: 'white',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
-                fontWeight: '500'
+                fontWeight: '500',
+                transition: 'var(--theme-transition)'
               }}
             >
               Add to Cart
@@ -794,8 +817,8 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
             style={{
               width: '100%',
               padding: '0.75rem',
-              backgroundColor: '#6c757d',
-              color: 'white',
+              backgroundColor: 'var(--color-secondary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'not-allowed',

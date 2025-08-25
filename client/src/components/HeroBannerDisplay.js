@@ -64,10 +64,23 @@ const HeroBannerDisplay = ({ tenantDomain }) => {
 
   const handleBannerClick = (banner) => {
     if (banner.link_url) {
-      // Open external links in new tab, internal links in same tab
-      if (banner.link_url.startsWith('http')) {
+      // Check if it's an external link (different domain)
+      const currentDomain = window.location.hostname;
+      let isExternal = false;
+      
+      try {
+        const linkUrl = new URL(banner.link_url, window.location.origin);
+        isExternal = linkUrl.hostname !== currentDomain;
+      } catch (e) {
+        // If URL parsing fails, treat as internal relative link
+        isExternal = false;
+      }
+      
+      if (isExternal) {
+        // Open external links in new tab
         window.open(banner.link_url, '_blank', 'noopener,noreferrer');
       } else {
+        // Navigate to internal links in same tab
         window.location.href = banner.link_url;
       }
     }

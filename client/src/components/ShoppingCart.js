@@ -24,24 +24,26 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
         maxWidth: '600px',
         width: '90%',
         maxHeight: '80vh',
         overflow: 'hidden',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        border: '1px solid var(--border-primary)',
+        boxShadow: 'var(--shadow-lg)'
       }}>
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: '1px solid var(--border-primary)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h3 style={{ margin: 0, color: '#333' }}>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
             Shopping Cart ({getCartItemCount()} items)
           </h3>
           <button
@@ -51,7 +53,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -65,7 +67,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
           padding: cart.length === 0 ? '2rem' : '0'
         }}>
           {cart.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#6c757d' }}>
+            <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
               <h4>Your cart is empty</h4>
               <p>Add some products to get started!</p>
             </div>
@@ -76,7 +78,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                   key={item.id}
                   style={{
                     padding: '1rem 1.5rem',
-                    borderBottom: '1px solid #f8f9fa',
+                    borderBottom: '1px solid var(--border-secondary)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem'
@@ -92,7 +94,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                         height: '60px',
                         objectFit: 'cover',
                         borderRadius: '4px',
-                        backgroundColor: '#f8f9fa'
+                        backgroundColor: 'var(--bg-tertiary)'
                       }}
                       onError={(e) => {
                         e.target.style.display = 'none';
@@ -102,13 +104,13 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                     <div style={{
                       width: '60px',
                       height: '60px',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-tertiary)',
                       borderRadius: '4px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontSize: '0.75rem',
-                      color: '#6c757d'
+                      color: 'var(--text-secondary)'
                     }}>
                       No Image
                     </div>
@@ -116,10 +118,10 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
 
                   {/* Product Info */}
                   <div style={{ flex: 1 }}>
-                    <h5 style={{ margin: '0 0 0.25rem 0', color: '#333' }}>
+                    <h5 style={{ margin: '0 0 0.25rem 0', color: 'var(--text-primary)' }}>
                       {item.name}
                     </h5>
-                    <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: '#6c757d' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                       ${item.price.toFixed(2)} each
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -128,13 +130,14 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                         style={{
                           width: '30px',
                           height: '30px',
-                          border: '1px solid #ddd',
-                          backgroundColor: 'white',
+                          border: '1px solid var(--border-primary)',
+                          backgroundColor: 'var(--input-bg)',
                           borderRadius: '4px',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          justifyContent: 'center',
+                          color: 'var(--text-primary)'
                         }}
                       >
                         -
@@ -142,7 +145,8 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                       <span style={{ 
                         minWidth: '40px', 
                         textAlign: 'center',
-                        fontWeight: '500'
+                        fontWeight: '500',
+                        color: 'var(--text-primary)'
                       }}>
                         {item.quantity}
                       </span>
@@ -152,14 +156,14 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                         style={{
                           width: '30px',
                           height: '30px',
-                          border: '1px solid #ddd',
-                          backgroundColor: item.quantity >= (item.stock || 999) ? '#f8f9fa' : 'white',
+                          border: '1px solid var(--border-primary)',
+                          backgroundColor: item.quantity >= (item.stock || 999) ? 'var(--bg-tertiary)' : 'var(--input-bg)',
                           borderRadius: '4px',
                           cursor: item.quantity >= (item.stock || 999) ? 'not-allowed' : 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: item.quantity >= (item.stock || 999) ? '#6c757d' : '#333'
+                          color: item.quantity >= (item.stock || 999) ? 'var(--text-secondary)' : 'var(--text-primary)'
                         }}
                       >
                         +
@@ -172,7 +176,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                     <div style={{ 
                       fontSize: '1.1rem', 
                       fontWeight: 'bold',
-                      color: '#28a745',
+                      color: 'var(--color-success)',
                       marginBottom: '0.5rem'
                     }}>
                       ${(item.price * item.quantity).toFixed(2)}
@@ -181,8 +185,8 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                       onClick={() => onRemoveItem(item.id)}
                       style={{
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
+                        backgroundColor: 'var(--color-danger)',
+                        color: 'var(--text-inverse)',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
@@ -202,8 +206,8 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
         {cart.length > 0 && (
           <div style={{
             padding: '1.5rem',
-            borderTop: '1px solid #dee2e6',
-            backgroundColor: '#f8f9fa'
+            borderTop: '1px solid var(--border-primary)',
+            backgroundColor: 'var(--bg-tertiary)'
           }}>
             <div style={{
               display: 'flex',
@@ -211,10 +215,10 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
               alignItems: 'center',
               marginBottom: '1rem'
             }}>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: 'var(--text-primary)' }}>
                 Total: ${getCartTotal().toFixed(2)}
               </span>
-              <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                 {getCartItemCount()} item{getCartItemCount() !== 1 ? 's' : ''}
               </span>
             </div>
@@ -224,8 +228,8 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                 style={{
                   flex: 1,
                   padding: '0.75rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
+                  backgroundColor: 'var(--text-secondary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -239,8 +243,8 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                 style={{
                   flex: 1,
                   padding: '0.75rem',
-                  backgroundColor: '#28a745',
-                  color: 'white',
+                  backgroundColor: 'var(--color-success)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',

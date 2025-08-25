@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
+import ThemeToggle from './ThemeToggle';
 
 function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -71,28 +72,40 @@ function LoginPage() {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            backgroundColor: '#f5f5f5'
+            backgroundColor: 'var(--bg-secondary)',
+            position: 'relative'
         }}>
+            {/* Theme Toggle - positioned at top right */}
+            <div style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                zIndex: 1000
+            }}>
+                <ThemeToggle variant="icon" />
+            </div>
+            
             <div style={{ 
                 maxWidth: '400px', 
                 width: '100%',
                 padding: '2rem', 
-                backgroundColor: 'white',
+                backgroundColor: 'var(--bg-elevated)',
                 borderRadius: '8px', 
-                boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 
+                boxShadow: 'var(--shadow-lg)',
+                border: '1px solid var(--border-primary)'
             }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#333' }}>
+                <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--text-primary)' }}>
                     {isLogin ? 'Vendor Login' : 'Create Account'}
                 </h2>
                 
                 {error && (
                     <div style={{ 
-                        color: '#dc3545', 
-                        backgroundColor: '#f8d7da',
+                        color: 'var(--color-danger)', 
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
                         padding: '0.75rem',
                         borderRadius: '4px',
                         marginBottom: '1rem',
-                        border: '1px solid #f5c6cb'
+                        border: '1px solid rgba(220, 53, 69, 0.3)'
                     }}>
                         {error}
                     </div>
@@ -100,7 +113,7 @@ function LoginPage() {
                 
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                             Email:
                         </label>
                         <input
@@ -112,15 +125,18 @@ function LoginPage() {
                             style={{ 
                                 width: '100%', 
                                 padding: '0.75rem', 
-                                border: '1px solid #ddd',
+                                border: '1px solid var(--input-border)',
                                 borderRadius: '4px',
-                                fontSize: '1rem'
+                                fontSize: '1rem',
+                                backgroundColor: 'var(--input-bg)',
+                                color: 'var(--text-primary)',
+                                transition: 'var(--theme-transition)'
                             }}
                         />
                     </div>
                     
                     <div style={{ marginBottom: '1rem' }}>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                             Password:
                         </label>
                         <input
@@ -132,9 +148,12 @@ function LoginPage() {
                             style={{ 
                                 width: '100%', 
                                 padding: '0.75rem', 
-                                border: '1px solid #ddd',
+                                border: '1px solid var(--input-border)',
                                 borderRadius: '4px',
-                                fontSize: '1rem'
+                                fontSize: '1rem',
+                                backgroundColor: 'var(--input-bg)',
+                                color: 'var(--text-primary)',
+                                transition: 'var(--theme-transition)'
                             }}
                         />
                     </div>
@@ -142,7 +161,7 @@ function LoginPage() {
                     {!isLogin && (
                         <>
                             <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                     Company Name:
                                 </label>
                                 <input
@@ -155,15 +174,18 @@ function LoginPage() {
                                     style={{ 
                                         width: '100%', 
                                         padding: '0.75rem', 
-                                        border: '1px solid #ddd',
+                                        border: '1px solid var(--input-border)',
                                         borderRadius: '4px',
-                                        fontSize: '1rem'
+                                        fontSize: '1rem',
+                                        backgroundColor: 'var(--input-bg)',
+                                        color: 'var(--text-primary)',
+                                        transition: 'var(--theme-transition)'
                                     }}
                                 />
                             </div>
                             
                             <div style={{ marginBottom: '1rem' }}>
-                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                     Domain (optional):
                                 </label>
                                 <input
@@ -175,9 +197,12 @@ function LoginPage() {
                                     style={{ 
                                         width: '100%', 
                                         padding: '0.75rem', 
-                                        border: '1px solid #ddd',
+                                        border: '1px solid var(--input-border)',
                                         borderRadius: '4px',
-                                        fontSize: '1rem'
+                                        fontSize: '1rem',
+                                        backgroundColor: 'var(--input-bg)',
+                                        color: 'var(--text-primary)',
+                                        transition: 'var(--theme-transition)'
                                     }}
                                 />
                             </div>
@@ -190,8 +215,8 @@ function LoginPage() {
                         style={{
                             width: '100%',
                             padding: '0.75rem',
-                            backgroundColor: loading ? '#6c757d' : '#007bff',
-                            color: 'white',
+                            backgroundColor: loading ? 'var(--color-secondary)' : 'var(--color-primary)',
+                            color: 'var(--text-inverse)',
                             border: 'none',
                             borderRadius: '4px',
                             cursor: loading ? 'not-allowed' : 'pointer',
@@ -199,7 +224,8 @@ function LoginPage() {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '0.5rem'
+                            gap: '0.5rem',
+                            transition: 'var(--theme-transition)'
                         }}
                     >
                         {loading && <LoadingSpinner size={20} />}
@@ -214,9 +240,10 @@ function LoginPage() {
                         style={{
                             background: 'none',
                             border: 'none',
-                            color: '#007bff',
+                            color: 'var(--color-primary)',
                             cursor: 'pointer',
-                            textDecoration: 'underline'
+                            textDecoration: 'underline',
+                            transition: 'var(--theme-transition)'
                         }}
                     >
                         {isLogin ? "Don't have an account? Sign up" : "Already have an account? Login"}

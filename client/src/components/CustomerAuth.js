@@ -110,18 +110,21 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: 'var(--bg-overlay)',
+      backdropFilter: 'blur(4px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000
     }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
         maxWidth: '400px',
         width: '90%',
-        padding: '2rem'
+        padding: '2rem',
+        boxShadow: 'var(--shadow-lg)',
+        border: '1px solid var(--border-primary)'
       }}>
         {/* Header */}
         <div style={{
@@ -130,7 +133,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
           alignItems: 'center',
           marginBottom: '1.5rem'
         }}>
-          <h3 style={{ margin: 0, color: '#333' }}>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
             {isLogin ? 'Customer Login' : 'Create Account'}
           </h3>
           <button
@@ -140,7 +143,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -149,12 +152,12 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
 
         {error && (
           <div style={{
-            color: '#dc3545',
-            backgroundColor: '#f8d7da',
+            color: 'var(--color-danger)',
+            backgroundColor: 'rgba(220, 53, 69, 0.1)',
             padding: '0.75rem',
             borderRadius: '4px',
             marginBottom: '1rem',
-            border: '1px solid #f5c6cb'
+            border: '1px solid rgba(220, 53, 69, 0.3)'
           }}>
             {error}
           </div>
@@ -173,9 +176,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
                 placeholder="Enter your email"
               />
@@ -196,9 +201,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
                 placeholder="Enter your password"
               />
@@ -245,9 +252,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    fontSize: '1rem'
+                    fontSize: '1rem',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
                 {registerForm.formState.errors.first_name && (
@@ -265,9 +274,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    fontSize: '1rem'
+                    fontSize: '1rem',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
                 {registerForm.formState.errors.last_name && (
@@ -288,9 +299,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
                 placeholder="Enter your email"
               />
@@ -311,9 +324,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
                 placeholder="Enter your phone number"
               />
@@ -332,9 +347,11 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
                 placeholder="Create a password"
               />
@@ -383,7 +400,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
             style={{
               background: 'none',
               border: 'none',
-              color: '#007bff',
+              color: 'var(--color-primary)',
               cursor: 'pointer',
               textDecoration: 'underline',
               fontSize: '0.9rem'
@@ -400,8 +417,8 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
             onClick={onClose}
             style={{
               background: 'none',
-              border: '1px solid #6c757d',
-              color: '#6c757d',
+              border: '1px solid var(--text-secondary)',
+              color: 'var(--text-secondary)',
               cursor: 'pointer',
               padding: '0.5rem 1rem',
               borderRadius: '4px',

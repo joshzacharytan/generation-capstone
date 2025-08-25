@@ -71,7 +71,7 @@ const AdminDashboard = () => {
         {/* Tab Navigation */}
         <div style={{
           display: 'flex',
-          borderBottom: '2px solid #dee2e6',
+          borderBottom: '2px solid var(--border-primary)',
           marginBottom: '2rem'
         }}>
           {tabs.map((tab) => (
@@ -85,14 +85,15 @@ const AdminDashboard = () => {
                 padding: '1rem 1.5rem',
                 border: 'none',
                 backgroundColor: 'transparent',
-                borderBottom: activeTab === tab.id ? '2px solid #007bff' : '2px solid transparent',
-                color: activeTab === tab.id ? '#007bff' : '#6c757d',
+                borderBottom: activeTab === tab.id ? '2px solid var(--color-primary)' : '2px solid transparent',
+                color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
                 fontSize: '1rem',
                 fontWeight: activeTab === tab.id ? '600' : '400',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                transition: 'var(--theme-transition)'
               }}
             >
               <span>{tab.icon}</span>
@@ -124,20 +125,21 @@ const AdminDashboard = () => {
                   alignItems: 'center',
                   marginBottom: '2rem'
                 }}>
-                  <h2 style={{ margin: 0, color: '#333' }}>Product Management</h2>
+                  <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Product Management</h2>
                   <button
                     onClick={handleAddProduct}
                     style={{
                       padding: '0.75rem 1.5rem',
-                      backgroundColor: '#28a745',
-                      color: 'white',
+                      backgroundColor: 'var(--color-success)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontSize: '1rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.5rem'
+                      gap: '0.5rem',
+                      transition: 'var(--theme-transition)'
                     }}
                   >
                     <span>+</span>
@@ -157,14 +159,14 @@ const AdminDashboard = () => {
 
         {activeTab === 'categories' && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: '#333' }}>Category Management</h2>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Category Management</h2>
             <CategoriesManagement />
           </div>
         )}
 
         {activeTab === 'orders' && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: '#333' }}>Order Management</h2>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Order Management</h2>
             <OrdersManagement />
           </div>
         )}
@@ -189,14 +191,14 @@ const AdminDashboard = () => {
 
         {activeTab === 'admin' && isSuperAdmin && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: '#333' }}>System Administration</h2>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>System Administration</h2>
             <SuperAdminDashboard />
           </div>
         )}
 
         {activeTab === 'profile' && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: '#333' }}>Profile Settings</h2>
+            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Profile Settings</h2>
             <ProfileSettings />
           </div>
         )}

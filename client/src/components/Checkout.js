@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { storeAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
@@ -9,6 +9,20 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [orderResult, setOrderResult] = useState(null);
+
+  // Prevent background scroll when modal is open
+  useEffect(() => {
+    // Store original overflow style
+    const originalOverflow = document.body.style.overflow;
+    
+    // Disable background scroll
+    document.body.style.overflow = 'hidden';
+    
+    // Cleanup: restore original overflow when component unmounts
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
 
   const shippingForm = useForm({
     defaultValues: isAuthenticated && customer ? {
@@ -190,36 +204,57 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
     }
   };
 
+  const handleModalClick = (e) => {
+    // Close modal only if clicking the backdrop (not the modal content)
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleModalContentScroll = (e) => {
+    // Prevent scroll events from bubbling to parent
+    e.stopPropagation();
+  };
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '8px',
-        maxWidth: '800px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflow: 'auto'
-      }}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      }}
+      onClick={handleModalClick}
+    >
+      <div 
+        style={{
+          backgroundColor: 'var(--bg-elevated)',
+          borderRadius: '8px',
+          maxWidth: '800px',
+          width: '90%',
+          maxHeight: '90vh',
+          overflow: 'auto',
+          border: '1px solid var(--border-primary)',
+          boxShadow: 'var(--shadow-lg)'
+        }}
+        onClick={(e) => e.stopPropagation()}
+        onScroll={handleModalContentScroll}
+      >
         {/* Header */}
         <div style={{
           padding: '1.5rem',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: '1px solid var(--border-primary)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h3 style={{ margin: 0, color: '#333' }}>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
             Checkout - Step {step} of 3
           </h3>
           <button
@@ -229,7 +264,7 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -245,8 +280,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   width: '30px',
                   height: '30px',
                   borderRadius: '50%',
-                  backgroundColor: step >= stepNum ? '#007bff' : '#e9ecef',
-                  color: step >= stepNum ? 'white' : '#6c757d',
+                  backgroundColor: step >= stepNum ? 'var(--color-primary)' : 'var(--bg-secondary)',
+                  color: step >= stepNum ? 'var(--text-inverse)' : 'var(--text-secondary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -259,27 +294,27 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   <div style={{
                     flex: 1,
                     height: '2px',
-                    backgroundColor: step > stepNum ? '#007bff' : '#e9ecef'
+                    backgroundColor: step > stepNum ? 'var(--color-primary)' : 'var(--bg-secondary)'
                   }} />
                 )}
               </React.Fragment>
             ))}
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-            <span style={{ fontSize: '0.875rem', color: '#6c757d' }}>Shipping</span>
-            <span style={{ fontSize: '0.875rem', color: '#6c757d' }}>Payment</span>
-            <span style={{ fontSize: '0.875rem', color: '#6c757d' }}>Confirmation</span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Shipping</span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Payment</span>
+            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Confirmation</span>
           </div>
         </div>
 
         {error && (
           <div style={{
             margin: '0 1.5rem',
-            color: '#dc3545',
-            backgroundColor: '#f8d7da',
+            color: 'var(--color-danger)',
+            backgroundColor: 'var(--bg-danger-subtle)',
             padding: '0.75rem',
             borderRadius: '4px',
-            border: '1px solid #f5c6cb',
+            border: '1px solid var(--border-danger)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
@@ -295,8 +330,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   }}
                   style={{
                     padding: '0.25rem 0.5rem',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
+                    backgroundColor: 'var(--color-danger)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -310,8 +345,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                 onClick={() => logDiagnostics()}
                 style={{
                   padding: '0.25rem 0.5rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
+                  backgroundColor: 'var(--text-secondary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -329,7 +364,7 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
           {/* Step 1: Shipping Information */}
           {step === 1 && (
             <form onSubmit={shippingForm.handleSubmit(handleShippingSubmit)}>
-              <h4 style={{ marginBottom: '1.5rem', color: '#333' }}>Shipping Information</h4>
+              <h4 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Shipping Information</h4>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                 <div>
@@ -341,8 +376,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   />
                 </div>
@@ -355,8 +392,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   />
                 </div>
@@ -372,8 +411,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -388,8 +429,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -403,8 +446,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -418,8 +463,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -434,8 +481,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   />
                 </div>
@@ -448,8 +497,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   />
                 </div>
@@ -462,8 +513,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   />
                 </div>
@@ -478,9 +531,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    backgroundColor: 'white'
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 >
                   <option value="">Select Country</option>
@@ -502,8 +556,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -519,11 +573,11 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
           {/* Step 2: Payment Information */}
           {step === 2 && (
             <form onSubmit={paymentForm.handleSubmit(handlePaymentSubmit)}>
-              <h4 style={{ marginBottom: '1rem', color: '#333' }}>Payment Information</h4>
+              <h4 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Payment Information</h4>
               
               {/* Test Cards */}
-              <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: '#f8f9fa', borderRadius: '4px' }}>
-                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: '#6c757d' }}>
+              <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--bg-secondary)', borderRadius: '4px', border: '1px solid var(--border-primary)' }}>
+                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                   Use test cards for demo:
                 </p>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
@@ -532,8 +586,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     onClick={() => fillTestCard('visa')}
                     style={{
                       padding: '0.25rem 0.5rem',
-                      backgroundColor: '#007bff',
-                      color: 'white',
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
@@ -547,8 +601,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     onClick={() => fillTestCard('mastercard')}
                     style={{
                       padding: '0.25rem 0.5rem',
-                      backgroundColor: '#28a745',
-                      color: 'white',
+                      backgroundColor: 'var(--color-success)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
@@ -562,8 +616,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     onClick={() => fillTestCard('amex')}
                     style={{
                       padding: '0.25rem 0.5rem',
-                      backgroundColor: '#17a2b8',
-                      color: 'white',
+                      backgroundColor: 'var(--color-info)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
@@ -584,8 +638,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -599,8 +655,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #ddd',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--bg-elevated)',
+                    color: 'var(--text-primary)'
                   }}
                   placeholder="1234 5678 9012 3456"
                 />
@@ -616,9 +674,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-primary)',
                       borderRadius: '4px',
-                      backgroundColor: 'white'
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   >
                     <option value="">Month</option>
@@ -638,9 +697,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-primary)',
                       borderRadius: '4px',
-                      backgroundColor: 'white'
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                   >
                     <option value="">Year</option>
@@ -663,8 +723,10 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      backgroundColor: 'var(--bg-elevated)',
+                      color: 'var(--text-primary)'
                     }}
                     placeholder="123"
                     maxLength="4"
@@ -674,12 +736,13 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
 
               {/* Order Summary */}
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: 'var(--bg-secondary)', 
                 padding: '1rem', 
                 borderRadius: '4px',
-                marginBottom: '1.5rem'
+                marginBottom: '1.5rem',
+                border: '1px solid var(--border-primary)'
               }}>
-                <h5 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Order Summary</h5>
+                <h5 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>Order Summary</h5>
                 {cart.map((item) => (
                   <div key={item.id} style={{ 
                     display: 'flex', 
@@ -691,12 +754,13 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                     <span>${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
-                <hr style={{ margin: '0.5rem 0' }} />
+                <hr style={{ margin: '0.5rem 0', borderColor: 'var(--border-primary)' }} />
                 <div style={{ 
                   display: 'flex', 
                   justifyContent: 'space-between',
                   fontWeight: 'bold',
-                  fontSize: '1.1rem'
+                  fontSize: '1.1rem',
+                  color: 'var(--text-primary)'
                 }}>
                   <span>Total:</span>
                   <span>${getCartTotal().toFixed(2)}</span>
@@ -710,8 +774,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     flex: 1,
                     padding: '0.75rem',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
+                    backgroundColor: 'var(--text-secondary)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: 'pointer',
@@ -726,8 +790,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                   style={{
                     flex: 2,
                     padding: '0.75rem',
-                    backgroundColor: loading ? '#6c757d' : '#28a745',
-                    color: 'white',
+                    backgroundColor: loading ? 'var(--text-secondary)' : 'var(--color-success)',
+                    color: 'var(--text-inverse)',
                     border: 'none',
                     borderRadius: '4px',
                     cursor: loading ? 'not-allowed' : 'pointer',
@@ -752,28 +816,29 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
               <div style={{ 
                 fontSize: '3rem', 
                 marginBottom: '1rem',
-                color: '#28a745'
+                color: 'var(--color-success)'
               }}>
                 ✅
               </div>
-              <h4 style={{ color: '#28a745', marginBottom: '1rem' }}>
+              <h4 style={{ color: 'var(--color-success)', marginBottom: '1rem' }}>
                 Order Placed Successfully!
               </h4>
-              <p style={{ color: '#6c757d', marginBottom: '1.5rem' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                 Thank you for your purchase. Your order has been confirmed.
               </p>
               
               <div style={{ 
-                backgroundColor: '#f8f9fa', 
+                backgroundColor: 'var(--bg-secondary)', 
                 padding: '1rem', 
                 borderRadius: '4px',
                 marginBottom: '1.5rem',
-                textAlign: 'left'
+                textAlign: 'left',
+                border: '1px solid var(--border-primary)'
               }}>
-                <h5 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Order Details</h5>
+                <h5 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>Order Details</h5>
                 <p><strong>Order Number:</strong> {orderResult.order?.order_number}</p>
                 <p><strong>Total Amount:</strong> ${parseFloat(orderResult.order?.total_amount || 0).toFixed(2)}</p>
-                <p><strong>Payment Status:</strong> <span style={{ color: '#28a745' }}>Paid</span></p>
+                <p><strong>Payment Status:</strong> <span style={{ color: 'var(--color-success)' }}>Paid</span></p>
                 <p><strong>Transaction ID:</strong> {orderResult.payment?.transaction_id}</p>
               </div>
 
@@ -781,8 +846,8 @@ const Checkout = ({ cart, tenantDomain, customer, isAuthenticated, onClose, onCo
                 onClick={onComplete}
                 style={{
                   padding: '0.75rem 2rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',

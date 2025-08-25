@@ -83,11 +83,11 @@ const PaymentTest = () => {
 
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '2rem' }}>
-      <h2 style={{ color: '#333', marginBottom: '2rem' }}>Payment Gateway Test</h2>
+      <h2 style={{ color: 'var(--text-primary)', marginBottom: '2rem' }}>Payment Gateway Test</h2>
       
       {/* Test Cards */}
       <div style={{ marginBottom: '2rem' }}>
-        <h3 style={{ color: '#333', marginBottom: '1rem' }}>Test Credit Cards</h3>
+        <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Test Credit Cards</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           {Object.entries(testCards).map(([cardType, cardNumber]) => (
             <button
@@ -95,12 +95,13 @@ const PaymentTest = () => {
               onClick={() => handleTestCardSelect(cardType)}
               style={{
                 padding: '1rem',
-                backgroundColor: selectedCard === cardType ? '#007bff' : 'white',
-                color: selectedCard === cardType ? 'white' : '#333',
-                border: '1px solid #dee2e6',
+                backgroundColor: selectedCard === cardType ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                color: selectedCard === cardType ? 'var(--text-inverse)' : 'var(--text-primary)',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '8px',
                 cursor: 'pointer',
-                textAlign: 'left'
+                textAlign: 'left',
+                transition: 'var(--theme-transition)'
               }}
             >
               <div style={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
@@ -116,17 +117,18 @@ const PaymentTest = () => {
 
       {/* Payment Form */}
       <div style={{ 
-        backgroundColor: 'white', 
+        backgroundColor: 'var(--bg-elevated)', 
         padding: '2rem', 
         borderRadius: '8px', 
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginBottom: '2rem'
+        boxShadow: 'var(--shadow-md)',
+        marginBottom: '2rem',
+        border: '1px solid var(--border-primary)'
       }}>
-        <h3 style={{ color: '#333', marginBottom: '1.5rem' }}>Payment Details</h3>
+        <h3 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem' }}>Payment Details</h3>
         
         <div style={{ display: 'grid', gap: '1rem' }}>
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
               Card Number
             </label>
             <input
@@ -138,16 +140,19 @@ const PaymentTest = () => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--input-border)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
               }}
             />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                 Expiry Month
               </label>
               <input
@@ -161,14 +166,17 @@ const PaymentTest = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--input-border)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)',
+                  transition: 'var(--theme-transition)'
                 }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                 Expiry Year
               </label>
               <input
@@ -182,14 +190,17 @@ const PaymentTest = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--input-border)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)',
+                  transition: 'var(--theme-transition)'
                 }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                 CVV
               </label>
               <input
@@ -202,16 +213,19 @@ const PaymentTest = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--input-border)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)',
+                  transition: 'var(--theme-transition)'
                 }}
               />
             </div>
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
               Cardholder Name
             </label>
             <input
@@ -223,15 +237,18 @@ const PaymentTest = () => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--input-border)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
               Amount ($)
             </label>
             <input
@@ -245,9 +262,12 @@ const PaymentTest = () => {
               style={{
                 width: '100%',
                 padding: '0.75rem',
-                border: '1px solid #ddd',
+                border: '1px solid var(--input-border)',
                 borderRadius: '4px',
-                fontSize: '1rem'
+                fontSize: '1rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
               }}
             />
           </div>

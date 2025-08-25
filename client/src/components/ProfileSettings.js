@@ -95,14 +95,15 @@ const ProfileSettings = () => {
                         }}
                         style={{
                             padding: '0.75rem 1rem',
-                            border: '1px solid #dee2e6',
-                            backgroundColor: activeSection === section.id ? '#007bff' : 'white',
-                            color: activeSection === section.id ? 'white' : '#333',
+                            border: '1px solid var(--border-primary)',
+                            backgroundColor: activeSection === section.id ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                            color: activeSection === section.id ? 'var(--text-inverse)' : 'var(--text-primary)',
                             borderRadius: '4px',
                             cursor: 'pointer',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '0.5rem'
+                            gap: '0.5rem',
+                            transition: 'var(--theme-transition)'
                         }}
                     >
                         <span>{section.icon}</span>
@@ -114,12 +115,12 @@ const ProfileSettings = () => {
             {/* Messages */}
             {message && (
                 <div style={{
-                    color: '#155724',
-                    backgroundColor: '#d4edda',
+                    color: 'var(--color-success)',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
                     padding: '0.75rem',
                     borderRadius: '4px',
                     marginBottom: '1rem',
-                    border: '1px solid #c3e6cb'
+                    border: '1px solid rgba(40, 167, 69, 0.3)'
                 }}>
                     {message}
                 </div>
@@ -127,12 +128,12 @@ const ProfileSettings = () => {
 
             {error && (
                 <div style={{
-                    color: '#721c24',
-                    backgroundColor: '#f8d7da',
+                    color: 'var(--color-danger)',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
                     padding: '0.75rem',
                     borderRadius: '4px',
                     marginBottom: '1rem',
-                    border: '1px solid #f5c6cb'
+                    border: '1px solid rgba(220, 53, 69, 0.3)'
                 }}>
                     {error}
                 </div>
@@ -141,15 +142,16 @@ const ProfileSettings = () => {
             {/* Change Password Section */}
             {activeSection === 'password' && (
                 <div style={{
-                    backgroundColor: 'white',
+                    backgroundColor: 'var(--bg-elevated)',
                     padding: '2rem',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--border-primary)'
                 }}>
-                    <h3 style={{ marginBottom: '1.5rem' }}>Change Password</h3>
+                    <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Change Password</h3>
                     <form onSubmit={passwordForm.handleSubmit(handlePasswordUpdate)}>
                         <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                 Current Password
                             </label>
                             <input
@@ -159,19 +161,22 @@ const ProfileSettings = () => {
                                     width: '100%',
                                     maxWidth: '400px',
                                     padding: '0.75rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
+                                    border: '1px solid var(--input-border)',
+                                    borderRadius: '4px',
+                                    backgroundColor: 'var(--input-bg)',
+                                    color: 'var(--text-primary)',
+                                    transition: 'var(--theme-transition)'
                                 }}
                             />
                             {passwordForm.formState.errors.oldPassword && (
-                                <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+                                <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                                     {passwordForm.formState.errors.oldPassword.message}
                                 </span>
                             )}
                         </div>
 
                         <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                 New Password
                             </label>
                             <input
@@ -184,19 +189,22 @@ const ProfileSettings = () => {
                                     width: '100%',
                                     maxWidth: '400px',
                                     padding: '0.75rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
+                                    border: '1px solid var(--input-border)',
+                                    borderRadius: '4px',
+                                    backgroundColor: 'var(--input-bg)',
+                                    color: 'var(--text-primary)',
+                                    transition: 'var(--theme-transition)'
                                 }}
                             />
                             {passwordForm.formState.errors.newPassword && (
-                                <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+                                <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                                     {passwordForm.formState.errors.newPassword.message}
                                 </span>
                             )}
                         </div>
 
                         <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                 Confirm New Password
                             </label>
                             <input
@@ -212,12 +220,15 @@ const ProfileSettings = () => {
                                     width: '100%',
                                     maxWidth: '400px',
                                     padding: '0.75rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
+                                    border: '1px solid var(--input-border)',
+                                    borderRadius: '4px',
+                                    backgroundColor: 'var(--input-bg)',
+                                    color: 'var(--text-primary)',
+                                    transition: 'var(--theme-transition)'
                                 }}
                             />
                             {passwordForm.formState.errors.confirmPassword && (
-                                <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+                                <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                                     {passwordForm.formState.errors.confirmPassword.message}
                                 </span>
                             )}
@@ -248,15 +259,16 @@ const ProfileSettings = () => {
             {/* Change Email Section */}
             {activeSection === 'email' && (
                 <div style={{
-                    backgroundColor: 'white',
+                    backgroundColor: 'var(--bg-elevated)',
                     padding: '2rem',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--border-primary)'
                 }}>
-                    <h3 style={{ marginBottom: '1.5rem' }}>Change Email</h3>
+                    <h3 style={{ marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Change Email</h3>
                     <form onSubmit={emailForm.handleSubmit(handleEmailUpdate)}>
                         <div style={{ marginBottom: '1rem' }}>
-                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', color: 'var(--text-primary)' }}>
                                 New Email Address
                             </label>
                             <input
@@ -266,13 +278,16 @@ const ProfileSettings = () => {
                                     width: '100%',
                                     maxWidth: '400px',
                                     padding: '0.75rem',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '4px'
+                                    border: '1px solid var(--input-border)',
+                                    borderRadius: '4px',
+                                    backgroundColor: 'var(--input-bg)',
+                                    color: 'var(--text-primary)',
+                                    transition: 'var(--theme-transition)'
                                 }}
                                 placeholder="Enter new email address"
                             />
                             {emailForm.formState.errors.newEmail && (
-                                <span style={{ color: '#dc3545', fontSize: '0.875rem' }}>
+                                <span style={{ color: 'var(--color-danger)', fontSize: '0.875rem' }}>
                                     {emailForm.formState.errors.newEmail.message}
                                 </span>
                             )}
@@ -303,14 +318,14 @@ const ProfileSettings = () => {
             {/* Danger Zone Section */}
             {activeSection === 'danger' && (
                 <div style={{
-                    backgroundColor: 'white',
+                    backgroundColor: 'var(--bg-elevated)',
                     padding: '2rem',
                     borderRadius: '8px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                    border: '1px solid #dc3545'
+                    boxShadow: 'var(--shadow-md)',
+                    border: '1px solid var(--color-danger)'
                 }}>
-                    <h3 style={{ marginBottom: '1rem', color: '#dc3545' }}>Danger Zone</h3>
-                    <p style={{ marginBottom: '1.5rem', color: '#6c757d' }}>
+                    <h3 style={{ marginBottom: '1rem', color: 'var(--color-danger)' }}>Danger Zone</h3>
+                    <p style={{ marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>
                         Once you delete your account, there is no going back. Please be certain.
                     </p>
                     <button
