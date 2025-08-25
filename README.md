@@ -208,7 +208,7 @@ npm start
 ### Development with Docker
 
 ```bash
-# Start all services (backend, frontend, database, redis)
+# Start all services (backend, frontend, database)
 docker-compose up -d
 
 # View logs
@@ -222,7 +222,6 @@ docker-compose down
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:8000
 - Database: localhost:5432
-- Redis: localhost:6379
 
 ### Production Deployment
 
@@ -252,7 +251,6 @@ POSTGRES_DB=ecommerce_db_prod
 POSTGRES_USER=ecommerce_user
 POSTGRES_PASSWORD=secure-password-here
 SECRET_KEY=generate-with-openssl-rand-hex-32
-REDIS_PASSWORD=secure-redis-password
 ```
 
 ### Docker Architecture
@@ -273,20 +271,14 @@ graph TB
         subgraph "Database Container"
             Postgres[(PostgreSQL)]
         end
-        
-        subgraph "Cache Container"
-            Redis[(Redis Cache)]
-        end
     end
     
     React --> FastAPI
     FastAPI --> Postgres
-    FastAPI --> Redis
     
     style React fill:#61dafb
     style FastAPI fill:#009688
     style Postgres fill:#336791
-    style Redis fill:#dc382d
 ```
 
 ### Build Individual Images
