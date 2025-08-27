@@ -103,7 +103,7 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 
 ## 🏗 System Architecture
 
-```
+```mermaid
 graph TB
     subgraph "Frontend (React)"
         UI[User Interface]
