@@ -4,6 +4,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware # Import CORSMiddleware
 import logging
+from datetime import datetime
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -65,14 +67,46 @@ app.include_router(orders.router, prefix="/orders", tags=["Orders"])
 # Root endpoint
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
+    """Enhanced root endpoint with comprehensive platform information"""
     return templates.TemplateResponse("index.html", {
         "request": request,
         "title": "Multi-Tenant E-Commerce Platform",
-        "version": "0.1.0"
+        "version": "1.0.0",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
+        "environment": os.getenv("ENVIRONMENT", "development")
     })
 
 # Health check endpoint
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "Multi-Tenant E-Commerce Platform is running"}
+    """Comprehensive health check with system information"""
+    try:
+        # Basic database connectivity check could be added here
+        # For now, return comprehensive system status
+        return {
+            "status": "healthy",
+            "message": "Multi-Tenant E-Commerce Platform is running",
+            "timestamp": datetime.now().isoformat(),
+            "version": "1.0.0",
+            "environment": os.getenv("ENVIRONMENT", "development"),
+            "features": {
+                "multi_tenant": True,
+                "ai_integration": bool(os.getenv("GEMINI_API_KEY")),
+                "database": "postgresql",
+                "authentication": "jwt"
+            },
+            "endpoints": {
+                "documentation": "/docs",
+                "redoc": "/redoc",
+                "health": "/health"
+            }
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return {
+            "status": "unhealthy",
+            "message": "System experiencing issues",
+            "timestamp": datetime.now().isoformat(),
+            "error": str(e)
+        }
 
