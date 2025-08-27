@@ -135,7 +135,23 @@ export const ordersAPI = {
     return api.get(`/orders/count${queryString ? `?${queryString}` : ''}`);
   },
   getById: (id) => api.get(`/orders/${id}`),
-  updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status })
+  updateStatus: (id, status) => api.put(`/orders/${id}/status`, { status }),
+  // Analytics endpoints
+  getAnalyticsOverview: (days = 30, categoryId = null) => {
+    const params = new URLSearchParams({ days: days.toString() });
+    if (categoryId) params.append('category_id', categoryId.toString());
+    return api.get(`/orders/analytics/overview?${params.toString()}`);
+  },
+  getRevenueTrend: (days = 30, categoryId = null) => {
+    const params = new URLSearchParams({ days: days.toString() });
+    if (categoryId) params.append('category_id', categoryId.toString());
+    return api.get(`/orders/analytics/revenue-trend?${params.toString()}`);
+  },
+  getTopProducts: (days = 30, limit = 10, categoryId = null) => {
+    const params = new URLSearchParams({ days: days.toString(), limit: limit.toString() });
+    if (categoryId) params.append('category_id', categoryId.toString());
+    return api.get(`/orders/analytics/top-products?${params.toString()}`);
+  }
 };
 
 // Payment API

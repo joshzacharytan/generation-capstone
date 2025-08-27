@@ -10,11 +10,12 @@ import PaymentTest from './PaymentTest';
 import CategoriesManagement from './CategoriesManagement';
 import BrandingManagement from './BrandingManagement';
 import HeroBannerManagement from './HeroBannerManagement';
+import SalesAnalytics from './SalesAnalytics';
 import { useUser } from '../contexts/UserContext';
 import LoadingSpinner from './LoadingSpinner';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('analytics');
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -53,6 +54,7 @@ const AdminDashboard = () => {
   }
 
   const tabs = [
+    { id: 'analytics', label: 'Sales Analytics', icon: '📊' },
     { id: 'products', label: 'Products', icon: '📦' },
     { id: 'categories', label: 'Categories', icon: '🏷️' },
     { id: 'orders', label: 'Orders', icon: '📋' },
@@ -100,6 +102,12 @@ const AdminDashboard = () => {
         </div>
 
         {/* Tab Content */}
+        {activeTab === 'analytics' && (
+          <div>
+            <SalesAnalytics />
+          </div>
+        )}
+
         {activeTab === 'products' && (
           <div>
             {showProductForm ? (
