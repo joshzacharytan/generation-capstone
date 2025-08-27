@@ -6,7 +6,7 @@ import ProductForm from './ProductForm';
 import ProfileSettings from './ProfileSettings';
 import SuperAdminDashboard from './SuperAdminDashboard';
 import OrdersManagement from './OrdersManagement';
-import PaymentTest from './PaymentTest';
+
 import CategoriesManagement from './CategoriesManagement';
 import BrandingManagement from './BrandingManagement';
 import HeroBannerManagement from './HeroBannerManagement';
@@ -60,7 +60,6 @@ const AdminDashboard = () => {
     { id: 'orders', label: 'Orders', icon: '📋' },
     { id: 'hero-banners', label: 'Hero Banners', icon: '🎭' },
     { id: 'branding', label: 'Branding', icon: '🎨' },
-    { id: 'payment-test', label: 'Payment Test', icon: '💳' },
     ...(isSuperAdmin ? [{ id: 'admin', label: 'System Admin', icon: '⚙️' }] : []),
     { id: 'profile', label: 'Profile', icon: '👤' }
   ];
@@ -183,11 +182,7 @@ const AdminDashboard = () => {
           </div>
         )}
 
-        {activeTab === 'payment-test' && (
-          <div>
-            <PaymentTest />
-          </div>
-        )}
+
 
         {activeTab === 'admin' && isSuperAdmin && (
           <div>

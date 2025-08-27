@@ -261,6 +261,8 @@ class DescriptionRequest(BaseModel):
 
 class DescriptionResponse(BaseModel):
     description: str
+    success: bool = True
+    error_type: Optional[str] = None
 
 # --- Hero Banner Schemas ---
 class HeroBannerBase(BaseModel):

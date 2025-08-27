@@ -160,9 +160,46 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       
       const keywordList = keywords.split(',').map(k => k.trim()).filter(k => k);
       const response = await aiAPI.generateDescription(watchedName, keywordList);
-      setValue('description', response.data.description);
+      
+      const responseData = response.data;
+      
+      // Check if the AI service returned an error or warning
+      if (responseData.success === false) {
+        // Handle service errors gracefully
+        if (responseData.error_type === 'service_error') {
+          setError(`AI Service: ${responseData.description}`);
+        } else {
+          setError('AI service is temporarily unavailable. Please try again or enter description manually.');
+        }
+        return;
+      }
+      
+      // Check if description indicates an error (fallback check)
+      if (responseData.description.startsWith('Error:') || 
+          responseData.description.startsWith('Description temporarily unavailable')) {
+        setError(`${responseData.description}`);
+        return;
+      }
+      
+      // Success - set the generated description
+      setValue('description', responseData.description);
+      
+      // Show success message briefly
+      const successMsg = 'Description generated successfully!';
+      setError('');
+      
+      // Optional: Show a brief success indication
+      setTimeout(() => {
+        // Clear any residual error messages after successful generation
+        setError('');
+      }, 100);
+      
     } catch (err) {
-      setError('Failed to generate description. Please try again.');
+      console.error('AI description error:', err);
+      
+      // Use the enhanced error message from the API service
+      const errorMessage = err.message || 'Failed to generate description. Please try again.';
+      setError(errorMessage);
     } finally {
       setAiLoading(false);
     }
@@ -262,11 +299,13 @@ const ProductForm = ({ product, onSave, onCancel }) => {
                 fontSize: '0.875rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                transition: 'background-color 0.2s'
               }}
+              title={!watchedName.trim() ? 'Enter a product name first' : 'Generate AI description'}
             >
               {aiLoading && <LoadingSpinner size={16} />}
-              {aiLoading ? 'Generating...' : '✨ AI Generate'}
+              {aiLoading ? 'Generating AI...' : '✨ AI Generate'}
             </button>
           </div>
           

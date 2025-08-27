@@ -389,12 +389,21 @@ def get_search_suggestions(
     ).limit(5).all()
     
     for product in products:
+            "id": product.id,
+>>>>>>> main
+            "image_url": product.image_url
+        })
         suggestions.append({
             "type": "product",
-            "id": product.id,
             "text": product.name,
             "subtitle": f"${product.price:.2f}",
             "count": None,
+            "id": product.id,
+            "image_url": product.image_url
+        })
+=======
+            "id": product.id,
+>>>>>>> main
             "image_url": product.image_url
         })
     
