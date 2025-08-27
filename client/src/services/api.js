@@ -154,11 +154,34 @@ export const productsAPI = {
 
 // AI API
 export const aiAPI = {
-  generateDescription: (productName, keywords) =>
-    api.post('/ai/generate-description', {
-      product_name: productName,
-      keywords
-    })
+  generateDescription: async (productName, keywords) => {
+    try {
+      return await api.post('/ai/generate-description', {
+        product_name: productName,
+        keywords
+      }, {
+        timeout: 20000 // 20 second timeout for AI requests
+      });
+    } catch (error) {
+      console.error('AI description generation failed:', error);
+      
+      // Enhanced error handling for AI service
+      if (error.code === 'ECONNABORTED') {
+        throw new Error('AI service is taking too long to respond. Please try again or enter description manually.');
+      } else if (error.response?.status === 400) {
+        throw new Error(error.response.data?.detail || 'Invalid request. Please check the product name.');
+      } else if (error.response?.status === 401) {
+        throw new Error('Authentication required. Please sign in again.');
+      } else if (error.response?.status >= 500) {
+        throw new Error('AI service is temporarily unavailable. Please try again later.');
+      } else if (!error.response) {
+        throw new Error('Unable to connect to AI service. Please check your connection.');
+      }
+      
+      // Re-throw the original error if not handled above
+      throw error;
+    }
+  }
 };
 
 // Profile API
@@ -222,8 +245,7 @@ export const ordersAPI = {
 // Payment API
 export const paymentAPI = {
   validateCard: (cardData) => api.post('/payment/validate-card', cardData),
-  processPayment: (paymentData) => api.post('/payment/process', paymentData),
-  getTestCards: () => api.get('/payment/test-cards')
+  processPayment: (paymentData) => api.post('/payment/process', paymentData)
 };
 
 // Store API (for customer-facing operations)
