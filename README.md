@@ -8,6 +8,10 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
   - 📊 **Sales Analytics**: Interactive dashboard with revenue trends and business insights
   - 📦 **Product Management**: Add, edit, and manage inventory
   - 📋 **Order Processing**: Track and manage customer orders
+- **SuperAdmin Portal**: `http://localhost:3000/` (Login with super admin credentials)
+  - 🏢 **System Overview**: Monitor all tenants and system health
+  - 👥 **User Management**: Manage user roles across all tenants
+  - 🔍 **Tenant Details**: Comprehensive tenant information and analytics
 - **Customer Storefront**: `http://localhost:3000/store/{tenant_domain}` (Public access)
 - **API Documentation**: `http://localhost:8000/docs` (Interactive Swagger UI)
 
@@ -249,12 +253,35 @@ GET /orders/analytics/revenue-trend # Daily revenue and order trends  \nGET /ord
 
 ## 🆕 Recent Updates
 
+### 🔧 Critical Fixes (v1.2.1)
+- **SuperAdmin Portal**: Fixed API routing issue preventing tenant information fetching
+  - Resolved missing `/admin` prefix in FastAPI router configuration
+  - Enhanced admin authentication and tenant data access
+- **Modal UX Improvements**: Completely redesigned SuperAdminDashboard modal system
+  - Fixed scroll propagation issues causing unwanted page scrolling
+  - Implemented proper flex layout with fixed header and scrollable content
+  - Added body scroll prevention when modal is open
+  - Enhanced click-to-close backdrop functionality
+- **Theme System Integration**: Seamlessly merged theme-aware styling with functional improvements
+  - Maintained full CSS variable support for light/dark themes
+  - Preserved theme system compatibility during critical fixes
+  - Applied consistent hover effects using `e.currentTarget` for containers
+
 ### 🎨 Theme System (v1.2.0)
 - **Light/Dark Mode**: Complete theme system with automatic system preference detection
 - **Seamless Switching**: Smooth transitions between theme modes
 - **Universal Coverage**: All components fully themed with CSS variables
 - **CI/CD Pipeline**: Advanced deployment pipeline with rollback capabilities
 - **Accessibility**: WCAG-compliant contrast ratios and focus indicators
+
+### 🔑 SuperAdmin Portal & System Management
+- **Multi-Tenant Overview**: Comprehensive system dashboard showing all tenants
+- **Tenant Details Modal**: Detailed view of tenant information, users, and products
+- **User Role Management**: Update user roles across tenants (Customer, Tenant Admin, Super Admin)
+- **System Analytics**: Tenant count, user distribution, and product statistics
+- **Enhanced UX**: Fixed modal scroll handling and theme-aware styling
+- **Real-time Data**: Live tenant information with proper error handling
+- **Responsive Design**: Optimized for desktop and mobile administration
 
 ### 🔍 Search Enhancements
 - **Enhanced Search Suggestions**: Improved dropdown with images and categories
