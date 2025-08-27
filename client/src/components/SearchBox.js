@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { getImageUrl } from '../utils/imageUtils';
 import { useNavigate } from 'react-router-dom';
 import { storeAPI } from '../services/api';
 
@@ -61,8 +62,16 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
   };
 
   const handleSuggestionClick = (suggestion) => {
-    setQuery(suggestion.text);
-    performSearch(suggestion.text);
+    setShowSuggestions(false);
+    
+    if (suggestion.type === 'product' && suggestion.id) {
+      // Navigate directly to product page for product suggestions
+      navigate(`/store/${tenantDomain}/product/${suggestion.id}`);
+    } else {
+      // Perform search for category, brand, or other suggestion types
+      setQuery(suggestion.text);
+      navigate(`/store/${tenantDomain}/search?q=${encodeURIComponent(suggestion.text)}`);
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -94,13 +103,17 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
     }
   };
 
-  const handleFocus = () => {
+  const handleFocus = (e) => {
+    e.target.style.borderColor = '#007bff';
+    e.target.style.backgroundColor = 'white';
     if (suggestions.length > 0) {
       setShowSuggestions(true);
     }
   };
 
   const handleBlur = (e) => {
+    e.target.style.borderColor = '#e9ecef';
+    e.target.style.backgroundColor = '#f8f9fa';
     // Delay hiding suggestions to allow clicking on them
     setTimeout(() => {
       if (!suggestionsRef.current?.contains(e.relatedTarget)) {
@@ -147,16 +160,6 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             outline: 'none',
             transition: 'border-color 0.2s ease',
             backgroundColor: '#f8f9fa'
-          }}
-          onFocus={(e) => {
-            e.target.style.borderColor = '#007bff';
-            e.target.style.backgroundColor = 'white';
-            handleFocus();
-          }}
-          onBlur={(e) => {
-            e.target.style.borderColor = '#e9ecef';
-            e.target.style.backgroundColor = '#f8f9fa';
-            handleBlur(e);
           }}
         />
         <button
@@ -235,16 +238,40 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
               }}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              <span style={{
+              <div style={{
                 fontSize: '0.875rem',
                 color: '#6c757d',
-                minWidth: '60px'
+                minWidth: '60px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
               }}>
-                {suggestion.type === 'product' ? '📦' : 
-                 suggestion.type === 'category' ? '🏷️' : 
-                 suggestion.type === 'brand' ? '🏢' : '🔍'}
-                {suggestion.type}
-              </span>
+                {suggestion.type === 'product' && suggestion.image_url ? (
+                  <img
+                    src={getImageUrl(suggestion.image_url)}
+                    alt={suggestion.text}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      objectFit: 'cover',
+                      borderRadius: '4px',
+                      backgroundColor: '#f8f9fa'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'inline';
+                    }}
+                  />
+                ) : null}
+                <span style={{
+                  display: suggestion.type === 'product' && suggestion.image_url ? 'none' : 'inline'
+                }}>
+                  {suggestion.type === 'product' ? '📦' : 
+                   suggestion.type === 'category' ? '🏷️' : 
+                   suggestion.type === 'brand' ? '🏢' : '🔍'}
+                </span>
+                <span style={{ fontSize: '0.8rem' }}>{suggestion.type}</span>
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '0.9rem', color: '#333' }}>
                   {highlightMatch(suggestion.text, query)}

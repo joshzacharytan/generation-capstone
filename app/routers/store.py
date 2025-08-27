@@ -393,7 +393,9 @@ def get_search_suggestions(
             "type": "product",
             "text": product.name,
             "subtitle": f"${product.price:.2f}",
-            "count": None
+            "count": None,
+            "id": product.id,
+            "image_url": product.image_url
         })
     
     # Category suggestions
