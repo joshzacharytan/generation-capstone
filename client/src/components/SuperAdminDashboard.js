@@ -118,6 +118,15 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
 
   useEffect(() => {
     fetchUsers();
+    
+    // Prevent body scrolling when modal is open
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    // Restore body scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
   }, []);
 
   const fetchUsers = async () => {
@@ -146,57 +155,80 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      }}
+      onClick={(e) => {
+        // Close modal if clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div style={{
         backgroundColor: 'white',
-        padding: '2rem',
         borderRadius: '8px',
         maxWidth: '800px',
         width: '90%',
         maxHeight: '80vh',
-        overflow: 'auto'
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden' // Prevent outer container from scrolling
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ margin: 0, color: '#333' }}>
-            {tenant.name} - Details
-          </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              color: '#6c757d'
-            }}
-          >
-            ×
-          </button>
+        {/* Fixed Header */}
+        <div style={{ 
+          padding: '2rem 2rem 0 2rem',
+          borderBottom: '1px solid #dee2e6',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: '#333' }}>
+              {tenant.name} - Details
+            </h3>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: '#6c757d'
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {error && (
+            <div style={{
+              color: '#dc3545',
+              backgroundColor: '#f8d7da',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '1rem',
+              border: '1px solid #f5c6cb'
+            }}>
+              {error}
+            </div>
+          )}
         </div>
 
-        {error && (
-          <div style={{
-            color: '#dc3545',
-            backgroundColor: '#f8d7da',
-            padding: '0.75rem',
-            borderRadius: '4px',
-            marginBottom: '1rem',
-            border: '1px solid #f5c6cb'
-          }}>
-            {error}
-          </div>
-        )}
+        {/* Scrollable Content */}
+        <div style={{
+          padding: '1rem 2rem 2rem 2rem',
+          overflow: 'auto',
+          flex: 1
+        }}>
 
         <div style={{ marginBottom: '2rem' }}>
           <h4 style={{ color: '#333', marginBottom: '1rem' }}>Tenant Information</h4>
@@ -267,7 +299,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
         <div>
           <h4 style={{ color: '#333', marginBottom: '1rem' }}>Products ({tenant.products?.length || 0})</h4>
           {tenant.products && tenant.products.length > 0 ? (
-            <div style={{ display: 'grid', gap: '0.5rem', maxHeight: '300px', overflow: 'auto' }}>
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
               {tenant.products.map((product) => (
                 <div
                   key={product.id}
@@ -301,6 +333,8 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
           ) : (
             <p style={{ color: '#6c757d', fontStyle: 'italic' }}>No products found</p>
           )}
+        </div>
+        {/* End Scrollable Content */}
         </div>
       </div>
     </div>
