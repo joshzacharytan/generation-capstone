@@ -8,6 +8,10 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
   - 📊 **Sales Analytics**: Interactive dashboard with revenue trends and business insights
   - 📦 **Product Management**: Add, edit, and manage inventory
   - 📋 **Order Processing**: Track and manage customer orders
+- **SuperAdmin Portal**: `http://localhost:3000/` (Login with super admin credentials)
+  - 🏢 **System Overview**: Monitor all tenants and system health
+  - 👥 **User Management**: Manage user roles across all tenants
+  - 🔍 **Tenant Details**: Comprehensive tenant information and analytics
 - **Customer Storefront**: `http://localhost:3000/store/{tenant_domain}` (Public access)
 - **API Documentation**: `http://localhost:8000/docs` (Interactive Swagger UI)
 
@@ -16,6 +20,7 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 - [Features](#-features)
 - [Technology Stack](#-technology-stack)
 - [System Architecture](#-system-architecture)
+- [Recent Updates](#-recent-updates)
 - [Prerequisites](#-prerequisites)
 - [Installation & Setup](#-installation--setup)
 - [Usage](#-usage)
@@ -194,6 +199,47 @@ GET /orders/analytics/revenue-trend # Daily revenue and order trends  \nGET /ord
 - **Inventory Management**: Track product performance to optimize stock levels
 - **Growth Tracking**: Monitor business growth with period comparisons
 - **Decision Support**: Data-driven insights for business strategy
+
+## 🆕 Recent Updates
+
+### 🔧 Critical Fixes & Stability Improvements (v1.1.0)
+- **SuperAdmin Portal**: Fixed API routing issue preventing tenant information fetching
+  - Resolved missing `/admin` prefix in FastAPI router configuration
+  - Enhanced admin authentication and tenant data access
+  - Improved modal UX with proper scroll isolation and body scroll prevention
+- **Search Enhancement**: Enhanced search suggestions with product images and direct routing
+  - Added 40x40px product images in search dropdown instead of emoji icons
+  - Implemented direct routing to product detail pages for better UX
+  - Optimized search suggestion performance and rendering
+- **Platform Information**: Enhanced FastAPI root endpoint with comprehensive system information
+  - Added feature showcase and technology stack display
+  - Improved API documentation and quick access links
+  - Enhanced developer experience with detailed system overview
+
+### 🧹 Code Quality & Maintenance
+- **Payment System Cleanup**: Removed legacy payment test components
+  - Maintained storefront checkout functionality while cleaning admin interface
+  - Removed unused API endpoints and dependencies
+  - Streamlined codebase for better maintainability
+- **AI Service Reliability**: Improved timeout handling and error management
+  - Enhanced robustness with comprehensive timeout scenarios
+  - Better error categorization and user feedback
+  - Fallback mechanisms for external service failures
+- **Authentication Fixes**: Resolved customer authentication and routing issues
+  - Fixed FastAPI routing compatibility with Cloudflare tunnel
+  - Cleaned up debug components and improved error handling
+  - Enhanced security and session management
+
+### 📊 Analytics & Business Intelligence
+- **Comprehensive Dashboard**: Added interactive sales analytics with real-time insights
+  - Revenue tracking with growth percentages and trend analysis
+  - Top products analysis with sortable metrics
+  - Multi-period reporting (7, 30, 90, 365 days)
+  - Category filtering and performance rankings
+- **Technical Implementation**: Optimized backend analytics API with efficient queries
+  - Three core analytics endpoints for overview, trends, and product analysis
+  - Database optimization with proper indexing and multi-tenant filtering
+  - Legacy support for both new category IDs and legacy category names
 
 ## 📋 Prerequisites
 
