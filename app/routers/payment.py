@@ -4,7 +4,7 @@ from typing import Dict, Any
 
 from .. import schemas
 from ..database import get_db
-from ..services.payment import MockPaymentGateway, TEST_CARDS
+from ..services.payment import MockPaymentGateway
 
 router = APIRouter()
 
@@ -53,12 +53,3 @@ def process_payment(payment_data: schemas.PaymentRequest):
     })
     
     return schemas.PaymentResponse(**result)
-
-@router.get("/test-cards")
-def get_test_cards():
-    """Get test credit card numbers for demo purposes"""
-    return {
-        "message": "Test credit card numbers for demo",
-        "cards": TEST_CARDS,
-        "note": "These cards will always be approved in the mock payment system"
-    }

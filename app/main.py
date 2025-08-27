@@ -52,7 +52,7 @@ templates = Jinja2Templates(directory="app/templates")
 # Include routers
 app.include_router(auth.router, tags=["Authentication"])
 app.include_router(products.router, tags=["Products"])
-app.include_router(ai.router, tags=["Generative AI"])
+app.include_router(ai.router, prefix="/ai", tags=["Generative AI"])
 app.include_router(admin.router, tags=["Admin"])
 app.include_router(profile.router, tags=["Profile"])
 app.include_router(categories.router, prefix="/categories", tags=["Categories"])
