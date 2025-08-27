@@ -118,6 +118,15 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
 
   useEffect(() => {
     fetchUsers();
+    
+    // Prevent body scrolling when modal is open
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    
+    // Restore body scrolling when component unmounts
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
   }, []);
 
   const fetchUsers = async () => {
@@ -146,6 +155,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
   };
 
   return (
+<<<<<<< HEAD
     <div style={{
       position: 'fixed',
       top: 0,
@@ -161,149 +171,289 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
       <div style={{
         backgroundColor: 'var(--bg-elevated)',
         padding: '2rem',
+=======
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000
+      }}
+      onClick={(e) => {
+        // Close modal if clicking on backdrop
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div style={{
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
         maxWidth: '800px',
         width: '90%',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden' // Prevent outer container from scrolling
+      }}>
+        {/* Fixed Header */}
+        <div style={{ 
+          padding: '2rem 2rem 0 2rem',
+          borderBottom: '1px solid #dee2e6',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: '#333' }}>
+              {tenant.name} - Details
+            </h3>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: '#6c757d'
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {error && (
+            <div style={{
+              color: '#dc3545',
+              backgroundColor: '#f8d7da',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '1rem',
+              border: '1px solid #f5c6cb'
+            }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Scrollable Content */}
+        <div style={{
+          padding: '1rem 2rem 2rem 2rem',
+          overflow: 'auto',
+          flex: 1
+        }}>
+>>>>>>> f07328c (fix: resolve superadmin portal issues and improve modal UX)
         maxHeight: '80vh',
-        overflow: 'auto',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden', // Prevent outer container from scrolling
         border: '1px solid var(--border-primary)'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
-            {tenant.name} - Details
-          </h3>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '1.5rem',
-              cursor: 'pointer',
-              color: 'var(--text-secondary)'
-            }}
-          >
-            ×
-          </button>
-        </div>
-
-        {error && (
-          <div style={{
-            color: 'var(--color-danger)',
-            backgroundColor: 'var(--bg-secondary)',
-            padding: '0.75rem',
-            borderRadius: '4px',
-            marginBottom: '1rem',
-            border: '1px solid var(--border-primary)'
-          }}>
-            {error}
+        {/* Fixed Header */}
+        <div style={{ 
+          padding: '2rem 2rem 0 2rem',
+          borderBottom: '1px solid var(--border-primary)',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+              {tenant.name} - Details
+            </h3>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: 'var(--text-secondary)'
+              }}
+            >
+              ×
+            </button>
           </div>
-        )}
 
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Tenant Information</h4>
-          <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '1rem', borderRadius: '4px', border: '1px solid var(--border-primary)' }}>
-            <p><strong>Name:</strong> {tenant.name}</p>
-            <p><strong>Domain:</strong> {tenant.domain}</p>
-            <p><strong>Created:</strong> {formatDateTime(tenant.created_at)}</p>
-            <p><strong>Last Updated:</strong> {formatDateTime(tenant.updated_at)}</p>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Users ({users.length})</h4>
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '1rem' }}>
-              <LoadingSpinner />
+          {error && (
+            <div style={{
+              color: 'var(--color-danger)',
+              backgroundColor: 'var(--bg-secondary)',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '1rem',
+              border: '1px solid var(--border-primary)'
+            }}>
+              {error}
             </div>
-          ) : users.length === 0 ? (
-            <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No users found</p>
-          ) : (
-            <div style={{ display: 'grid', gap: '0.5rem' }}>
-              {users.map((user) => (
-                <div
-                  key={user.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0.75rem',
-                    backgroundColor: 'var(--bg-secondary)',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-primary)'
-                  }}
-                >
-                  <div>
-                    <strong>{user.email}</strong>
-                    <span style={{ 
-                      marginLeft: '0.5rem',
-                      padding: '0.25rem 0.5rem',
-                      backgroundColor: user.role === 'super_admin' ? 'var(--color-danger)' : 'var(--color-primary)',
-                      color: 'var(--text-inverse)',
-                      borderRadius: '12px',
-                      fontSize: '0.75rem'
-                    }}>
-                      {user.role.replace('_', ' ').toUpperCase()}
-                    </span>
-                  </div>
-                  <select
-                    value={user.role}
-                    onChange={(e) => updateUserRole(user.id, e.target.value)}
+          )}
+        </div>
+
+        {/* Scrollable Content */}
+        <div style={{
+          padding: '1rem 2rem 2rem 2rem',
+          overflow: 'auto',
+          flex: 1
+        }}>
+=======
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden' // Prevent outer container from scrolling
+      }}>
+        {/* Fixed Header */}
+        <div style={{ 
+          padding: '2rem 2rem 0 2rem',
+          borderBottom: '1px solid #dee2e6',
+          flexShrink: 0
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ margin: 0, color: '#333' }}>
+              {tenant.name} - Details
+            </h3>
+            <button
+              onClick={onClose}
+              style={{
+                background: 'none',
+                border: 'none',
+                fontSize: '1.5rem',
+                cursor: 'pointer',
+                color: '#6c757d'
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {error && (
+            <div style={{
+              color: '#dc3545',
+              backgroundColor: '#f8d7da',
+              padding: '0.75rem',
+              borderRadius: '4px',
+              marginBottom: '1rem',
+              border: '1px solid #f5c6cb'
+            }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        {/* Scrollable Content */}
+        <div style={{
+          padding: '1rem 2rem 2rem 2rem',
+          overflow: 'auto',
+          flex: 1
+        }}>
+>>>>>>> f07328c (fix: resolve superadmin portal issues and improve modal UX)
+
+          <div style={{ marginBottom: '2rem' }}>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Tenant Information</h4>
+            <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '1rem', borderRadius: '4px', border: '1px solid var(--border-primary)' }}>
+              <p><strong>Name:</strong> {tenant.name}</p>
+              <p><strong>Domain:</strong> {tenant.domain}</p>
+              <p><strong>Created:</strong> {formatDateTime(tenant.created_at)}</p>
+              <p><strong>Last Updated:</strong> {formatDateTime(tenant.updated_at)}</p>
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '2rem' }}>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Users ({users.length})</h4>
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '1rem' }}>
+                <LoadingSpinner />
+              </div>
+            ) : users.length === 0 ? (
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No users found</p>
+            ) : (
+              <div style={{ display: 'grid', gap: '0.5rem' }}>
+                {users.map((user) => (
+                  <div
+                    key={user.id}
                     style={{
-                      padding: '0.25rem 0.5rem',
-                      backgroundColor: 'var(--input-bg)',
-                      border: '1px solid var(--input-border)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.75rem',
+                      backgroundColor: 'var(--bg-secondary)',
                       borderRadius: '4px',
-                      fontSize: '0.875rem',
-                      color: 'var(--text-primary)'
+                      border: '1px solid var(--border-primary)'
                     }}
                   >
-                    <option value="customer">Customer</option>
-                    <option value="tenant_admin">Tenant Admin</option>
-                    <option value="super_admin">Super Admin</option>
-                  </select>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    <div>
+                      <strong>{user.email}</strong>
+                      <span style={{ 
+                        marginLeft: '0.5rem',
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: user.role === 'super_admin' ? 'var(--color-danger)' : 'var(--color-primary)',
+                        color: 'var(--text-inverse)',
+                        borderRadius: '12px',
+                        fontSize: '0.75rem'
+                      }}>
+                        {user.role.replace('_', ' ').toUpperCase()}
+                      </span>
+                    </div>
+                    <select
+                      value={user.role}
+                      onChange={(e) => updateUserRole(user.id, e.target.value)}
+                      style={{
+                        padding: '0.25rem 0.5rem',
+                        backgroundColor: 'var(--input-bg)',
+                        border: '1px solid var(--input-border)',
+                        borderRadius: '4px',
+                        fontSize: '0.875rem',
+                        color: 'var(--text-primary)'
+                      }}
+                    >
+                      <option value="customer">Customer</option>
+                      <option value="tenant_admin">Tenant Admin</option>
+                      <option value="super_admin">Super Admin</option>
+                    </select>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div>
-          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Products ({tenant.products?.length || 0})</h4>
-          {tenant.products && tenant.products.length > 0 ? (
-            <div style={{ display: 'grid', gap: '0.5rem', maxHeight: '300px', overflow: 'auto' }}>
-              {tenant.products.map((product) => (
-                <div
-                  key={product.id}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0.75rem',
-                    backgroundColor: 'var(--bg-secondary)',
-                    borderRadius: '4px',
-                    border: '1px solid var(--border-primary)'
-                  }}
-                >
-                  <div>
-                    <strong>{product.name}</strong>
-                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                      {product.description?.substring(0, 100)}...
-                    </p>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <div style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
-                      ${product.price?.toFixed(2)}
+          <div>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Products ({tenant.products?.length || 0})</h4>
+            {tenant.products && tenant.products.length > 0 ? (
+              <div style={{ display: 'grid', gap: '0.5rem' }}>
+                {tenant.products.map((product) => (
+                  <div
+                    key={product.id}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.75rem',
+                      backgroundColor: 'var(--bg-secondary)',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-primary)'
+                    }}
+                  >
+                    <div>
+                      <strong>{product.name}</strong>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        {product.description?.substring(0, 100)}...
+                      </p>
                     </div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                      Stock: {product.quantity}
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
+                        ${product.price?.toFixed(2)}
+                      </div>
+                      <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                        Stock: {product.quantity}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No products found</p>
-          )}
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No products found</p>
+            )}
+          </div>
+        {/* End Scrollable Content */}
         </div>
       </div>
     </div>
