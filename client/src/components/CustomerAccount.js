@@ -660,7 +660,7 @@ const OrderDetailsModal = ({ order, onClose, getStatusColor }) => {
         overflow: 'auto',
         padding: '2rem',
         border: '1px solid var(--border-primary)',
-        boxShadow: 'var(--shadow-xl)'
+        boxShadow: 'var(--shadow-md)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <h4 style={{ margin: 0, color: 'var(--text-primary)' }}>

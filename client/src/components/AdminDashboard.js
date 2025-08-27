@@ -158,14 +158,12 @@ const AdminDashboard = () => {
 
         {activeTab === 'categories' && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Category Management</h2>
             <CategoriesManagement />
           </div>
         )}
 
         {activeTab === 'orders' && (
           <div>
-            <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Order Management</h2>
             <OrdersManagement />
           </div>
         )}

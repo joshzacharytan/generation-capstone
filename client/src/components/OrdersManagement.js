@@ -420,14 +420,16 @@ const OrdersManagement = () => {
                   boxShadow: 'var(--shadow-md)',
                   border: '1px solid var(--border-primary)',
                   cursor: 'pointer',
-                  transition: 'box-shadow 0.2s ease'
+                  transition: 'box-shadow 0.2s ease, transform 0.1s ease'
                 }}
                 onClick={() => setSelectedOrder(order)}
                 onMouseEnter={(e) => {
-                  e.target.style.boxShadow = 'var(--shadow-lg)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.boxShadow = 'var(--shadow-md)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
@@ -586,7 +588,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
         maxHeight: 'calc(90vh - 2rem)',
         overflow: 'auto',
         border: '1px solid var(--border-primary)',
-        boxShadow: 'var(--shadow-lg)',
+        boxShadow: 'var(--shadow-md)',
         margin: 'auto'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

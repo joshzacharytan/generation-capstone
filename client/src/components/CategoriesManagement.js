@@ -98,9 +98,9 @@ const CategoriesManagement = () => {
             alignItems: 'center',
             marginBottom: '2rem'
           }}>
-            <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
+            <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>
               Category Management ({categories.length} categories)
-            </h3>
+            </h2>
             <div style={{ display: 'flex', gap: '1rem' }}>
               {categories.length === 0 && (
                 <button

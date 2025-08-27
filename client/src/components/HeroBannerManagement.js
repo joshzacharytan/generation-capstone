@@ -608,6 +608,36 @@ function HeroBannerManagement() {
               </small>
             </div>
 
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Sort Order:</label>
+              <input
+                type="number"
+                name="sort_order"
+                value={formData.sort_order}
+                onChange={handleInputChange}
+                min="0"
+                placeholder="0"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '4px',
+                  fontSize: '1rem',
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              />
+              <small style={{ color: 'var(--text-secondary)', marginTop: '0.25rem', display: 'block' }}>
+                Display order for banners (0 = first, higher numbers appear later). Banners are sorted by this value.
+              </small>
+            </div>
+
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ 
                 display: 'block', 
