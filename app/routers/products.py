@@ -8,7 +8,7 @@ from ..services.file_upload import FileUploadService
 
 router = APIRouter()
 
-@router.post("/", response_model=schemas.Product)
+@router.post("/products", response_model=schemas.Product)
 def create_product(
     product: schemas.ProductCreate, 
     db: Session = Depends(get_db),
@@ -20,7 +20,7 @@ def create_product(
     """
     return crud.create_product_for_tenant(db=db, product=product, tenant_id=current_user.tenant_id)
 
-@router.get("/", response_model=List[schemas.Product])
+@router.get("/products", response_model=List[schemas.Product])
 def read_products(
     skip: int = 0, 
     limit: int = 100,
@@ -53,7 +53,7 @@ def read_products(
     )
     return products
 
-@router.get("/analytics", response_model=dict)
+@router.get("/products/analytics", response_model=dict)
 def get_product_analytics(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(security.get_current_user)
@@ -64,7 +64,7 @@ def get_product_analytics(
     analytics = crud.get_product_analytics(db, tenant_id=current_user.tenant_id)
     return analytics
 
-@router.put("/{product_id}", response_model=schemas.Product)
+@router.put("/products/{product_id}", response_model=schemas.Product)
 def update_product(
     product_id: int,
     product_update: schemas.ProductUpdate,
@@ -82,7 +82,7 @@ def update_product(
     updated_product = crud.update_product(db, product_id=product_id, product_update=product_update)
     return updated_product
 
-@router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
     product_id: int,
     db: Session = Depends(get_db),
@@ -99,7 +99,7 @@ def delete_product(
     crud.delete_product(db, product_id=product_id)
     return
 
-@router.get("/categories", response_model=List[str])
+@router.get("/products/categories", response_model=List[str])
 def get_categories(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(security.get_current_user)
@@ -110,7 +110,7 @@ def get_categories(
     categories = crud.get_categories_by_tenant(db, tenant_id=current_user.tenant_id)
     return categories
 
-@router.get("/categories/suggestions", response_model=List[str])
+@router.get("/products/categories/suggestions", response_model=List[str])
 def get_category_suggestions():
     """
     Get suggested categories for product creation.
@@ -118,7 +118,7 @@ def get_category_suggestions():
     from ..constants import DEFAULT_CATEGORIES
     return DEFAULT_CATEGORIES
 
-@router.post("/upload-image")
+@router.post("/products/upload-image")
 async def upload_product_image(
     file: UploadFile = File(...),
     current_user: models.User = Depends(security.get_current_user)
@@ -135,7 +135,7 @@ async def upload_product_image(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
-@router.post("/create-with-image", response_model=schemas.Product)
+@router.post("/products/create-with-image", response_model=schemas.Product)
 async def create_product_with_image(
     name: str = Form(...),
     description: Optional[str] = Form(None),

@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 import os
 from dotenv import load_dotenv
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
@@ -62,6 +62,66 @@ def get_super_admin_user(current_user: models.User = Depends(get_current_user)):
     if current_user.role != models.Role.SUPER_ADMIN:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this resource.")
     return current_user
+
+def get_current_user_alternative(request: Request, db: Session = Depends(get_db)):
+    """
+    Alternative authentication method that checks multiple headers for Cloudflare compatibility.
+    Checks X-Auth-Token, X-User-Token, X-API-Key, and Authorization headers.
+    """
+    from fastapi import Request
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    # Try multiple header sources
+    token = None
+    token_source = None
+    
+    # Check custom headers first (less likely to be stripped by Cloudflare)
+    for header_name in ['x-auth-token', 'x-user-token', 'x-api-key']:
+        if header_name in request.headers:
+            token = request.headers[header_name]
+            token_source = header_name
+            logger.debug(f"Token source: {header_name}, Token found: {token is not None}")
+            break
+    
+    # Fallback to Authorization header
+    if not token and 'authorization' in request.headers:
+        auth_header = request.headers['authorization']
+        if auth_header.startswith('Bearer '):
+            token = auth_header[7:]  # Remove 'Bearer ' prefix
+            token_source = "Authorization"
+            logger.debug(f"Token source: Authorization, Token found: {token is not None}")
+    
+    if not token:
+        logger.debug("No token found in any header")
+        raise credentials_exception
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            logger.debug("No email found in token payload")
+            raise credentials_exception
+        logger.debug(f"Token decoded successfully for email: {email} from {token_source}")
+        token_data = schemas.TokenData(email=email)
+    except JWTError as e:
+        logger.debug(f"JWT decode error: {str(e)}")
+        raise credentials_exception
+    
+    user = crud.get_user_by_email(db, email=token_data.email)
+    if user is None:
+        logger.debug(f"User not found for email: {token_data.email}")
+        raise credentials_exception
+    
+    logger.debug(f"Authentication successful for user: {user.email} via {token_source}")
+    return user
 
 def get_current_customer(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     """Get current customer from token"""
