@@ -5,6 +5,9 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 ## 🚀 Live Demo
 
 - **Admin Dashboard**: `http://localhost:3000/` (Login with tenant admin credentials)
+  - 📊 **Sales Analytics**: Interactive dashboard with revenue trends and business insights
+  - 📦 **Product Management**: Add, edit, and manage inventory
+  - 📋 **Order Processing**: Track and manage customer orders
 - **Customer Storefront**: `http://localhost:3000/store/{tenant_domain}` (Public access)
 - **API Documentation**: `http://localhost:8000/docs` (Interactive Swagger UI)
 
@@ -45,6 +48,16 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 - **Order Management**: Complete order lifecycle with status tracking
 - **Payment Processing**: Mock payment gateway with validation
 - **Inventory Tracking**: Real-time stock updates and low-stock alerts
+
+### 📊 Sales Analytics & Business Intelligence
+- **Comprehensive Dashboard**: Real-time revenue, orders, and performance metrics
+- **Interactive Charts**: Line charts showing revenue and order trends over time
+- **Key Performance Indicators**: Total revenue, order count, average order value, growth percentages
+- **Top Products Analysis**: Sortable table with revenue, quantity, orders, and pricing data
+- **Category Filtering**: Filter analytics by product categories for targeted insights
+- **Multi-Period Analysis**: 7, 30, 90, and 365-day reporting windows
+- **Click-to-Sort**: Interactive column sorting for revenue, quantity, orders, and average price
+- **Growth Tracking**: Period-over-period revenue growth comparisons
 
 ### 🤖 AI Integration
 - **Product Descriptions**: Auto-generate compelling descriptions using Google Gemini AI
@@ -90,7 +103,7 @@ A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capston
 
 ## 🏗 System Architecture
 
-```mermaid
+```
 graph TB
     subgraph "Frontend (React)"
         UI[User Interface]
@@ -130,6 +143,57 @@ graph TB
     style DB fill:#336791
     style AI fill:#4285f4
 ```
+
+## 📊 Sales Analytics Dashboard
+
+The platform includes a comprehensive sales analytics dashboard that provides real-time business insights and performance tracking for tenant administrators.
+
+### 💼 Key Features
+
+**Business Intelligence**
+- 💰 **Revenue Tracking**: Real-time revenue monitoring with growth percentages
+- 📋 **Order Analytics**: Track order volumes, counts, and average order values
+- 📈 **Trend Analysis**: Interactive line charts showing revenue and order trends
+- 📅 **Multi-Period Reports**: 7, 30, 90, and 365-day analysis windows
+
+**Interactive Visualizations**
+- 📊 **Line Charts**: Dual-axis charts showing revenue vs order count trends
+- 🏆 **Top Products Table**: Sortable rankings by revenue, quantity, orders, and pricing
+- 🎨 **Visual Indicators**: Sort icons and growth trend arrows
+- 🗂️ **Category Filtering**: Filter analytics by product categories
+
+**Data Insights**
+- 📈 **Growth Metrics**: Period-over-period revenue growth comparisons
+- 📊 **Status Distribution**: Order status breakdown with values
+- 🔄 **Real-time Updates**: Live data refresh based on current orders
+- 🎯 **Performance Rankings**: Identify top-performing products and categories
+
+### 🚀 Technical Implementation
+
+**Backend Analytics API**
+```
+# Three core analytics endpoints
+GET /orders/analytics/overview      # KPIs and growth metrics
+GET /orders/analytics/revenue-trend # Daily revenue and order trends  \nGET /orders/analytics/top-products  # Best-selling products analysis
+```
+
+**Frontend Features**
+- **Interactive Sorting**: Click column headers to sort by different metrics
+- **Category Filtering**: Dropdown to filter by product categories
+- **Responsive Design**: Works seamlessly on desktop and mobile
+- **Error Handling**: Comprehensive loading states and error messages
+
+**Database Optimization**
+- **Efficient Queries**: Optimized SQL with proper indexing
+- **Multi-Tenant Filtering**: Automatic tenant isolation for all analytics
+- **Legacy Support**: Handles both new category IDs and legacy category names
+
+### 💹 Business Value
+
+- **Revenue Optimization**: Identify best-selling products and high-value categories
+- **Inventory Management**: Track product performance to optimize stock levels
+- **Growth Tracking**: Monitor business growth with period comparisons
+- **Decision Support**: Data-driven insights for business strategy
 
 ## 📋 Prerequisites
 
@@ -202,6 +266,10 @@ npm start
 ```
 
 ### 4. Access the Application
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Docs**: http://localhost:8000/docs
 
 ## 🐳 Docker & Production Deployment
 
@@ -395,12 +463,6 @@ docker ps
 - **Secret Management**: Production secrets via external secret stores
 - **Database Encryption**: PostgreSQL encryption at rest
 - **JWT Security**: Signed tokens with configurable expiration
-
-### 4. Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
 
 ## 💡 Usage
 
