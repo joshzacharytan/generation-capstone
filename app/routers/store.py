@@ -393,6 +393,8 @@ def get_search_suggestions(
 >>>>>>> main
             "image_url": product.image_url
         })
+    
+    # Category suggestions
         suggestions.append({
             "type": "product",
             "text": product.name,
@@ -401,6 +403,8 @@ def get_search_suggestions(
             "id": product.id,
             "image_url": product.image_url
         })
+    
+    # Category suggestions
 =======
             "id": product.id,
 >>>>>>> main
