@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { heroBannerAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
-
-// Helper function to get full image URL
-const getFullImageUrl = (imageUrl) => {
-  if (!imageUrl) return '';
-  if (imageUrl.startsWith('http')) return imageUrl;
-  return `http://localhost:8000${imageUrl}`;
-};
+import { getImageUrl as getFullImageUrl } from '../utils/imageUtils';
 
 // Mini Hero Banner Preview Component for Admin
 const HeroBannerPreview = ({ banners }) => {

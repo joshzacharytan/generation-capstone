@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -11,8 +11,9 @@ router = APIRouter()
 @router.post("/products", response_model=schemas.Product)
 def create_product(
     product: schemas.ProductCreate, 
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Create a new product for the current user's tenant.
@@ -22,6 +23,7 @@ def create_product(
 
 @router.get("/products", response_model=List[schemas.Product])
 def read_products(
+    request: Request,
     skip: int = 0, 
     limit: int = 100,
     search: Optional[str] = None,
@@ -32,7 +34,7 @@ def read_products(
     sort_by: Optional[str] = "name",  # name, price, stock, date
     sort_order: Optional[str] = "asc",  # asc, desc
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Retrieve products for the current user's tenant with advanced filtering and search.
@@ -55,8 +57,9 @@ def read_products(
 
 @router.get("/products/analytics", response_model=dict)
 def get_product_analytics(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get product analytics and smart suggestions for the admin dashboard.
@@ -68,8 +71,9 @@ def get_product_analytics(
 def update_product(
     product_id: int,
     product_update: schemas.ProductUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Update an existing product for the current user's tenant.
@@ -85,8 +89,9 @@ def update_product(
 @router.delete("/products/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_product(
     product_id: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Delete a product for the current user's tenant.
@@ -101,8 +106,9 @@ def delete_product(
 
 @router.get("/products/categories", response_model=List[str])
 def get_categories(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get all unique categories for the current user's tenant.
@@ -120,8 +126,9 @@ def get_category_suggestions():
 
 @router.post("/products/upload-image")
 async def upload_product_image(
+    request: Request,
     file: UploadFile = File(...),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Upload a product image.
@@ -137,13 +144,14 @@ async def upload_product_image(
 
 @router.post("/products/create-with-image", response_model=schemas.Product)
 async def create_product_with_image(
+    request: Request,
     name: str = Form(...),
     description: Optional[str] = Form(None),
     price: float = Form(...),
     quantity: int = Form(...),
     category: str = Form("General"),
     image: Optional[UploadFile] = File(None),
-    current_user: models.User = Depends(security.get_current_user),
+    current_user: models.User = Depends(security.get_current_user_alternative),
     db: Session = Depends(get_db)
 ):
     """

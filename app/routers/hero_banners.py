@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, status, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -9,7 +9,7 @@ from ..services.file_upload import FileUploadService
 router = APIRouter()
 
 # Dependency for tenant admin access
-def get_tenant_admin_db(db: Session = Depends(get_db), current_user: models.User = Depends(security.get_current_user)):
+def get_tenant_admin_db(request: Request, db: Session = Depends(get_db), current_user: models.User = Depends(security.get_current_user_alternative)):
     return db, current_user
 
 # Dependency for public store access

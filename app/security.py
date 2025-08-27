@@ -143,3 +143,41 @@ def get_current_customer(token: str = Depends(oauth2_scheme), db: Session = Depe
     if customer is None:
         raise credentials_exception
     return customer
+
+def get_current_customer_alternative(request: Request, db: Session = Depends(get_db)):
+    """Get current customer from token - Cloudflare compatible version"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    # Try multiple headers to work around Cloudflare header stripping
+    token = None
+    auth_header = request.headers.get("authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+    
+    if not token:
+        token = request.headers.get("x-auth-token")
+    if not token:
+        token = request.headers.get("x-user-token")
+    if not token:
+        token = request.headers.get("x-api-key")
+    
+    if not token:
+        raise credentials_exception
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        customer_id: int = payload.get("customer_id")
+        tenant_id: int = payload.get("tenant_id")
+        if customer_id is None or tenant_id is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+    
+    customer = crud.get_customer_by_id(db, customer_id=customer_id, tenant_id=tenant_id)
+    if customer is None:
+        raise credentials_exception
+    return customer

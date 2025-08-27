@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { productsAPI, aiAPI, categoriesAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductForm = ({ product, onSave, onCancel }) => {
   const [loading, setLoading] = useState(false);
@@ -35,7 +36,7 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       
       // Set image preview if product has an image
       if (product.image_url) {
-        setImagePreview(`http://localhost:8000${product.image_url}`);
+        setImagePreview(getImageUrl(product.image_url));
       }
     }
   }, [product, setValue]);

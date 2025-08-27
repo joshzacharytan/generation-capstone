@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useCustomer } from '../contexts/CustomerContext';
 import LoadingSpinner from './LoadingSpinner';
 import { formatDateTime } from '../utils/dateUtils';
+import { getApiBaseUrl } from '../services/api';
 
 const CustomerAccount = ({ tenantDomain, onClose }) => {
   const { customer } = useCustomer();
@@ -98,7 +99,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
         }
       }
       
-      const response = await fetch(`http://localhost:8000/store/${tenantDomain}/customer/orders?${params}`, {
+      const response = await fetch(`${getApiBaseUrl()}/store/${tenantDomain}/customer/orders?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -160,7 +161,7 @@ const CustomerAccount = ({ tenantDomain, onClose }) => {
         }
       }
       
-      const response = await fetch(`http://localhost:8000/store/${tenantDomain}/customer/orders/count?${params}`, {
+      const response = await fetch(`${getApiBaseUrl()}/store/${tenantDomain}/customer/orders/count?${params}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

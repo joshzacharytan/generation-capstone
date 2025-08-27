@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -10,8 +10,9 @@ router = APIRouter()
 
 @router.get("/", response_model=schemas.Tenant)
 def get_tenant_branding(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """Get current tenant's branding information"""
     tenant = crud.get_tenant_branding(db, tenant_id=current_user.tenant_id)
@@ -22,8 +23,9 @@ def get_tenant_branding(
 @router.put("/", response_model=schemas.Tenant)
 def update_tenant_branding(
     branding_data: schemas.TenantBrandingUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """Update tenant branding information"""
     updated_tenant = crud.update_tenant_branding(
@@ -38,7 +40,8 @@ def update_tenant_branding(
 @router.post("/logo")
 async def upload_company_logo(
     file: UploadFile = File(...),
-    current_user: models.User = Depends(security.get_current_user),
+    request: Request = None,
+    current_user: models.User = Depends(security.get_current_user_alternative),
     db: Session = Depends(get_db)
 ):
     """Upload company logo"""
@@ -76,8 +79,9 @@ async def upload_company_logo(
 
 @router.delete("/logo")
 def remove_company_logo(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """Remove company logo"""
     branding_data = schemas.TenantBrandingUpdate(

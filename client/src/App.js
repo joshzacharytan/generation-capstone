@@ -8,6 +8,7 @@ import AdminDashboard from './components/AdminDashboard';
 import CustomerStorefront from './components/CustomerStorefront';
 import ProductDetail from './components/ProductDetail';
 import SearchResults from './components/SearchResults';
+
 import './App.css';
 
 function App() {

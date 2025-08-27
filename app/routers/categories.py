@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -11,7 +11,7 @@ router = APIRouter()
 def get_categories(
     active_only: bool = True,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get all categories for the current user's tenant.
@@ -23,7 +23,7 @@ def get_categories(
 def create_category(
     category: schemas.CategoryCreate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Create a new category for the current user's tenant.
@@ -46,7 +46,7 @@ def create_category(
 def get_category(
     category_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get a specific category by ID.
@@ -61,7 +61,7 @@ def update_category(
     category_id: int,
     category_update: schemas.CategoryUpdate,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Update a category.
@@ -94,7 +94,7 @@ def update_category(
 def delete_category(
     category_id: int,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Delete a category. If products use this category, it will be deactivated instead.
@@ -113,7 +113,7 @@ def delete_category(
 @router.post("/initialize-defaults")
 def initialize_default_categories(
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Initialize default categories for the tenant if they don't have any.
@@ -132,8 +132,9 @@ def initialize_default_categories(
 def reorder_category(
     category_id: int,
     new_order: int,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Update the sort order of a category.

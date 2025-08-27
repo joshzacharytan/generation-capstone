@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Detection Test</title>
+</head>
+<body>
+    <h1>API Base URL Detection Test</h1>
+    <div id="results"></div>
+    <button onclick="testApi()">Test API Connection</button>
+    
+    <script>
+        // Same logic as in api.js
+        const getApiBaseUrl = () => {
+            // Check hostname first
+            if (typeof window !== 'undefined') {
+                const hostname = window.location.hostname;
+                console.log('API Base URL: Checking hostname:', hostname);
+                
+                // For your specific setup: frontend is gensg.tanfamily.cc, API is gensg-fastapi.tanfamily.cc
+                if (hostname === 'gensg.tanfamily.cc') {
+                    console.log('API Base URL: Using gensg-fastapi.tanfamily.cc (production tunnel)');
+                    return 'https://gensg-fastapi.tanfamily.cc';
+                }
+                
+                // If hostname is localhost, use localhost API (for true local development)
+                if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                    console.log('API Base URL: Development mode on localhost');
+                    return 'http://localhost:8000';
+                }
+            }
+            
+            // Fallback for any other case
+            console.log('API Base URL: Fallback to localhost');
+            return 'http://localhost:8000';
+        };
+
+        const results = document.getElementById('results');
+        const hostname = window.location.hostname;
+        const apiUrl = getApiBaseUrl();
+        
+        results.innerHTML = `
+            <p><strong>Current hostname:</strong> ${hostname}</p>
+            <p><strong>Current URL:</strong> ${window.location.href}</p>
+            <p><strong>Detected API URL:</strong> ${apiUrl}</p>
+            <p><strong>Expected for gensg.tanfamily.cc:</strong> https://gensg-fastapi.tanfamily.cc</p>
+        `;
+        
+        console.log('Hostname:', hostname);
+        console.log('API URL:', apiUrl);
+        
+        async function testApi() {
+            try {
+                console.log('Testing API connection to:', apiUrl);
+                const response = await fetch(`${apiUrl}/store/Test1Co/products`);
+                console.log('API Response:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`API Success! Got ${data.length} products`);
+                } else {
+                    alert(`API Failed: ${response.status} ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+                alert(`API Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>

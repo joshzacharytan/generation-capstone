@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getApiBaseUrl } from '../services/api';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = getApiBaseUrl();
 
 export const runApiDiagnostics = async () => {
   const results = {

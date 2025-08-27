@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import LoadingSpinner from './LoadingSpinner';
+import { getApiBaseUrl } from '../services/api';
 
 const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
@@ -20,7 +21,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
       formData.append('password', data.password);
       formData.append('tenant_domain', tenantDomain);
 
-      const response = await fetch(`http://localhost:8000/store/auth/login?tenant_domain=${tenantDomain}`, {
+      const response = await fetch(`${getApiBaseUrl()}/store/auth/login?tenant_domain=${tenantDomain}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -39,7 +40,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
       localStorage.setItem(`customer_token_${tenantDomain}`, result.access_token);
       
       // Get customer details from the backend
-      const customerResponse = await fetch(`http://localhost:8000/store/${tenantDomain}/customer/me`, {
+      const customerResponse = await fetch(`${getApiBaseUrl()}/store/${tenantDomain}/customer/me`, {
         headers: {
           'Authorization': `Bearer ${result.access_token}`
         }
@@ -73,7 +74,7 @@ const CustomerAuth = ({ tenantDomain, onLogin, onClose }) => {
       setLoading(true);
       setError('');
 
-      const response = await fetch(`http://localhost:8000/store/auth/register?tenant_domain=${tenantDomain}`, {
+      const response = await fetch(`${getApiBaseUrl()}/store/auth/register?tenant_domain=${tenantDomain}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

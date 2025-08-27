@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any, Optional
@@ -126,6 +126,7 @@ def get_current_customer_profile(
 @router.get("/{tenant_domain}/customer/orders", response_model=List[schemas.Order])
 def get_customer_orders(
     tenant_domain: str,
+    request: Request,
     skip: int = 0,
     limit: int = 20,
     status: Optional[str] = None,
@@ -133,7 +134,7 @@ def get_customer_orders(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_customer: models.Customer = Depends(security.get_current_customer)
+    current_customer: models.Customer = Depends(security.get_current_customer_alternative)
 ):
     """Get current customer's order history with pagination and filtering"""
     from datetime import datetime
@@ -176,12 +177,13 @@ def get_customer_orders(
 @router.get("/{tenant_domain}/customer/orders/count")
 def get_customer_orders_count(
     tenant_domain: str,
+    request: Request,
     status: Optional[str] = None,
     search: Optional[str] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_customer: models.Customer = Depends(security.get_current_customer)
+    current_customer: models.Customer = Depends(security.get_current_customer_alternative)
 ):
     """Get total count of customer orders for pagination"""
     from datetime import datetime

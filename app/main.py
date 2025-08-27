@@ -41,14 +41,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add a middleware to log all incoming requests
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    logger.info(f"Incoming request: {request.method} {request.url}")
-    logger.info(f"Headers: {dict(request.headers)}")
-    response = await call_next(request)
-    logger.info(f"Response status: {response.status_code}")
-    return response
+# Debug logging middleware removed
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
@@ -61,13 +54,13 @@ app.include_router(auth.router, tags=["Authentication"])
 app.include_router(products.router, tags=["Products"])
 app.include_router(ai.router, tags=["Generative AI"])
 app.include_router(admin.router, tags=["Admin"])
-app.include_router(profile.router)
-app.include_router(orders.router, tags=["Orders"])
-app.include_router(store.router, tags=["Customer Store"])
+app.include_router(profile.router, tags=["Profile"])
+app.include_router(categories.router, prefix="/categories", tags=["Categories"])
+app.include_router(branding.router, prefix="/branding", tags=["Tenant Branding"])
+app.include_router(hero_banners.router, prefix="/hero-banners", tags=["Hero Banners"])
 app.include_router(payment.router, tags=["Payment Processing"])
-app.include_router(categories.router, tags=["Categories"])
-app.include_router(branding.router, tags=["Tenant Branding"])
-app.include_router(hero_banners.router, tags=["Hero Banners"])
+app.include_router(store.router, prefix="/store", tags=["Customer Store"])
+app.include_router(orders.router, prefix="/orders", tags=["Orders"])
 
 # Root endpoint
 @app.get("/", response_class=HTMLResponse)

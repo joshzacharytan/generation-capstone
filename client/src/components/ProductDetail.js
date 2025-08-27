@@ -8,6 +8,7 @@ import StoreFooter from './StoreFooter';
 import ShoppingCart from './ShoppingCart';
 import Checkout from './Checkout';
 import CustomerAuth from './CustomerAuth';
+import { getImageUrl } from '../utils/imageUtils';
 import CustomerAccount from './CustomerAccount';
 import { CustomerProvider, useCustomer } from '../contexts/CustomerContext';
 
@@ -233,7 +234,7 @@ const ProductDetailContent = () => {
           <div style={{ position: 'relative' }}>
             {product.image_url ? (
               <img
-                src={`http://localhost:8000${product.image_url}`}
+                src={getImageUrl(product.image_url)}
                 alt={product.name}
                 style={{
                   width: '100%',

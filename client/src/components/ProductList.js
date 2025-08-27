@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { productsAPI, categoriesAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   const [products, setProducts] = useState([]);
@@ -619,7 +620,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
         <div style={{ flexShrink: 0 }}>
           {product.image_url ? (
             <img
-              src={`http://localhost:8000${product.image_url}`}
+              src={getImageUrl(product.image_url)}
               alt={product.name}
               style={{
                 width: '80px',
@@ -757,7 +758,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       <div style={{ marginBottom: '1rem', position: 'relative' }}>
         {product.image_url ? (
           <img
-            src={`http://localhost:8000${product.image_url}`}
+            src={getImageUrl(product.image_url)}
             alt={product.name}
             style={{
               width: '100%',

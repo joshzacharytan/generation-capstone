@@ -8,6 +8,7 @@ import CustomerAuth from './CustomerAuth';
 import CustomerAccount from './CustomerAccount';
 import NetworkStatus from './NetworkStatus';
 import StoreHeader from './StoreHeader';
+import { getImageUrl } from '../utils/imageUtils';
 import StoreFooter from './StoreFooter';
 import HeroBannerDisplay from './HeroBannerDisplay';
 import { CustomerProvider, useCustomer } from '../contexts/CustomerContext';
@@ -657,7 +658,7 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
       {/* Product Image */}
       {product.image_url ? (
         <img
-          src={`http://localhost:8000${product.image_url}`}
+          src={getImageUrl(product.image_url)}
           alt={product.name}
           style={{
             width: '100%',

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../contexts/CustomerContext';
 import { storeAPI } from '../services/api';
 import SearchBox from './SearchBox';
+import { getImageUrl } from '../utils/imageUtils';
 
 const StoreHeader = ({ 
   tenantDomain, 
@@ -131,7 +132,7 @@ const StoreHeader = ({
             {/* Company Logo */}
             {tenantBranding?.company_logo_url && (
               <img
-                src={`http://localhost:8000${tenantBranding.company_logo_url}`}
+                src={getImageUrl(tenantBranding.company_logo_url)}
                 alt={`${tenantDomain} Logo`}
                 style={{
                   height: '40px',

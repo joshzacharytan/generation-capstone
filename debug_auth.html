@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auth Debug</title>
+</head>
+<body>
+    <h1>Authentication Debug</h1>
+    <div id="status"></div>
+    <button onclick="checkAuth()">Check Auth Status</button>
+    <button onclick="login()">Login</button>
+    <button onclick="testAPI()">Test API</button>
+    
+    <script>
+        function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            document.getElementById('status').innerHTML = `
+                <p>Token: ${token ? 'Present' : 'Not found'}</p>
+                <p>Domain: ${window.location.hostname}</p>
+                <p>API Base: ${getApiBaseUrl()}</p>
+            `;
+        }
+        
+        function getApiBaseUrl() {
+            console.log('Current hostname:', window.location.hostname);
+            if (window.location.hostname === 'gensg.tanfamily.cc') {
+                console.log('Using tunnel API URL');
+                return 'https://gensg-fastapi.tanfamily.cc';
+            }
+            console.log('Using localhost API URL');
+            return 'http://localhost:8000';
+        }
+        
+        async function login() {
+            try {
+                const response = await fetch(`${getApiBaseUrl()}/auth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'username=test1@test.com&password=password'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    document.getElementById('status').innerHTML = '<p>Login successful!</p>';
+                } else {
+                    document.getElementById('status').innerHTML = '<p>Login failed!</p>';
+                }
+            } catch (error) {
+                document.getElementById('status').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+        
+        async function testAPI() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                document.getElementById('status').innerHTML = '<p>No token found. Please login first.</p>';
+                return;
+            }
+            
+            console.log('Testing API with token:', token.substring(0, 20) + '...');
+            console.log('API URL:', getApiBaseUrl());
+            
+            try {
+                const response = await fetch(`${getApiBaseUrl()}/products`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('status').innerHTML = `<p>API Success! Found ${data.length} products</p>`;
+                } else {
+                    const error = await response.text();
+                    console.log('Error response:', error);
+                    document.getElementById('status').innerHTML = `<p>API Error: ${response.status} - ${error}</p>`;
+                }
+            } catch (error) {
+                console.log('Network error:', error);
+                document.getElementById('status').innerHTML = `<p>Network Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Check auth on load
+        checkAuth();
+    </script>
+</body>
+</html>

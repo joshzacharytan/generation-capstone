@@ -1,4 +1,5 @@
 import React from 'react';
+import { getImageUrl } from '../utils/imageUtils';
 
 const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckout }) => {
   const getCartTotal = () => {
@@ -84,7 +85,7 @@ const ShoppingCart = ({ cart, onUpdateQuantity, onRemoveItem, onClose, onCheckou
                   {/* Product Image */}
                   {item.image_url ? (
                     <img
-                      src={`http://localhost:8000${item.image_url}`}
+                      src={getImageUrl(item.image_url)}
                       alt={item.name}
                       style={{
                         width: '60px',

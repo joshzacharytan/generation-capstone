@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract, desc, or_
 import sqlalchemy as sa
@@ -12,6 +12,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[schemas.Order])
 def get_orders(
+    request: Request,
     skip: int = 0,
     limit: int = 15,
     status: Optional[str] = None,
@@ -19,7 +20,7 @@ def get_orders(
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get all orders for the current user's tenant with pagination and filtering.
@@ -65,12 +66,13 @@ def get_orders(
 
 @router.get("/count")
 def get_orders_count(
+    request: Request,
     status: Optional[str] = None,
     search: Optional[str] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get total count of orders for the current tenant for pagination.
@@ -112,27 +114,13 @@ def get_orders_count(
     total_count = query.count()
     return {"total": total_count}
 
-@router.get("/{order_id}", response_model=schemas.Order)
-def get_order(
-    order_id: int,
-    db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
-):
-    """
-    Get a specific order by ID.
-    Only accessible to authenticated admin users who own the order.
-    """
-    order = crud.get_order_by_id(db, order_id=order_id, tenant_id=current_user.tenant_id)
-    if not order:
-        raise HTTPException(status_code=404, detail="Order not found")
-    return order
-
 @router.get("/analytics/overview")
 def get_sales_overview(
+    request: Request,
     days: int = 30,
     category_id: Optional[int] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get sales overview analytics for the dashboard.
@@ -274,10 +262,11 @@ def get_sales_overview(
 
 @router.get("/analytics/revenue-trend")
 def get_revenue_trend(
+    request: Request,
     days: int = 30,
     category_id: Optional[int] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get daily revenue trend data for charts.
@@ -325,11 +314,12 @@ def get_revenue_trend(
 
 @router.get("/analytics/top-products")
 def get_top_products(
+    request: Request,
     limit: int = 10,
     days: int = 30,
     category_id: Optional[int] = None,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Get top-selling products by revenue and quantity.
@@ -392,8 +382,9 @@ def get_top_products(
 def update_order_status(
     order_id: int,
     status_update: schemas.OrderStatusUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """
     Update order status.
@@ -405,6 +396,22 @@ def update_order_status(
         status=status_update.status, 
         tenant_id=current_user.tenant_id
     )
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    return order
+
+@router.get("/{order_id}", response_model=schemas.Order)
+def get_order(
+    order_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(security.get_current_user_alternative)
+):
+    """
+    Get a specific order by ID.
+    Only accessible to authenticated admin users who own the order.
+    """
+    order = crud.get_order_by_id(db, order_id=order_id, tenant_id=current_user.tenant_id)
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     return order

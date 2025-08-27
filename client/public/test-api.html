@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    <div id="results"></div>
+    <button onclick="testLogin()">1. Test Login</button>
+    <button onclick="testProducts()">2. Test Products</button>
+    <button onclick="clearStorage()">Clear Storage</button>
+    
+    <script>
+        const API_BASE = 'https://gensg-fastapi.tanfamily.cc';
+        
+        async function testLogin() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'username=test1@test.com&password=password'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    document.getElementById('results').innerHTML = `
+                        <p>✅ Login successful!</p>
+                        <p>Token: ${data.access_token.substring(0, 30)}...</p>
+                    `;
+                } else {
+                    const error = await response.text();
+                    document.getElementById('results').innerHTML = `
+                        <p>❌ Login failed: ${response.status}</p>
+                        <p>Error: ${error}</p>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <p>❌ Network error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testProducts() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                document.getElementById('results').innerHTML = '<p>❌ No token found. Login first.</p>';
+                return;
+            }
+            
+            try {
+                console.log('Making request to:', `${API_BASE}/products`);
+                console.log('With token:', token.substring(0, 30) + '...');
+                
+                const response = await fetch(`${API_BASE}/products`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('results').innerHTML = `
+                        <p>✅ Products API successful!</p>
+                        <p>Found ${data.length} products</p>
+                        <pre>${JSON.stringify(data.slice(0, 2), null, 2)}</pre>
+                    `;
+                } else {
+                    const error = await response.text();
+                    document.getElementById('results').innerHTML = `
+                        <p>❌ Products API failed: ${response.status}</p>
+                        <p>Error: ${error}</p>
+                    `;
+                }
+            } catch (error) {
+                console.log('Network error:', error);
+                document.getElementById('results').innerHTML = `
+                    <p>❌ Network error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('results').innerHTML = '<p>Storage cleared</p>';
+        }
+    </script>
+</body>
+</html>

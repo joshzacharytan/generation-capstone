@@ -1,20 +1,85 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+// Dynamic API base URL that works in both development and production
+const getApiBaseUrl = () => {
+  // Check if there's an environment variable override (but only if not commented out)
+  if (process.env.REACT_APP_API_BASE_URL && !process.env.REACT_APP_API_BASE_URL.includes('#')) {
+    console.log('API Base URL: Using environment variable:', process.env.REACT_APP_API_BASE_URL);
+    return process.env.REACT_APP_API_BASE_URL;
+  }
+  
+  // Check hostname first - this takes priority over NODE_ENV
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    console.log('API Base URL: Checking hostname:', hostname);
+    
+    // For your specific setup: frontend is gensg.tanfamily.cc, API is gensg-fastapi.tanfamily.cc
+    if (hostname === 'gensg.tanfamily.cc') {
+      console.log('API Base URL: Using gensg-fastapi.tanfamily.cc (production tunnel)');
+      return 'https://gensg-fastapi.tanfamily.cc';
+    }
+    
+    // If hostname is localhost, use localhost API (for true local development)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      console.log('API Base URL: Development mode on localhost');
+      return 'http://localhost:8000';
+    }
+  }
+  
+  // Fallback for any other case
+  console.log('API Base URL: Fallback to localhost');
+  return 'http://localhost:8000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
+console.log('API Base URL:', API_BASE_URL); // Debug log
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 30000, // 30 second timeout
 });
 
+// Add request interceptor to dynamically set the baseURL
+api.interceptors.request.use(
+  (config) => {
+    // Set baseURL dynamically for each request
+    config.baseURL = getApiBaseUrl();
+    console.log('API Request:', config.method?.toUpperCase(), config.baseURL, config.url, config);
+    return config;
+  },
+  (error) => {
+    console.error('API Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to log all responses
+api.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', response.status, response.config.url, response);
+    return response;
+  },
+  (error) => {
+    console.error('API Response Error:', error);
+    if (error.response) {
+      console.error('API Response Error Details:', error.response.status, error.response.data);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Add token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) {
+    // Use multiple custom headers that Cloudflare is less likely to strip
+    config.headers['X-Auth-Token'] = token;
+    config.headers['X-User-Token'] = token;
+    config.headers['X-API-Key'] = token;
+    // Also try Authorization as fallback
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -122,7 +187,7 @@ export const ordersAPI = {
       }
     });
     const queryString = queryParams.toString();
-    return api.get(`/orders${queryString ? `?${queryString}` : ''}`);
+    return api.get(`/orders/${queryString ? `?${queryString}` : ''}`);
   },
   getCount: (params = {}) => {
     const queryParams = new URLSearchParams();
@@ -274,9 +339,9 @@ export const storeAPI = {
 
 // Categories API
 export const categoriesAPI = {
-  getAll: (activeOnly = true) => api.get(`/categories?active_only=${activeOnly}`),
+  getAll: (activeOnly = true) => api.get(`/categories/?active_only=${activeOnly}`),
   getById: (id) => api.get(`/categories/${id}`),
-  create: (category) => api.post('/categories', category),
+  create: (category) => api.post('/categories/', category),
   update: (id, category) => api.put(`/categories/${id}`, category),
   delete: (id) => api.delete(`/categories/${id}`),
   initializeDefaults: () => api.post('/categories/initialize-defaults'),
@@ -285,8 +350,8 @@ export const categoriesAPI = {
 
 // Branding API
 export const brandingAPI = {
-  getBranding: () => api.get('/branding'),
-  updateBranding: (brandingData) => api.put('/branding', brandingData),
+  getBranding: () => api.get('/branding/'),
+  updateBranding: (brandingData) => api.put('/branding/', brandingData),
   uploadLogo: (formData) => api.post('/branding/logo', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
@@ -303,9 +368,9 @@ export const adminAPI = {
 
 // Hero Banner API
 export const heroBannerAPI = {
-  getAll: (activeOnly = false) => api.get(`/hero-banners?active_only=${activeOnly}`),
+  getAll: (activeOnly = false) => api.get(`/hero-banners/?active_only=${activeOnly}`),
   getById: (id) => api.get(`/hero-banners/${id}`),
-  create: (formData) => api.post('/hero-banners', formData, {
+  create: (formData) => api.post('/hero-banners/', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   update: (id, formData) => api.put(`/hero-banners/${id}`, formData, {
@@ -316,3 +381,6 @@ export const heroBannerAPI = {
 };
 
 export default api;
+
+// Export the getApiBaseUrl function for use in components
+export { getApiBaseUrl };

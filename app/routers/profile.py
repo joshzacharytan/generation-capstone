@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
 from .. import crud, schemas, security, models
@@ -9,8 +9,9 @@ router = APIRouter(prefix="/profile", tags=["Profile"])
 @router.put("/password", response_model=schemas.User)
 def update_password(
     password_update: schemas.UserPasswordUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     if not security.verify_password(password_update.old_password, current_user.hashed_password):
         raise HTTPException(
@@ -25,8 +26,9 @@ def update_password(
 @router.put("/email", response_model=schemas.User)
 def update_email(
     email_update: schemas.UserEmailUpdate,
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     if crud.get_user_by_email(db, email=email_update.new_email):
         raise HTTPException(
@@ -39,16 +41,18 @@ def update_email(
 
 @router.get("/me", response_model=schemas.UserWithTenant)
 def get_current_user_profile(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     """Get current user profile with tenant information"""
     return current_user
 
 @router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 def delete_account(
+    request: Request,
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(security.get_current_user)
+    current_user: models.User = Depends(security.get_current_user_alternative)
 ):
     crud.delete_user_account(db, current_user.id)
     return

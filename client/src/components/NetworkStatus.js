@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getApiBaseUrl } from '../services/api';
 
 const NetworkStatus = ({ onStatusChange }) => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
@@ -29,7 +30,7 @@ const NetworkStatus = ({ onStatusChange }) => {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch('http://localhost:8000/docs', {
+      const response = await fetch(`${getApiBaseUrl()}/docs`, {
         method: 'HEAD',
         mode: 'no-cors'
       });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { brandingAPI } from '../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import { getImageUrl } from '../utils/imageUtils';
 
 const BrandingManagement = () => {
   const [branding, setBranding] = useState({
@@ -179,7 +180,7 @@ const BrandingManagement = () => {
             {branding.company_logo_url ? (
               <div style={{ textAlign: 'center' }}>
                 <img
-                  src={`http://localhost:8000${branding.company_logo_url}`}
+                  src={getImageUrl(branding.company_logo_url)}
                   alt="Company Logo"
                   style={{
                     maxHeight: '100px',

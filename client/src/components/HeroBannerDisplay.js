@@ -1,12 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { storeAPI } from '../services/api';
-
-// Helper function to get full image URL
-const getFullImageUrl = (imageUrl) => {
-  if (!imageUrl) return '';
-  if (imageUrl.startsWith('http')) return imageUrl;
-  return `http://localhost:8000${imageUrl}`;
-};
+import { getImageUrl as getFullImageUrl } from '../utils/imageUtils';
 
 const HeroBannerDisplay = ({ tenantDomain }) => {
   const [banners, setBanners] = useState([]);
