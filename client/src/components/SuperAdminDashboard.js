@@ -75,8 +75,8 @@ const SuperAdminDashboard = () => {
                 transition: 'transform 0.2s ease, var(--theme-transition)'
               }}
               onClick={() => setSelectedTenant(tenant)}
-              onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
                 {tenant.name}
@@ -155,23 +155,6 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
   };
 
   return (
-<<<<<<< HEAD
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'var(--bg-overlay)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
-      <div style={{
-        backgroundColor: 'var(--bg-elevated)',
-        padding: '2rem',
-=======
     <div 
       style={{
         position: 'fixed',
@@ -179,7 +162,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'var(--bg-overlay)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -197,55 +180,6 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
         borderRadius: '8px',
         maxWidth: '800px',
         width: '90%',
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden' // Prevent outer container from scrolling
-      }}>
-        {/* Fixed Header */}
-        <div style={{ 
-          padding: '2rem 2rem 0 2rem',
-          borderBottom: '1px solid #dee2e6',
-          flexShrink: 0
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ margin: 0, color: '#333' }}>
-              {tenant.name} - Details
-            </h3>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                color: '#6c757d'
-              }}
-            >
-              ×
-            </button>
-          </div>
-
-          {error && (
-            <div style={{
-              color: '#dc3545',
-              backgroundColor: '#f8d7da',
-              padding: '0.75rem',
-              borderRadius: '4px',
-              marginBottom: '1rem',
-              border: '1px solid #f5c6cb'
-            }}>
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Scrollable Content */}
-        <div style={{
-          padding: '1rem 2rem 2rem 2rem',
-          overflow: 'auto',
-          flex: 1
-        }}>
->>>>>>> f07328c (fix: resolve superadmin portal issues and improve modal UX)
         maxHeight: '80vh',
         display: 'flex',
         flexDirection: 'column',
@@ -296,57 +230,6 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
           overflow: 'auto',
           flex: 1
         }}>
-=======
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden' // Prevent outer container from scrolling
-      }}>
-        {/* Fixed Header */}
-        <div style={{ 
-          padding: '2rem 2rem 0 2rem',
-          borderBottom: '1px solid #dee2e6',
-          flexShrink: 0
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ margin: 0, color: '#333' }}>
-              {tenant.name} - Details
-            </h3>
-            <button
-              onClick={onClose}
-              style={{
-                background: 'none',
-                border: 'none',
-                fontSize: '1.5rem',
-                cursor: 'pointer',
-                color: '#6c757d'
-              }}
-            >
-              ×
-            </button>
-          </div>
-
-          {error && (
-            <div style={{
-              color: '#dc3545',
-              backgroundColor: '#f8d7da',
-              padding: '0.75rem',
-              borderRadius: '4px',
-              marginBottom: '1rem',
-              border: '1px solid #f5c6cb'
-            }}>
-              {error}
-            </div>
-          )}
-        </div>
-
-        {/* Scrollable Content */}
-        <div style={{
-          padding: '1rem 2rem 2rem 2rem',
-          overflow: 'auto',
-          flex: 1
-        }}>
->>>>>>> f07328c (fix: resolve superadmin portal issues and improve modal UX)
-
           <div style={{ marginBottom: '2rem' }}>
             <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Tenant Information</h4>
             <div style={{ backgroundColor: 'var(--bg-secondary)', padding: '1rem', borderRadius: '4px', border: '1px solid var(--border-primary)' }}>
@@ -453,7 +336,6 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
               <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No products found</p>
             )}
           </div>
-        {/* End Scrollable Content */}
         </div>
       </div>
     </div>
