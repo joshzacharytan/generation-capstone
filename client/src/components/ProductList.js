@@ -806,7 +806,10 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       borderRadius: '8px',
       boxShadow: 'var(--shadow-md)',
       border: '1px solid var(--border-primary)',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%' // Ensure all cards take full height of grid cell
     }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -866,115 +869,139 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       </div>
 
       {/* Product Details */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-        <h4 style={{ margin: 0, color: 'var(--text-primary)', flex: 1, marginRight: '0.5rem' }}>
-          {product.name}
-        </h4>
-        <span style={{
-          fontSize: '0.75rem',
-          backgroundColor: 'var(--bg-tertiary)',
-          color: 'var(--text-secondary)',
-          padding: '0.25rem 0.5rem',
-          borderRadius: '12px',
-          whiteSpace: 'nowrap'
-        }}>
-          {product.category || 'General'}
-        </span>
-      </div>
-
-      <p style={{ 
-        color: 'var(--text-secondary)', 
-        fontSize: '0.9rem',
-        margin: '0 0 1rem 0',
-        lineHeight: '1.4',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {product.description || 'No description available'}
-      </p>
-
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem'
-      }}>
-        <span style={{ 
-          fontSize: '1.25rem', 
-          fontWeight: 'bold',
-          color: 'var(--color-success)'
-        }}>
-          ${product.price.toFixed(2)}
-        </span>
-        <span style={{
-          fontSize: '0.875rem',
-          color: stockStatus.color,
-          backgroundColor: stockStatus.bg,
-          padding: '0.25rem 0.5rem',
-          borderRadius: '12px',
-          fontWeight: '500'
-        }}>
-          {stockStatus.text}
-        </span>
-      </div>
-
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <button
-          onClick={() => onEdit(product)}
-          style={{
-            flex: 1,
-            padding: '0.75rem',
-            backgroundColor: 'var(--color-primary)',
-            color: 'var(--text-inverse)',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-primary-dark)'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-primary)'}
-        >
-          ✏️ Edit
-        </button>
-        <button
-          onClick={() => onDelete(product.id)}
-          style={{
-            flex: 1,
-            padding: '0.75rem',
-            backgroundColor: 'var(--color-danger)',
-            color: 'var(--text-inverse)',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-danger-dark)'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-danger)'}
-        >
-          🗑️ Delete
-        </button>
-      </div>
-
-      {/* Quick Info */}
-      <div style={{
-        marginTop: '0.75rem',
-        padding: '0.5rem',
-        backgroundColor: 'var(--bg-tertiary)',
-        borderRadius: '4px',
-        fontSize: '0.75rem',
-        color: 'var(--text-secondary)',
+        flex: 1, // Take up remaining space
         display: 'flex',
-        justifyContent: 'space-between'
+        flexDirection: 'column'
       }}>
-        <span>ID: {product.id}</span>
-        <span>Added: {new Date(product.created_at).toLocaleDateString()}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+          <h4 style={{ 
+            margin: 0, 
+            color: 'var(--text-primary)', 
+            flex: 1, 
+            marginRight: '0.5rem',
+            minHeight: '2.5rem', // Reserve space for 2 lines of text
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            lineHeight: '1.25'
+          }}>
+            {product.name}
+          </h4>
+          <span style={{
+            fontSize: '0.75rem',
+            backgroundColor: 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            whiteSpace: 'nowrap'
+          }}>
+            {product.category || 'General'}
+          </span>
+        </div>
+
+        <p style={{ 
+          color: 'var(--text-secondary)', 
+          fontSize: '0.9rem',
+          margin: '0 0 1rem 0',
+          lineHeight: '1.4',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          minHeight: '2.8rem' // Reserve consistent space for 2 lines
+        }}>
+          {product.description || 'No description available'}
+        </p>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem'
+        }}>
+          <span style={{ 
+            fontSize: '1.25rem', 
+            fontWeight: 'bold',
+            color: 'var(--color-success)'
+          }}>
+            ${product.price.toFixed(2)}
+          </span>
+          <span style={{
+            fontSize: '0.875rem',
+            color: stockStatus.color,
+            backgroundColor: stockStatus.bg,
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            fontWeight: '500'
+          }}>
+            {stockStatus.text}
+          </span>
+        </div>
+      </div>
+
+      {/* Action Buttons - Push to bottom */}
+      <div style={{ 
+        marginTop: 'auto', // Push to bottom
+        display: 'flex', 
+        flexDirection: 'column',
+        gap: '0.5rem'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => onEdit(product)}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--text-inverse)',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-primary-dark)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-primary)'}
+          >
+            ✏️ Edit
+          </button>
+          <button
+            onClick={() => onDelete(product.id)}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              backgroundColor: 'var(--color-danger)',
+              color: 'var(--text-inverse)',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-danger-dark)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-danger)'}
+          >
+            🗑️ Delete
+          </button>
+        </div>
+
+        {/* Quick Info */}
+        <div style={{
+          padding: '0.5rem',
+          backgroundColor: 'var(--bg-tertiary)',
+          borderRadius: '4px',
+          fontSize: '0.75rem',
+          color: 'var(--text-secondary)',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}>
+          <span>ID: {product.id}</span>
+          <span>Added: {new Date(product.created_at).toLocaleDateString()}</span>
+        </div>
       </div>
     </div>
   );

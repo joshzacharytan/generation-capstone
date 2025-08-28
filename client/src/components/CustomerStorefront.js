@@ -663,7 +663,10 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
       overflow: 'hidden',
       transition: 'transform 0.2s ease, box-shadow 0.2s ease',
       cursor: 'pointer',
-      border: '1px solid var(--border-primary)'
+      border: '1px solid var(--border-primary)',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%' // Ensure all cards take full height of grid cell
     }}
       onClick={handleProductClick}
       onMouseEnter={(e) => {
@@ -704,7 +707,12 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
         </div>
       )}
 
-      <div style={{ padding: '1.5rem' }}>
+      <div style={{ 
+        padding: '1.5rem',
+        flex: 1, // Take up remaining space
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <div style={{ marginBottom: '0.5rem' }}>
           <span style={{
             fontSize: '0.75rem',
@@ -721,7 +729,13 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
           margin: '0 0 0.5rem 0',
           color: 'var(--text-primary)',
           fontSize: '1.1rem',
-          transition: 'color 0.2s ease'
+          transition: 'color 0.2s ease',
+          minHeight: '2.75rem', // Reserve space for 2 lines of text
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          lineHeight: '1.25'
         }}>
           {product.name}
         </h3>
@@ -734,7 +748,8 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: '2.8rem' // Reserve consistent space for 2 lines
         }}>
           {product.description || 'No description available'}
         </p>
@@ -770,64 +785,67 @@ const ProductCard = ({ product, onAddToCart, tenantDomain, currentCategory }) =>
           </span>
         </div>
 
-        {product.quantity > 0 ? (
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <select
-              value={quantity}
-              onChange={(e) => {
-                e.stopPropagation(); // Prevent navigation when changing quantity
-                setQuantity(parseInt(e.target.value));
-              }}
-              style={{
-                padding: '0.5rem',
-                border: '1px solid var(--border-primary)',
-                borderRadius: '4px',
-                fontSize: '0.9rem',
-                backgroundColor: 'var(--input-bg)',
-                color: 'var(--text-primary)'
-              }}
-            >
-              {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
+        {/* Action Section - Push to bottom */}
+        <div style={{ marginTop: 'auto' }}>
+          {product.quantity > 0 ? (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <select
+                value={quantity}
+                onChange={(e) => {
+                  e.stopPropagation(); // Prevent navigation when changing quantity
+                  setQuantity(parseInt(e.target.value));
+                }}
+                style={{
+                  padding: '0.5rem',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddToCart}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  transition: 'var(--theme-transition)'
+                }}
+              >
+                Add to Cart
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={handleAddToCart}
+              disabled
               style={{
-                flex: 1,
+                width: '100%',
                 padding: '0.75rem',
-                backgroundColor: 'var(--color-primary)',
+                backgroundColor: 'var(--color-secondary)',
                 color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                fontWeight: '500',
-                transition: 'var(--theme-transition)'
+                cursor: 'not-allowed',
+                fontSize: '0.9rem'
               }}
             >
-              Add to Cart
+              Out of Stock
             </button>
-          </div>
-        ) : (
-          <button
-            disabled
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: 'var(--color-secondary)',
-              color: 'var(--text-inverse)',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'not-allowed',
-              fontSize: '0.9rem'
-            }}
-          >
-            Out of Stock
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
