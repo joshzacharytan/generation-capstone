@@ -1,32 +1,7 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:15-alpine
-    container_name: ecommerce_db_prod
-    restart: always
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_db}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups:ro  # Read-only backups
-    networks:
-      - backend_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-        reservations:
-          memory: 512M
+
 
   # FastAPI Backend
   backend:
@@ -35,20 +10,20 @@ services:
       dockerfile: docker/Dockerfile.backend
     container_name: ecommerce_backend_prod
     restart: always
+    # Use host network to access local PostgreSQL
+    # Alternative: use host.docker.internal on Windows/Mac
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-ecommerce_db}
+      - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=${ALGORITHM:-HS256}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       - ENVIRONMENT=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     volumes:
       - ./app/static:/app/static
       - ./logs:/app/logs
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+    depends_on: []
+    # No database dependency since using local PostgreSQL
     networks:
       - backend_network
       - frontend_network
@@ -65,7 +40,7 @@ services:
         reservations:
           memory: 512M
 
-  # React Frontend with Nginx
+  # React Frontend with NGINX
   frontend:
     build:
       context: .
@@ -75,6 +50,8 @@ services:
     ports:
       - "80:80"
       - "443:443"  # For SSL termination
+    volumes:
+      - ./docker/nginx.prod.conf:/etc/nginx/nginx.conf:ro  # Use production NGINX config
     depends_on:
       backend:
         condition: service_healthy
@@ -92,35 +69,16 @@ services:
         reservations:
           memory: 128M
 
-  # Redis for caching and sessions
-  redis:
-    image: redis:7-alpine
-    container_name: ecommerce_redis_prod
-    restart: always
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
-    volumes:
-      - redis_data:/data
-    networks:
-      - backend_network
-    healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
 
-  # Nginx Reverse Proxy (Optional - for multiple services)
+
+  # Nginx Reverse Proxy (Optional - for advanced load balancing)
+  # This is separate from the frontend NGINX and can be used for additional load balancing
   nginx:
     image: nginx:alpine
     container_name: ecommerce_nginx_prod
     restart: always
     ports:
-      - "8080:80"
+      - "8080:80"  # Alternative port for advanced proxy
     volumes:
       - ./docker/nginx-proxy.conf:/etc/nginx/nginx.conf:ro
       - ./logs/nginx:/var/log/nginx
@@ -134,12 +92,15 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
 
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
+volumes: {}
+  # No volumes needed since using local PostgreSQL
 
 networks:
   frontend_network:

@@ -30,7 +30,8 @@ RUN apk update && apk upgrade && apk add --no-cache \
 # Copy built assets from builder stage
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy custom nginx configuration
+# Copy custom nginx configuration (default to development config)
+# Production builds should mount the production config as a volume
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Set permissions for nginx user (user already exists in nginx:alpine)

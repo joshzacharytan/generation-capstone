@@ -1,38 +1,34 @@
 import axios from 'axios';
 
-// Dynamic API base URL that works in both development and production
+// Dynamic API base URL that works with NGINX reverse proxy
 const getApiBaseUrl = () => {
-  // Check if there's an environment variable override (but only if not commented out)
-  if (process.env.REACT_APP_API_BASE_URL && !process.env.REACT_APP_API_BASE_URL.includes('#')) {
-    console.log('API Base URL: Using environment variable:', process.env.REACT_APP_API_BASE_URL);
-    return process.env.REACT_APP_API_BASE_URL;
-  }
-  
-  // Check hostname first - this takes priority over NODE_ENV
+  // Check if we're running in a browser environment
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
     console.log('API Base URL: Checking hostname:', hostname);
     
-    // For your specific setup: frontend is gensg.tanfamily.cc, API is gensg-fastapi.tanfamily.cc
-    if (hostname === 'gensg.tanfamily.cc') {
-      console.log('API Base URL: Using gensg-fastapi.tanfamily.cc (production tunnel)');
-      return 'https://gensg-fastapi.tanfamily.cc';
+    // Check for environment variable override first
+    if (process.env.REACT_APP_API_BASE_URL && !process.env.REACT_APP_API_BASE_URL.includes('#')) {
+      console.log('API Base URL: Using environment variable:', process.env.REACT_APP_API_BASE_URL);
+      return process.env.REACT_APP_API_BASE_URL;
     }
     
-    // If hostname is localhost, use localhost API (for true local development)
+    // For localhost, use direct backend connection (development)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      console.log('API Base URL: Development mode on localhost');
+      console.log('API Base URL: Development mode - direct to FastAPI backend');
       return 'http://localhost:8000';
     }
+    
+    // For any other domain (production/staging), use relative paths through NGINX proxy
+    console.log('API Base URL: Production/Staging domain - using relative paths through NGINX proxy');
+    return '/api';  // Relative path - NGINX will proxy to backend
   }
   
-  // Fallback for any other case
+  // Fallback for server-side rendering or non-browser environments
   console.log('API Base URL: Fallback to localhost');
   return 'http://localhost:8000';
 };
-
-const API_BASE_URL = getApiBaseUrl();
-console.log('API Base URL:', API_BASE_URL); // Debug log
 
 // Create axios instance with default config
 const api = axios.create({
@@ -102,21 +98,28 @@ api.interceptors.response.use(
   }
 );
 
-// Auth API
+// Auth API - Updated to use relative paths with explicit full URLs for direct calls
 export const authAPI = {
   login: async (email, password) => {
     const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
 
-    const response = await axios.post(`${API_BASE_URL}/auth/token`, formData, {
+    // For auth endpoints, we might need to make direct calls in development
+    const baseUrl = getApiBaseUrl();
+    const url = baseUrl.startsWith('/api') ? `${baseUrl}/auth/token` : `${baseUrl}/auth/token`;
+    
+    const response = await axios.post(url, formData, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     return response.data;
   },
 
   register: async (email, password, tenantName, tenantDomain) => {
-    const response = await axios.post(`${API_BASE_URL}/auth/register`, {
+    const baseUrl = getApiBaseUrl();
+    const url = baseUrl.startsWith('/api') ? `${baseUrl}/auth/register` : `${baseUrl}/auth/register`;
+    
+    const response = await axios.post(url, {
       email,
       password,
       tenant_name: tenantName,

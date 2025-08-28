@@ -1,0 +1,40 @@
+# Staging Environment: Production Frontend + Local Backend + Local PostgreSQL
+# This setup allows testing NGINX proxy with your existing test data
+
+services:
+  # Production-ready React Frontend with NGINX
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: ecommerce_frontend_staging
+    restart: unless-stopped
+    ports:
+      - "80:80"     # Standard web port
+      - "3000:80"   # Alternative access port
+    environment:
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN:-}
+      # REACT_APP_API_BASE_URL intentionally not set to force relative /api paths through NGINX proxy
+    volumes:
+      - ./docker/nginx.staging.conf:/etc/nginx/nginx.conf:ro  # Use staging NGINX config
+    # No backend dependency since using local backend
+    networks:
+      - staging_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+# Custom network for staging
+networks:
+  staging_network:
+    driver: bridge
+
+# No volumes needed since using local services
