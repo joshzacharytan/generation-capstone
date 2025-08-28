@@ -4,6 +4,10 @@ from pathlib import Path
 from typing import Optional
 from fastapi import UploadFile, HTTPException
 import shutil
+import aiohttp
+import asyncio
+from urllib.parse import urlparse
+import re
 
 # Configuration
 UPLOAD_DIR = Path("app/static/uploads/products")
@@ -307,3 +311,140 @@ class FileUploadService:
             print(f"Error deleting banner: {e}")
         
         return False
+
+    @staticmethod
+    def validate_image_url(url: str) -> bool:
+        """Validate if URL is properly formatted and points to an image"""
+        try:
+            # Basic URL validation
+            parsed_url = urlparse(url)
+            if not parsed_url.scheme or not parsed_url.netloc:
+                return False
+            
+            # Check if URL has image extension
+            path = parsed_url.path.lower()
+            image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg']
+            has_image_extension = any(path.endswith(ext) for ext in image_extensions)
+            
+            # Also accept URLs that might not have extensions but contain image indicators
+            has_image_indicator = any(indicator in url.lower() for indicator in ['image', 'photo', 'picture', 'img'])
+            
+            return has_image_extension or has_image_indicator
+            
+        except Exception:
+            return False
+
+    @staticmethod
+    async def save_product_image_from_url(url: str, tenant_id: int) -> dict:
+        """Download and save product image from URL"""
+        
+        # Validate URL format
+        if not FileUploadService.validate_image_url(url):
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid image URL. Please provide a direct link to an image file."
+            )
+        
+        # Create tenant-specific directory
+        tenant_dir = UPLOAD_DIR / str(tenant_id)
+        tenant_dir.mkdir(exist_ok=True)
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                # Set headers to mimic a browser request
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+                
+                async with session.get(url, headers=headers, timeout=30) as response:
+                    if response.status != 200:
+                        raise HTTPException(
+                            status_code=400, 
+                            detail=f"Failed to download image. HTTP status: {response.status}"
+                        )
+                    
+                    # Check content type
+                    content_type = response.headers.get('content-type', '').lower()
+                    if not content_type.startswith('image/'):
+                        raise HTTPException(
+                            status_code=400, 
+                            detail=f"URL does not point to an image. Content type: {content_type}"
+                        )
+                    
+                    # Check content length
+                    content_length = response.headers.get('content-length')
+                    if content_length and int(content_length) > MAX_FILE_SIZE:
+                        raise HTTPException(
+                            status_code=400, 
+                            detail=f"Image too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
+                        )
+                    
+                    # Read content
+                    content = await response.read()
+                    
+                    # Double-check actual size
+                    if len(content) > MAX_FILE_SIZE:
+                        raise HTTPException(
+                            status_code=400, 
+                            detail=f"Image too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
+                        )
+                    
+                    # Generate filename based on content type and URL
+                    parsed_url = urlparse(url)
+                    original_filename = Path(parsed_url.path).name
+                    
+                    # If no filename from URL, generate one based on content type
+                    if not original_filename or '.' not in original_filename:
+                        extension_map = {
+                            'image/jpeg': '.jpg',
+                            'image/jpg': '.jpg',
+                            'image/png': '.png',
+                            'image/gif': '.gif',
+                            'image/webp': '.webp',
+                            'image/svg+xml': '.svg'
+                        }
+                        extension = extension_map.get(content_type, '.jpg')
+                        original_filename = f"image_from_url{extension}"
+                    
+                    unique_filename = FileUploadService.generate_unique_filename(original_filename)
+                    file_path = tenant_dir / unique_filename
+                    
+                    # Save file
+                    with open(file_path, "wb") as buffer:
+                        buffer.write(content)
+                    
+                    # Generate URL path
+                    relative_path = f"uploads/products/{tenant_id}/{unique_filename}"
+                    image_url = f"/static/{relative_path}"
+                    
+                    return {
+                        "success": True,
+                        "image_url": image_url,
+                        "image_filename": unique_filename,
+                        "original_filename": original_filename,
+                        "source_url": url,
+                        "file_size": len(content),
+                        "content_type": content_type
+                    }
+                    
+        except aiohttp.ClientError as e:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Failed to download image: {str(e)}"
+            )
+        except asyncio.TimeoutError:
+            raise HTTPException(
+                status_code=400, 
+                detail="Image download timed out. Please try again or use a different URL."
+            )
+        except HTTPException:
+            # Re-raise HTTP exceptions as-is
+            raise
+        except Exception as e:
+            # Clean up file if something went wrong
+            try:
+                if 'file_path' in locals() and file_path.exists():
+                    file_path.unlink()
+            except:
+                pass
+            raise HTTPException(status_code=500, detail=f"Failed to save image from URL: {str(e)}")

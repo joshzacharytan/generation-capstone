@@ -13,6 +13,13 @@ const ProductForm = ({ product, onSave, onCancel }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadType, setImageUploadType] = useState('file'); // 'file' or 'url'
+  const [imageUrl, setImageUrl] = useState('');
+  const [urlUploading, setUrlUploading] = useState(false);
+  
+  // Upload history for fallback functionality
+  const [uploadHistory, setUploadHistory] = useState([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(-1);
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm({
     defaultValues: {
@@ -34,9 +41,23 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       setValue('quantity', product.quantity);
       setValue('category', product.category || 'General');
       
-      // Set image preview if product has an image
+      // Set image preview and initialize upload history if product has an image
       if (product.image_url) {
+        const initialImage = {
+          image_url: product.image_url,
+          image_filename: product.image_filename,
+          isFromUrl: false,
+          isOriginal: true,
+          uploadType: 'existing',
+          timestamp: new Date().toISOString()
+        };
+        setUploadHistory([initialImage]);
+        setCurrentImageIndex(0);
+        setSelectedImage(initialImage);
         setImagePreview(getImageUrl(product.image_url));
+      } else {
+        setUploadHistory([]);
+        setCurrentImageIndex(-1);
       }
     }
   }, [product, setValue]);
@@ -86,6 +107,19 @@ const ProductForm = ({ product, onSave, onCancel }) => {
         return;
       }
       
+      // Create upload history entry
+      const newUpload = {
+        file: file,
+        isFromUrl: false,
+        uploadType: 'file',
+        timestamp: new Date().toISOString(),
+        name: file.name
+      };
+      
+      // Add to history and set as current
+      const newHistory = [...uploadHistory, newUpload];
+      setUploadHistory(newHistory);
+      setCurrentImageIndex(newHistory.length - 1);
       setSelectedImage(file);
       
       // Create preview
@@ -93,6 +127,89 @@ const ProductForm = ({ product, onSave, onCancel }) => {
       reader.onload = (e) => setImagePreview(e.target.result);
       reader.readAsDataURL(file);
       setError('');
+    }
+  };
+
+  const handleUrlImageUpload = async () => {
+    if (!imageUrl.trim()) {
+      setError('Please enter an image URL');
+      return;
+    }
+
+    try {
+      setUrlUploading(true);
+      setError('');
+      
+      const response = await productsAPI.uploadImageFromUrl(imageUrl.trim());
+      
+      // Create upload history entry
+      const newUpload = {
+        isFromUrl: true,
+        image_url: response.data.image_url,
+        image_filename: response.data.image_filename,
+        source_url: imageUrl.trim(),
+        uploadType: 'url',
+        timestamp: new Date().toISOString()
+      };
+      
+      // Add to history and set as current
+      const newHistory = [...uploadHistory, newUpload];
+      setUploadHistory(newHistory);
+      setCurrentImageIndex(newHistory.length - 1);
+      setSelectedImage(newUpload);
+      
+      // Set the preview
+      setImagePreview(getImageUrl(response.data.image_url));
+      
+      setError('');
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to upload image from URL');
+    } finally {
+      setUrlUploading(false);
+    }
+  };
+
+  const switchToUpload = (index) => {
+    if (index >= 0 && index < uploadHistory.length) {
+      const upload = uploadHistory[index];
+      setCurrentImageIndex(index);
+      setSelectedImage(upload);
+      
+      if (upload.file) {
+        // File upload - create preview from file
+        const reader = new FileReader();
+        reader.onload = (e) => setImagePreview(e.target.result);
+        reader.readAsDataURL(upload.file);
+      } else if (upload.image_url) {
+        // URL upload or existing image
+        setImagePreview(getImageUrl(upload.image_url));
+      }
+    }
+  };
+
+  const removeFromHistory = (index) => {
+    if (uploadHistory.length <= 1) {
+      // Don't remove if it's the only image
+      return;
+    }
+    
+    const newHistory = uploadHistory.filter((_, i) => i !== index);
+    setUploadHistory(newHistory);
+    
+    if (currentImageIndex === index) {
+      // If removing current image, switch to the last one
+      const newIndex = Math.min(currentImageIndex, newHistory.length - 1);
+      setCurrentImageIndex(newIndex);
+      if (newIndex >= 0) {
+        switchToUpload(newIndex);
+      } else {
+        setSelectedImage(null);
+        setImagePreview(null);
+        setCurrentImageIndex(-1);
+      }
+    } else if (currentImageIndex > index) {
+      // Adjust current index if needed
+      setCurrentImageIndex(currentImageIndex - 1);
     }
   };
 
@@ -114,29 +231,53 @@ const ProductForm = ({ product, onSave, onCancel }) => {
         // If there's a new image, upload it first
         if (selectedImage) {
           setImageUploading(true);
-          const formData = new FormData();
-          formData.append('file', selectedImage);
           
-          const uploadResponse = await productsAPI.uploadImage(formData);
-          productData.image_url = uploadResponse.data.image_url;
-          productData.image_filename = uploadResponse.data.image_filename;
+          if (selectedImage.isFromUrl) {
+            // Image was already uploaded from URL
+            productData.image_url = selectedImage.image_url;
+            productData.image_filename = selectedImage.image_filename;
+          } else {
+            // Upload file
+            const formData = new FormData();
+            formData.append('file', selectedImage);
+            
+            const uploadResponse = await productsAPI.uploadImage(formData);
+            productData.image_url = uploadResponse.data.image_url;
+            productData.image_filename = uploadResponse.data.image_filename;
+          }
         }
 
         await productsAPI.update(product.id, productData);
       } else {
-        // Create new product with image
-        const formData = new FormData();
-        formData.append('name', data.name);
-        formData.append('description', data.description || '');
-        formData.append('price', data.price);
-        formData.append('quantity', data.quantity);
-        formData.append('category', data.category);
-        
-        if (selectedImage) {
-          formData.append('image', selectedImage);
-        }
+        // Create new product
+        if (selectedImage && selectedImage.isFromUrl) {
+          // Image was uploaded from URL, create product with image data
+          const productData = {
+            name: data.name,
+            description: data.description || '',
+            price: parseFloat(data.price),
+            quantity: parseInt(data.quantity),
+            category: data.category,
+            image_url: selectedImage.image_url,
+            image_filename: selectedImage.image_filename
+          };
+          
+          await productsAPI.create(productData);
+        } else {
+          // Create new product with file upload
+          const formData = new FormData();
+          formData.append('name', data.name);
+          formData.append('description', data.description || '');
+          formData.append('price', data.price);
+          formData.append('quantity', data.quantity);
+          formData.append('category', data.category);
+          
+          if (selectedImage) {
+            formData.append('image', selectedImage);
+          }
 
-        await productsAPI.createWithImage(formData);
+          await productsAPI.createWithImage(formData);
+        }
       }
 
       onSave();
@@ -355,25 +496,125 @@ const ProductForm = ({ product, onSave, onCancel }) => {
             Product Image
           </label>
           
+          {/* Upload Type Toggle */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '1rem', 
+            marginBottom: '1rem',
+            border: '1px solid var(--border-primary)',
+            borderRadius: '4px',
+            padding: '0.5rem',
+            backgroundColor: 'var(--bg-tertiary)'
+          }}>
+            <button
+              type="button"
+              onClick={() => {
+                setImageUploadType('file');
+                setImageUrl('');
+                setError('');
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                backgroundColor: imageUploadType === 'file' ? 'var(--color-primary)' : 'transparent',
+                color: imageUploadType === 'file' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
+              }}
+            >
+              📁 Upload File
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setImageUploadType('url');
+                setSelectedImage(null);
+                setError('');
+              }}
+              style={{
+                padding: '0.5rem 1rem',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '0.875rem',
+                backgroundColor: imageUploadType === 'url' ? 'var(--color-primary)' : 'transparent',
+                color: imageUploadType === 'url' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
+              }}
+            >
+              🔗 From URL
+            </button>
+          </div>
+          
           <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                style={{
-                  width: '100%',
-                  padding: '0.75rem',
-                  border: '1px solid var(--border-primary)',
-                  borderRadius: '4px',
-                  fontSize: '1rem',
-                  backgroundColor: 'var(--input-bg)',
-                  color: 'var(--text-primary)'
-                }}
-              />
-              <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0.5rem 0 0 0' }}>
-                Supported formats: JPEG, PNG, GIF, WebP (Max 5MB)
-              </p>
+              {imageUploadType === 'file' ? (
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid var(--border-primary)',
+                      borderRadius: '4px',
+                      fontSize: '1rem',
+                      backgroundColor: 'var(--input-bg)',
+                      color: 'var(--text-primary)'
+                    }}
+                  />
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0.5rem 0 0 0' }}>
+                    Supported formats: JPEG, PNG, GIF, WebP (Max 5MB)
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <input
+                      type="url"
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      placeholder="Enter image URL (e.g., https://example.com/image.jpg)"
+                      style={{
+                        flex: 1,
+                        padding: '0.75rem',
+                        border: '1px solid var(--border-primary)',
+                        borderRadius: '4px',
+                        fontSize: '1rem',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleUrlImageUpload}
+                      disabled={urlUploading || !imageUrl.trim()}
+                      style={{
+                        padding: '0.75rem 1rem',
+                        backgroundColor: urlUploading || !imageUrl.trim() ? 'var(--text-secondary)' : 'var(--color-success)',
+                        color: 'var(--text-inverse)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: urlUploading || !imageUrl.trim() ? 'not-allowed' : 'pointer',
+                        fontSize: '0.875rem',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      {urlUploading && <LoadingSpinner size={16} />}
+                      {urlUploading ? 'Uploading...' : 'Upload'}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', margin: '0.5rem 0 0 0' }}>
+                    Enter a direct link to an image. Supported formats: JPEG, PNG, GIF, WebP (Max 5MB)
+                  </p>
+                </>
+              )}
             </div>
             
             {imagePreview && (
@@ -400,6 +641,105 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               </div>
             )}
           </div>
+          
+          {/* Upload History */}
+          {uploadHistory.length > 1 && (
+            <div style={{ marginTop: '1rem' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                fontSize: '0.875rem',
+                color: 'var(--text-secondary)'
+              }}>
+                Upload History ({uploadHistory.length} images)
+              </label>
+              <div style={{ 
+                display: 'flex', 
+                gap: '0.5rem', 
+                flexWrap: 'wrap',
+                padding: '0.5rem',
+                backgroundColor: 'var(--bg-tertiary)',
+                borderRadius: '4px',
+                border: '1px solid var(--border-primary)'
+              }}>
+                {uploadHistory.map((upload, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: currentImageIndex === index ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                      color: currentImageIndex === index ? 'var(--text-inverse)' : 'var(--text-primary)',
+                      borderRadius: '4px',
+                      border: '1px solid ' + (currentImageIndex === index ? 'var(--color-primary)' : 'var(--border-primary)'),
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      transition: 'var(--theme-transition)'
+                    }}
+                    onClick={() => switchToUpload(index)}
+                    title={upload.uploadType === 'url' ? `URL: ${upload.source_url}` : 
+                           upload.uploadType === 'file' ? `File: ${upload.name}` : 'Original image'}
+                  >
+                    <span>
+                      {upload.uploadType === 'existing' && '📄'}
+                      {upload.uploadType === 'file' && '📁'}
+                      {upload.uploadType === 'url' && '🔗'}
+                    </span>
+                    <span>
+                      {upload.uploadType === 'existing' ? 'Original' :
+                       upload.uploadType === 'file' ? 'File' :
+                       'URL'}
+                    </span>
+                    {currentImageIndex === index && (
+                      <span style={{ 
+                        marginLeft: '0.25rem',
+                        fontWeight: 'bold'
+                      }}>✓</span>
+                    )}
+                    {uploadHistory.length > 1 && !upload.isOriginal && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFromHistory(index);
+                        }}
+                        style={{
+                          marginLeft: '0.25rem',
+                          padding: '0',
+                          width: '16px',
+                          height: '16px',
+                          backgroundColor: 'transparent',
+                          border: 'none',
+                          color: 'inherit',
+                          cursor: 'pointer',
+                          borderRadius: '50%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.75rem'
+                        }}
+                        title="Remove this upload"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <p style={{ 
+                fontSize: '0.75rem', 
+                color: 'var(--text-secondary)', 
+                margin: '0.5rem 0 0 0',
+                fontStyle: 'italic'
+              }}>
+                💡 Latest upload will be used as primary. Click on any upload to switch to it.
+              </p>
+            </div>
+          )}
         </div>
 
         <div style={{ marginBottom: '1rem' }}>
@@ -539,8 +879,11 @@ const ProductForm = ({ product, onSave, onCancel }) => {
               gap: '0.5rem'
             }}
           >
-            {(loading || imageUploading) && <LoadingSpinner size={20} />}
-            {loading ? 'Saving...' : imageUploading ? 'Uploading image...' : (product ? 'Update Product' : 'Add Product')}
+            {(loading || imageUploading || urlUploading) && <LoadingSpinner size={20} />}
+            {loading ? 'Saving...' : 
+             imageUploading ? 'Uploading image...' : 
+             urlUploading ? 'Processing URL...' : 
+             (product ? 'Update Product' : 'Add Product')}
           </button>
         </div>
       </form>

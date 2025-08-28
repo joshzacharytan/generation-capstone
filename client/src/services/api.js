@@ -150,6 +150,13 @@ export const productsAPI = {
   uploadImage: (formData) => api.post('/products/upload-image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+  uploadImageFromUrl: (imageUrl) => {
+    const params = new URLSearchParams();
+    params.append('image_url', imageUrl);
+    return api.post('/products/upload-image-from-url', params, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    });
+  },
   createWithImage: (formData) => api.post('/products/create-with-image', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
