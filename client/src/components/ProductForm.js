@@ -229,22 +229,27 @@ const ProductForm = ({ product, onSave, onCancel }) => {
         };
 
         // If there's a new image, upload it first
-        if (selectedImage) {
+        if (selectedImage && selectedImage.uploadType !== 'existing') {
           setImageUploading(true);
           
           if (selectedImage.isFromUrl) {
             // Image was already uploaded from URL
             productData.image_url = selectedImage.image_url;
             productData.image_filename = selectedImage.image_filename;
-          } else {
+          } else if (selectedImage.file || selectedImage instanceof File) {
             // Upload file
             const formData = new FormData();
-            formData.append('file', selectedImage);
+            const fileToUpload = selectedImage.file || selectedImage;
+            formData.append('file', fileToUpload);
             
             const uploadResponse = await productsAPI.uploadImage(formData);
             productData.image_url = uploadResponse.data.image_url;
             productData.image_filename = uploadResponse.data.image_filename;
           }
+        } else if (selectedImage && selectedImage.uploadType === 'existing') {
+          // Keep existing image
+          productData.image_url = selectedImage.image_url;
+          productData.image_filename = selectedImage.image_filename;
         }
 
         await productsAPI.update(product.id, productData);
