@@ -216,20 +216,75 @@ export FRONTEND_DOMAIN="your-vm-ip-address"
 docker-compose -f docker-compose.staging.yml up -d
 ```
 
+### Ubuntu VM with Custom Domain Testing
+
+To test with your custom domain (example: `gen-capstone.tanfamily.cc`) on Ubuntu VM:
+
+```bash
+# 1. Set up PostgreSQL (if not already installed)
+sudo apt update && sudo apt install postgresql postgresql-contrib
+
+# 2. Create database
+sudo -u postgres createdb ecommerce_db
+sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ecommerce_db TO postgres;"
+
+# 3. Configure environment (replace with your domain)
+export FRONTEND_DOMAIN=your-domain.com  # e.g., gen-capstone.tanfamily.cc
+cat > .env << EOF
+DATABASE_URL=postgresql://postgres:password@host.docker.internal:5432/ecommerce_db
+SECRET_KEY=your-secret-key-for-testing
+GEMINI_API_KEY=your-gemini-api-key-here
+FRONTEND_DOMAIN=your-domain.com
+EOF
+
+# 4. Add domain to hosts file (replace with your domain)
+sudo bash -c 'echo "127.0.0.1 your-domain.com" >> /etc/hosts'
+
+# 5. Deploy with staging config
+docker-compose -f docker-compose.staging.yml up -d
+
+# 6. Test setup (replace with your domain)
+curl http://your-domain.com/health
+curl http://your-domain.com/api/health
+```
+
+**Access at:** `http://your-domain.com`
+
+**Note:** Replace `your-domain.com` with your actual domain (e.g., `gen-capstone.tanfamily.cc`, `mystore.example.com`, etc.)
+
 ## 💡 Getting Started
 
+**For Local Development:**
 1. **Run with Docker**: `docker-compose up -d`
 2. **Register**: Go to http://localhost:3000 and create your store
 3. **Add Products**: Use the admin dashboard to add products
 4. **Visit Store**: Your public store is at http://localhost:3000/store/your-domain
 5. **Test Shopping**: Add items to cart and complete checkout
 
+**For Production Testing (Ubuntu VM):**
+1. **Set up environment**: Follow "Ubuntu VM with Custom Domain Testing" section above
+2. **Deploy**: `docker-compose -f docker-compose.staging.yml up -d`
+3. **Register**: Go to http://your-domain.com and create your store
+4. **Add Products**: Use the admin dashboard to add products
+5. **Visit Store**: Your public store is at http://your-domain.com/store/your-domain
+6. **Test Shopping**: Add items to cart and complete checkout
+
 ## 📚 API Documentation
 
+**Local Development:**
 - **Admin Dashboard**: http://localhost:3000
 - **API Docs**: http://localhost:8000/docs
 - **Store Frontend**: http://localhost:3000/store/{domain}
 - **Health Check**: http://localhost:8000/health
+
+**Production Testing:**
+- **Admin Dashboard**: http://your-domain.com
+- **API Docs**: http://your-domain.com/api/docs
+- **Store Frontend**: http://your-domain.com/store/{domain}
+- **Health Check**: http://your-domain.com/health
+
+**Note:** Replace `your-domain.com` with your configured domain (set via `FRONTEND_DOMAIN` environment variable)
 
 ## 🔧 Troubleshooting
 
