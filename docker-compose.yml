@@ -32,7 +32,7 @@ services:
 
   # React Frontend with NGINX
   frontend:
-    image: joshzacharytan/generation-capstone-frontend:before-theme
+    image: joshzacharytan/generation-capstone-frontend:after-theme
     container_name: ecommerce_frontend
     restart: unless-stopped
     ports:
