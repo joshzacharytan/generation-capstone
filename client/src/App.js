@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserProvider } from './contexts/UserContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
@@ -10,14 +11,15 @@ import ProductDetail from './components/ProductDetail';
 import SearchResults from './components/SearchResults';
 
 import './App.css';
-import './styles/basic.css';
+import './styles/theme.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <UserProvider>
-        <div className="App">
-          <Routes>
+    <ThemeProvider>
+      <AuthProvider>
+        <UserProvider>
+          <div className="App">
+            <Routes>
             <Route path="/" element={<LoginPage />} />
             <Route 
               path="/dashboard" 
@@ -40,6 +42,7 @@ function App() {
         </div>
       </UserProvider>
     </AuthProvider>
+    </ThemeProvider>
   );
 }
 
