@@ -104,7 +104,7 @@ else:
 
 # Debug logging middleware removed
 
-# Mount static files
+# Mount static files BEFORE routers to prevent route conflicts
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Setup Jinja2 templates
