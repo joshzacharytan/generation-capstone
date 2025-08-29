@@ -1,12 +1,13 @@
 # Production Testing Docker Compose
-# Uses pre-built images from ghcr.io and connects to external PostgreSQL
+# Uses pre-built images from Docker Hub and connects to external PostgreSQL
+# Images: joshzacharytan/generation-capstone-*:latest
 
 version: '3.8'
 
 services:
   # FastAPI Backend
   backend:
-    image: ghcr.io/joshzacharytan/generation-capstone-backend:latest
+    image: joshzacharytan/generation-capstone-backend:latest
     container_name: ecommerce_backend
     restart: unless-stopped
     environment:
@@ -31,7 +32,7 @@ services:
 
   # React Frontend with NGINX
   frontend:
-    image: ghcr.io/joshzacharytan/generation-capstone-frontend:latest
+    image: joshzacharytan/generation-capstone-frontend:latest
     container_name: ecommerce_frontend
     restart: unless-stopped
     ports:

@@ -14,20 +14,55 @@ git clone https://github.com/joshzacharytan/generation-capstone.git
 cd generation-capstone
 cp .env.example .env
 
-# 2. Edit .env with your VM details
-# DATABASE_URL=postgresql://postgres:your_password@your_vm_ip:5432/ecommerce_db
-# FRONTEND_DOMAIN=your_vm_ip
+# 2. Create required directories with proper permissions
+mkdir -p ./uploads/{products,logos,banners} ./logs
+sudo chown -R 1000:1000 ./uploads ./logs
+sudo chmod -R 755 ./uploads ./logs
+
+# 3. Find your VM IP address
+ip addr show | grep "inet " | grep -v 127.0.0.1
+# Note the IP (e.g., 192.168.1.7)
+
+# 4. Edit .env with your VM details
+nano .env
+# Update these lines:
+# DATABASE_URL=postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db
+# FRONTEND_DOMAIN=192.168.1.7
 # SECRET_KEY=your-secret-key-here
 
-# 3. Run containers (uses ghcr.io pre-built images)
+# 5. Configure PostgreSQL for Docker access
+sudo nano /etc/postgresql/*/main/postgresql.conf
+# Ensure: listen_addresses = '*'
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+# Add lines:
+# host    all             all             172.16.0.0/12           md5
+# host    all             all             192.168.0.0/16          md5
+sudo systemctl restart postgresql
+
+# 6. Create/recreate database
+psql -h localhost -U postgres
+# In PostgreSQL prompt:
+# DROP DATABASE IF EXISTS ecommerce_db;
+# CREATE DATABASE ecommerce_db;
+# \q
+
+# 7. Test database connection
+psql -h 192.168.1.7 -U postgres -d ecommerce_db
+# If connection works, proceed to next step
+
+# 8. Run containers (uses Docker Hub pre-built images)
 docker-compose up -d
 
-# 4. Access your store
-# Open browser: http://your_vm_ip
+# 9. Check logs and verify startup
+docker-compose logs backend
+docker-compose ps
+
+# 10. Access your store
+# Open browser: http://192.168.1.7
 ```
 
 **What this does:**
-- ✅ Uses pre-built images from GitHub Container Registry
+- ✅ Uses pre-built images from Docker Hub
 - ✅ Connects to your existing PostgreSQL on Ubuntu VM  
 - ✅ Frontend accessible on port 80 (production-like)
 - ✅ Backend API proxied through NGINX
@@ -73,12 +108,40 @@ npm start
 sudo systemctl status postgresql
 
 # Test connection from your machine
-psql -h your_vm_ip -U postgres -d ecommerce_db
+psql -h localhost -U postgres -d ecommerce_db
 
-# Check PostgreSQL config allows connections
+# Check PostgreSQL config allows Docker connections
 sudo nano /etc/postgresql/*/main/postgresql.conf  # listen_addresses = '*'
-sudo nano /etc/postgresql/*/main/pg_hba.conf       # Add your IP range
+sudo nano /etc/postgresql/*/main/pg_hba.conf       # Add: host all all 172.0.0.0/8 md5
 sudo systemctl restart postgresql
+
+# Test Docker to PostgreSQL connection
+docker run --rm postgres:13 psql "postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db" -c "SELECT 1;"
+```
+
+**Permission denied errors for uploads?**
+```bash
+# Create upload directories with proper permissions
+mkdir -p ./uploads/{products,logos,banners} ./logs
+sudo chown -R 1000:1000 ./uploads ./logs
+sudo chmod -R 755 ./uploads ./logs
+```
+
+**Database schema issues (column users.role does not exist)?**
+```bash
+# Recreate database to fix schema issues
+psql -h localhost -U postgres
+# In PostgreSQL prompt:
+DROP DATABASE IF EXISTS ecommerce_db;
+CREATE DATABASE ecommerce_db;
+\q
+
+# Restart backend to recreate schema
+docker-compose restart backend
+
+# Verify tables were created
+psql -h localhost -U postgres -d ecommerce_db -c "\dt"
+psql -h localhost -U postgres -d ecommerce_db -c "\d users"
 ```
 
 **Frontend not loading?**
@@ -99,6 +162,90 @@ cat .env
 docker-compose down
 ```
 
+### 🛠️ Common Issues and Solutions
+
+#### Issue 1: PostgreSQL Connection Refused
+**Error:** `connection to server at "192.168.1.7", port 5432 failed: connection refused`
+
+**Solution:**
+```bash
+# 1. Configure PostgreSQL to accept external connections
+sudo nano /etc/postgresql/*/main/postgresql.conf
+# Change: #listen_addresses = 'localhost' to: listen_addresses = '*'
+
+# 2. Configure authentication for Docker networks
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+# Add these lines:
+host    all             all             172.16.0.0/12           md5
+host    all             all             192.168.0.0/16          md5
+
+# 3. Restart PostgreSQL
+sudo systemctl restart postgresql
+
+# 4. Update your .env file with VM IP
+DATABASE_URL=postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db
+```
+
+#### Issue 2: Docker Upload Directory Permissions
+**Error:** `PermissionError: [Errno 13] Permission denied: 'app/static/uploads/products'`
+
+**Solution:**
+```bash
+# Create directories with proper ownership before starting containers
+mkdir -p ./uploads/{products,logos,banners} ./logs
+sudo chown -R 1000:1000 ./uploads ./logs
+sudo chmod -R 755 ./uploads ./logs
+```
+
+#### Issue 3: Database Schema Missing
+**Error:** `column users.role does not exist` or `duplicate key value violates unique constraint`
+
+**Solution:**
+```bash
+# Option A: Clean database recreation (recommended)
+psql -h localhost -U postgres
+DROP DATABASE IF EXISTS ecommerce_db;
+CREATE DATABASE ecommerce_db;
+\q
+
+# Option B: Manual cleanup if needed
+psql -h localhost -U postgres -d ecommerce_db
+DROP TYPE IF EXISTS role CASCADE;
+DROP TYPE IF EXISTS orderstatus CASCADE;
+\q
+
+# Restart backend to recreate schema
+docker-compose restart backend
+```
+
+#### Issue 4: host.docker.internal Not Working on Ubuntu
+**Error:** `could not translate host name "host.docker.internal" to address`
+
+**Solution:**
+```bash
+# Use actual VM IP address instead of host.docker.internal
+# Find your VM IP:
+ip addr show | grep "inet " | grep -v 127.0.0.1
+
+# Update .env file:
+DATABASE_URL=postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db
+```
+
+#### Issue 5: Registration Fails with 500 Error
+**Error:** Backend shows database schema errors during user registration
+
+**Solution:**
+```bash
+# Verify database schema is complete
+psql -h localhost -U postgres -d ecommerce_db -c "\dt"
+psql -h localhost -U postgres -d ecommerce_db -c "\d users"
+
+# If tables missing, recreate database and restart backend
+docker-compose down
+psql -h localhost -U postgres -c "DROP DATABASE IF EXISTS ecommerce_db; CREATE DATABASE ecommerce_db;"
+docker-compose up -d
+```
+
 ## 🐳 Docker Configuration Explained
 
 ### Why This Project Uses Custom Docker Setup
@@ -107,7 +254,7 @@ This application uses **custom NGINX configurations** because:
 
 1. **Frontend Routing**: The React app needs NGINX to proxy `/api/*` requests to the backend
 2. **File Serving**: NGINX serves both React static files AND uploaded images from the backend
-3. **Production Ready**: Uses pre-built images from GitHub Container Registry
+3. **Production Ready**: Uses pre-built images from Docker Hub
 4. **Container Communication**: Handles Docker network routing between frontend and backend
 
 ### Key Docker Files:
@@ -216,7 +363,7 @@ graph TB
 - **Backend**: FastAPI, PostgreSQL, JWT Authentication
 - **Frontend**: React 18, Context API, CSS Variables
 - **AI**: Google Gemini for product descriptions
-- **DevOps**: Docker, NGINX, GitHub Container Registry
+- **DevOps**: Docker, NGINX, Docker Hub
 
 ## 🚀 Deployment
 
