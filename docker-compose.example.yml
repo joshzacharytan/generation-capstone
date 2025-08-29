@@ -1,0 +1,75 @@
+# Production Docker Compose Example
+# Copy this file to docker-compose.yml and configure your environment variables
+# Make sure to create a .env file with the required environment variables
+
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    image: joshzacharytan/generation-capstone-backend:before-theme
+    container_name: ecommerce_backend
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=${DATABASE_URL}           # postgresql://user:password@host:port/database
+      - SECRET_KEY=${SECRET_KEY}               # Your JWT secret key (generate a random string)
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - ENVIRONMENT=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}       # Your Google Gemini API key for AI features
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}     # Your frontend domain (e.g., example.com)
+    volumes:
+      - ./uploads:/app/static/uploads          # Mount uploads directory for file uploads
+      - ./logs:/app/logs                       # Mount logs directory
+    networks:
+      - ecommerce_network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # React Frontend with NGINX
+  frontend:
+    image: joshzacharytan/generation-capstone-frontend:before-theme
+    container_name: ecommerce_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"                               # HTTP port
+      - "443:443"                             # HTTPS port (configure SSL certificates separately)
+    environment:
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}     # Should match backend FRONTEND_DOMAIN
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ecommerce_network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  uploads:
+    driver: local
+  logs:
+    driver: local
+
+networks:
+  ecommerce_network:
+    driver: bridge
+
+# Required .env file variables:
+# DATABASE_URL=postgresql://username:password@host:5432/database_name
+# SECRET_KEY=your_jwt_secret_key_here
+# GEMINI_API_KEY=your_gemini_api_key_here
+# FRONTEND_DOMAIN=your-domain.com
+#
+# Setup Instructions:
+# 1. Copy this file to docker-compose.yml
+# 2. Create a .env file with the above variables
+# 3. Create uploads and logs directories: mkdir -p uploads logs
+# 4. Set proper permissions: sudo chown -R 999:999 uploads logs
+# 5. Run: docker compose up -d

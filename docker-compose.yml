@@ -7,7 +7,7 @@ version: '3.8'
 services:
   # FastAPI Backend
   backend:
-    image: joshzacharytan/generation-capstone-backend:latest
+    image: joshzacharytan/generation-capstone-backend:before-theme
     container_name: ecommerce_backend
     restart: unless-stopped
     environment:
@@ -32,7 +32,7 @@ services:
 
   # React Frontend with NGINX
   frontend:
-    image: joshzacharytan/generation-capstone-frontend:latest
+    image: joshzacharytan/generation-capstone-frontend:before-theme
     container_name: ecommerce_frontend
     restart: unless-stopped
     ports:
