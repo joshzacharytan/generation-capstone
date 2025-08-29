@@ -210,8 +210,8 @@ const OrdersManagement = () => {
     <div>
       {/* Header with order count */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <h2 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Order Management</h2>
-        <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+        <h2 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>Order Management</h2>
+        <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
           {totalOrders > 0 ? `${totalOrders} order${totalOrders !== 1 ? 's' : ''} found` : 'No orders found'}
           {statusFilter !== 'all' && ` • Filtered by: ${statusFilter}`}
           {dateFilter !== 'all' && ` • ${getDateFilterLabel(dateFilter)}`}
@@ -221,11 +221,11 @@ const OrdersManagement = () => {
       {/* Error Display */}
       {error && (
         <div style={{
-          color: '#dc3545',
-          backgroundColor: '#f8d7da',
+          color: 'var(--color-danger)',
+          backgroundColor: 'var(--bg-danger-subtle)',
           padding: '1rem',
           borderRadius: '4px',
-          border: '1px solid #f5c6cb',
+          border: '1px solid var(--border-danger)',
           marginBottom: '1rem'
         }}>
           {error}
@@ -234,11 +234,11 @@ const OrdersManagement = () => {
 
       {/* Filters Section */}
       <div style={{ 
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '1.5rem',
         borderRadius: '8px',
         marginBottom: '1.5rem',
-        border: '1px solid #dee2e6'
+        border: '1px solid var(--border-primary)'
       }}>
         {/* Status Filter Tabs */}
         <div style={{ marginBottom: '1rem' }}>
@@ -257,9 +257,9 @@ const OrdersManagement = () => {
                 onClick={() => setStatusFilter(status.key)}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: statusFilter === status.key ? '#007bff' : 'white',
-                  color: statusFilter === status.key ? 'white' : '#495057',
-                  border: '1px solid #dee2e6',
+                  backgroundColor: statusFilter === status.key ? 'var(--color-primary)' : 'var(--bg-elevated)',
+                  color: statusFilter === status.key ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   fontSize: '0.85rem',
@@ -293,17 +293,19 @@ const OrdersManagement = () => {
                 style={{
                   flex: 1,
                   padding: '0.5rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '0.9rem'
+                  fontSize: '0.9rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
               <button
                 type="submit"
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -321,10 +323,12 @@ const OrdersManagement = () => {
             onChange={(e) => setDateFilter(e.target.value)}
             style={{
               padding: '0.5rem',
-              border: '1px solid #ced4da',
+              border: '1px solid var(--border-primary)',
               borderRadius: '4px',
               fontSize: '0.9rem',
-              minWidth: '120px'
+              minWidth: '120px',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
           >
             <option value="all">All Time</option>
@@ -344,8 +348,8 @@ const OrdersManagement = () => {
               }}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: '#6c757d',
-                color: 'white',
+                backgroundColor: 'var(--text-secondary)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -360,7 +364,7 @@ const OrdersManagement = () => {
 
       {/* Orders List */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: '2rem' }}>
+        <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-primary)' }}>
           <LoadingSpinner />
           <p>Loading orders...</p>
         </div>
@@ -368,19 +372,19 @@ const OrdersManagement = () => {
         <div style={{
           textAlign: 'center',
           padding: '3rem',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          border: '1px solid #dee2e6'
+          border: '1px solid var(--border-primary)'
         }}>
           {statusFilter === 'all' && !searchQuery && dateFilter === 'all' ? (
             <>
-              <h3 style={{ color: '#6c757d' }}>No orders yet</h3>
-              <p style={{ color: '#6c757d' }}>Orders will appear here when customers make purchases.</p>
+              <h3 style={{ color: 'var(--text-secondary)' }}>No orders yet</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>Orders will appear here when customers make purchases.</p>
             </>
           ) : (
             <>
-              <h3 style={{ color: '#6c757d' }}>No orders found</h3>
-              <p style={{ color: '#6c757d' }}>Try adjusting your filters or search criteria.</p>
+              <h3 style={{ color: 'var(--text-secondary)' }}>No orders found</h3>
+              <p style={{ color: 'var(--text-secondary)' }}>Try adjusting your filters or search criteria.</p>
               <button
                 onClick={() => {
                   setStatusFilter('all');
@@ -389,8 +393,8 @@ const OrdersManagement = () => {
                 }}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -410,31 +414,33 @@ const OrdersManagement = () => {
               <div
                 key={order.id}
                 style={{
-                  backgroundColor: 'white',
+                  backgroundColor: 'var(--bg-elevated)',
                   padding: '1.5rem',
                   borderRadius: '8px',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  border: '1px solid #dee2e6',
+                  boxShadow: 'var(--shadow-md)',
+                  border: '1px solid var(--border-primary)',
                   cursor: 'pointer',
-                  transition: 'box-shadow 0.2s ease'
+                  transition: 'box-shadow 0.2s ease, transform 0.1s ease'
                 }}
                 onClick={() => setSelectedOrder(order)}
                 onMouseEnter={(e) => {
-                  e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                  e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                   <div>
-                    <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+                    <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
                       Order #{order.order_number}
                     </h4>
-                    <p style={{ margin: '0 0 0.5rem 0', color: '#6c757d', fontSize: '0.9rem' }}>
+                    <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                       Customer: {order.customer?.first_name} {order.customer?.last_name} ({order.customer?.email})
                     </p>
-                    <p style={{ margin: 0, color: '#6c757d', fontSize: '0.9rem' }}>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                       {formatDateTime(order.created_at)}
                     </p>
                   </div>
@@ -442,7 +448,7 @@ const OrdersManagement = () => {
                     <div style={{
                       fontSize: '1.25rem',
                       fontWeight: 'bold',
-                      color: '#28a745',
+                      color: 'var(--color-success)',
                       marginBottom: '0.5rem'
                     }}>
                       ${parseFloat(order.total_amount).toFixed(2)}
@@ -450,7 +456,7 @@ const OrdersManagement = () => {
                     <span style={{
                       fontSize: '0.875rem',
                       backgroundColor: getStatusColor(order.status),
-                      color: 'white',
+                      color: 'var(--text-inverse)',
                       padding: '0.25rem 0.75rem',
                       borderRadius: '12px',
                       textTransform: 'uppercase'
@@ -460,7 +466,7 @@ const OrdersManagement = () => {
                   </div>
                 </div>
                 
-                <div style={{ fontSize: '0.875rem', color: '#6c757d' }}>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                   {order.order_items?.length || 0} item(s) • Click to view details
                 </div>
               </div>
@@ -475,8 +481,8 @@ const OrdersManagement = () => {
                 disabled={loadingMore}
                 style={{
                   padding: '0.75rem 2rem',
-                  backgroundColor: loadingMore ? '#6c757d' : '#007bff',
-                  color: 'white',
+                  backgroundColor: loadingMore ? 'var(--text-secondary)' : 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '25px',
                   cursor: loadingMore ? 'not-allowed' : 'pointer',
@@ -506,7 +512,7 @@ const OrdersManagement = () => {
           
           {/* End Message */}
           {!hasMoreOrders() && orders.length > 0 && (
-            <div style={{ textAlign: 'center', padding: '1rem', color: '#6c757d', fontSize: '0.85rem' }}>
+            <div style={{ textAlign: 'center', padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
               ✓ All orders loaded ({totalOrders} total)
             </div>
           )}
@@ -529,36 +535,64 @@ const OrdersManagement = () => {
 const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatusOptions }) => {
   const [updating, setUpdating] = useState(false);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    // Save original body overflow
+    const originalOverflow = document.body.style.overflow;
+    // Hide body overflow
+    document.body.style.overflow = 'hidden';
+    
+    // Cleanup function to restore original overflow
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   const handleStatusUpdate = async (newStatus) => {
     setUpdating(true);
     await onStatusUpdate(order.id, newStatus);
     setUpdating(false);
   };
 
+  const handleBackdropClick = (e) => {
+    // Only close if clicking on the backdrop, not the modal content
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
-    }}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1000,
+        padding: '1rem',
+        overflowY: 'auto'
+      }}
+      onClick={handleBackdropClick}
+    >
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '2rem',
         borderRadius: '8px',
         maxWidth: '800px',
-        width: '90%',
-        maxHeight: '80vh',
-        overflow: 'auto'
+        width: '100%',
+        maxHeight: 'calc(90vh - 2rem)',
+        overflow: 'auto',
+        border: '1px solid var(--border-primary)',
+        boxShadow: 'var(--shadow-md)',
+        margin: 'auto'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h3 style={{ margin: 0, color: '#333' }}>
+          <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
             Order #{order.order_number}
           </h3>
           <button
@@ -568,7 +602,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
               border: 'none',
               fontSize: '1.5rem',
               cursor: 'pointer',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}
           >
             ×
@@ -579,13 +613,13 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
         <div style={{ marginBottom: '2rem' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
             <div>
-              <h4 style={{ color: '#333', marginBottom: '0.5rem' }}>Customer Information</h4>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Customer Information</h4>
               <p><strong>Name:</strong> {order.customer?.first_name} {order.customer?.last_name}</p>
               <p><strong>Email:</strong> {order.customer?.email}</p>
               {order.customer?.phone && <p><strong>Phone:</strong> {order.customer.phone}</p>}
             </div>
             <div>
-              <h4 style={{ color: '#333', marginBottom: '0.5rem' }}>Order Details</h4>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Order Details</h4>
               <p><strong>Date:</strong> {formatDateTime(order.created_at)}</p>
               <p><strong>Total:</strong> ${parseFloat(order.total_amount).toFixed(2)}</p>
               <p>
@@ -607,8 +641,8 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
           {/* Shipping Address */}
           {order.shipping_address && (
             <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ color: '#333', marginBottom: '0.5rem' }}>Shipping Address</h4>
-              <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: '4px' }}>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Shipping Address</h4>
+              <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '4px' }}>
                 <p>{order.shipping_address.address_line1}</p>
                 {order.shipping_address.address_line2 && <p>{order.shipping_address.address_line2}</p>}
                 <p>{order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.postal_code}</p>
@@ -620,7 +654,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
 
         {/* Order Items */}
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: '#333', marginBottom: '1rem' }}>Order Items</h4>
+          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Order Items</h4>
           <div style={{ display: 'grid', gap: '0.5rem' }}>
             {order.order_items?.map((item) => (
               <div
@@ -630,14 +664,14 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '0.75rem',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--bg-tertiary)',
                   borderRadius: '4px',
-                  border: '1px solid #dee2e6'
+                  border: '1px solid var(--border-primary)'
                 }}
               >
                 <div>
                   <strong>{item.product?.name || `Product ID: ${item.product_id}`}</strong>
-                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#6c757d' }}>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                     Quantity: {item.quantity} × ${parseFloat(item.unit_price).toFixed(2)}
                   </p>
                 </div>
@@ -653,7 +687,7 @@ const OrderDetails = ({ order, onClose, onStatusUpdate, getStatusColor, getStatu
 
         {/* Status Update */}
         <div>
-          <h4 style={{ color: '#333', marginBottom: '1rem' }}>Update Status</h4>
+          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Update Status</h4>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             {getStatusOptions(order.status).map((status) => (
               <button

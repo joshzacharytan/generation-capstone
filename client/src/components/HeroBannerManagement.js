@@ -342,7 +342,12 @@ function HeroBannerManagement() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '2rem',
+        backgroundColor: 'var(--bg-secondary)',
+        color: 'var(--text-primary)'
+      }}>
         <LoadingSpinner />
         <p>Loading hero banners...</p>
       </div>
@@ -357,14 +362,14 @@ function HeroBannerManagement() {
         alignItems: 'center',
         marginBottom: '2rem'
       }}>
-        <h2 style={{ margin: 0, color: '#333' }}>Hero Banner Management</h2>
+        <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>Hero Banner Management</h2>
         <button
           onClick={handleAddNew}
           disabled={showForm}
           style={{
             padding: '0.75rem 1.5rem',
-            backgroundColor: '#28a745',
-            color: 'white',
+            backgroundColor: 'var(--color-success)',
+            color: 'var(--text-inverse)',
             border: 'none',
             borderRadius: '4px',
             cursor: showForm ? 'not-allowed' : 'pointer',
@@ -378,12 +383,12 @@ function HeroBannerManagement() {
 
       {error && (
         <div style={{
-          backgroundColor: '#f8d7da',
-          color: '#721c24',
+          backgroundColor: 'var(--bg-danger-subtle)',
+          color: 'var(--color-danger)',
           padding: '1rem',
           borderRadius: '4px',
           marginBottom: '1rem',
-          border: '1px solid #f5c6cb'
+          border: '1px solid var(--border-danger)'
         }}>
           {error}
         </div>
@@ -392,16 +397,16 @@ function HeroBannerManagement() {
       {/* Hero Banner Preview */}
       {banners.length > 0 && (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-elevated)',
           padding: '1.5rem',
           borderRadius: '8px',
           marginBottom: '2rem',
-          border: '1px solid #dee2e6'
+          border: '1px solid var(--border-primary)'
         }}>
-          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-primary)' }}>
             🔍 Storefront Preview
           </h3>
-          <p style={{ color: '#6c757d', fontSize: '0.9rem', marginBottom: '1rem' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
             This is how your hero banners will appear to customers on your storefront:
           </p>
           
@@ -414,12 +419,12 @@ function HeroBannerManagement() {
             overflow: 'hidden',
             borderRadius: '8px',
             boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-            border: '2px solid #007bff'
+            border: '2px solid var(--color-primary)'
           }}>
             <HeroBannerPreview banners={banners.filter(b => b.is_active)} />
           </div>
           
-          <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: '#6c757d' }}>
+          <div style={{ marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
             💡 <strong>Tip:</strong> Only active banners are shown in the preview. 
             {banners.filter(b => b.is_active).length > 1 ? 
               `Auto-rotation every ${banners.find(b => b.is_active)?.rotation_interval || 5} seconds.` : 
@@ -431,19 +436,24 @@ function HeroBannerManagement() {
 
       {showForm && (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-elevated)',
           padding: '2rem',
           borderRadius: '8px',
           marginBottom: '2rem',
-          border: '1px solid #dee2e6'
+          border: '1px solid var(--border-primary)'
         }}>
-          <h3 style={{ marginTop: 0, color: '#333' }}>
+          <h3 style={{ marginTop: 0, color: 'var(--text-primary)' }}>
             {editingBanner ? 'Edit Hero Banner' : 'Create New Hero Banner'}
           </h3>
           
           <form onSubmit={handleSubmit}>
             <div>
-              <label>Title:</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Title:</label>
               <input
                 type="text"
                 name="title"
@@ -453,16 +463,23 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   fontSize: '1rem',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
             
             <div>
-              <label>Subtitle:</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Subtitle:</label>
               <textarea
                 name="subtitle"
                 value={formData.subtitle}
@@ -472,16 +489,23 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   fontSize: '1rem',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
 
             <div>
-              <label>Link URL:</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Link URL:</label>
               <input
                 type="url"
                 name="link_url"
@@ -491,16 +515,23 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   fontSize: '1rem',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
 
             <div>
-              <label>Link Text:</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Link Text:</label>
               <input
                 type="text"
                 name="link_text"
@@ -510,16 +541,18 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   fontSize: '1rem',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
-              <label>
+              <label style={{ color: 'var(--text-primary)' }}>
                 <input
                   type="checkbox"
                   name="is_active"
@@ -532,7 +565,7 @@ function HeroBannerManagement() {
             </div>
 
             <div style={{ marginBottom: '1.5rem' }}>
-              <label>
+              <label style={{ color: 'var(--text-primary)' }}>
                 <input
                   type="checkbox"
                   name="show_title"
@@ -545,7 +578,12 @@ function HeroBannerManagement() {
             </div>
 
             <div>
-              <label>Rotation Interval (seconds):</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Rotation Interval (seconds):</label>
               <input
                 type="number"
                 name="rotation_interval"
@@ -557,19 +595,56 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   fontSize: '1rem',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
-              <small style={{ color: '#6c757d', marginTop: '0.25rem', display: 'block' }}>
+              <small style={{ color: 'var(--text-secondary)', marginTop: '0.25rem', display: 'block' }}>
                 How often banners rotate automatically (1-30 seconds). Only applies when multiple banners are active.
               </small>
             </div>
 
+            <div>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Sort Order:</label>
+              <input
+                type="number"
+                name="sort_order"
+                value={formData.sort_order}
+                onChange={handleInputChange}
+                min="0"
+                placeholder="0"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '4px',
+                  fontSize: '1rem',
+                  marginBottom: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              />
+              <small style={{ color: 'var(--text-secondary)', marginTop: '0.25rem', display: 'block' }}>
+                Display order for banners (0 = first, higher numbers appear later). Banners are sorted by this value.
+              </small>
+            </div>
+
             <div style={{ marginBottom: '1.5rem' }}>
-              <label>Banner Image:</label>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>Banner Image:</label>
               <input
                 type="file"
                 accept="image/*"
@@ -577,13 +652,15 @@ function HeroBannerManagement() {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #ced4da',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '1rem'
+                  fontSize: '1rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
               {!editingBanner && (
-                <small style={{ color: '#6c757d', marginTop: '0.25rem', display: 'block' }}>
+                <small style={{ color: 'var(--text-secondary)', marginTop: '0.25rem', display: 'block' }}>
                   Required for new banners. Recommended size: 1200x400px.
                 </small>
               )}
@@ -591,9 +668,14 @@ function HeroBannerManagement() {
 
             {previewUrl && (
               <div style={{ marginBottom: '1.5rem' }}>
-                <label>Preview:</label>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem', 
+                  fontWeight: '500',
+                  color: 'var(--text-primary)'
+                }}>Preview:</label>
                 <div style={{
-                  border: '1px solid #dee2e6',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   overflow: 'hidden',
                   maxWidth: '600px'
@@ -617,8 +699,8 @@ function HeroBannerManagement() {
                 disabled={submitting}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: submitting ? '#6c757d' : '#007bff',
-                  color: 'white',
+                  backgroundColor: submitting ? 'var(--text-secondary)' : 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: submitting ? 'not-allowed' : 'pointer',
@@ -634,8 +716,8 @@ function HeroBannerManagement() {
                 disabled={submitting}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
+                  backgroundColor: 'var(--text-secondary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: submitting ? 'not-allowed' : 'pointer',
@@ -654,20 +736,20 @@ function HeroBannerManagement() {
           <div style={{
             textAlign: 'center',
             padding: '3rem',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '8px',
-            border: '1px solid #dee2e6'
+            border: '1px solid var(--border-primary)'
           }}>
-            <h3 style={{ color: '#6c757d', marginBottom: '1rem' }}>No Hero Banners</h3>
-            <p style={{ color: '#6c757d', marginBottom: '1.5rem' }}>
+            <h3 style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>No Hero Banners</h3>
+            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
               Create your first hero banner to showcase promotions.
             </p>
             <button
               onClick={handleAddNew}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#007bff',
-                color: 'white',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -681,10 +763,10 @@ function HeroBannerManagement() {
           <div style={{ display: 'grid', gap: '1rem' }}>
             {banners.map((banner) => (
               <div key={banner.id} style={{
-                border: '1px solid #dee2e6',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '8px',
                 overflow: 'hidden',
-                backgroundColor: 'white',
+                backgroundColor: 'var(--bg-elevated)',
                 display: 'flex'
               }}>
                 <div style={{ width: '200px', flexShrink: 0 }}>
@@ -703,14 +785,14 @@ function HeroBannerManagement() {
                 <div style={{ flex: 1, padding: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+                      <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
                         {banner.title || 'Untitled Banner'}
                         {!banner.is_active && (
                           <span style={{
                             marginLeft: '0.5rem',
                             padding: '0.25rem 0.5rem',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
+                            backgroundColor: 'var(--color-danger)',
+                            color: 'var(--text-inverse)',
                             borderRadius: '12px',
                             fontSize: '0.75rem'
                           }}>
@@ -720,12 +802,12 @@ function HeroBannerManagement() {
                       </h4>
                       
                       {banner.subtitle && (
-                        <p style={{ margin: '0 0 0.5rem 0', color: '#6c757d', fontSize: '0.9rem' }}>
+                        <p style={{ margin: '0 0 0.5rem 0', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                           {banner.subtitle}
                         </p>
                       )}
                       
-                      <div style={{ fontSize: '0.85rem', color: '#6c757d' }}>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                         {banner.link_url && (
                           <span style={{ marginRight: '1rem' }}>🔗 {banner.link_text || 'Link'}</span>
                         )}
@@ -740,8 +822,8 @@ function HeroBannerManagement() {
                         disabled={showForm}
                         style={{
                           padding: '0.5rem 1rem',
-                          backgroundColor: '#007bff',
-                          color: 'white',
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'var(--text-inverse)',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: showForm ? 'not-allowed' : 'pointer',
@@ -757,8 +839,8 @@ function HeroBannerManagement() {
                         disabled={showForm}
                         style={{
                           padding: '0.5rem 1rem',
-                          backgroundColor: '#dc3545',
-                          color: 'white',
+                          backgroundColor: 'var(--color-danger)',
+                          color: 'var(--text-inverse)',
                           border: 'none',
                           borderRadius: '4px',
                           cursor: showForm ? 'not-allowed' : 'pointer',

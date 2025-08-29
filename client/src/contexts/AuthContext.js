@@ -16,20 +16,75 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      // In a real app, you'd validate the token with the backend
-      // For now, we'll assume the token is valid if it exists
-      setUser({ token });
-    }
-    setLoading(false);
+    const initializeAuth = async () => {
+      // Check if localStorage is available
+      if (typeof window === 'undefined' || !window.localStorage) {
+        setLoading(false);
+        return;
+      }
+      
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        // Check if token is expired (basic JWT check)
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const currentTime = Date.now() / 1000;
+          
+          if (payload.exp && payload.exp < currentTime) {
+            // Token is expired
+            localStorage.removeItem('access_token');
+            setUser(null);
+          } else {
+            // Token appears valid, set user
+            setUser({ token });
+            
+            // Optional: Try to validate with server in background
+            try {
+              const response = await fetch('http://localhost:8000/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+              });
+              
+              if (response.ok) {
+                const userData = await response.json();
+                setUser({ token, ...userData });
+              } else if (response.status === 401 || response.status === 403) {
+                localStorage.removeItem('access_token');
+                setUser(null);
+              }
+            } catch (error) {
+              // Server validation failed, but keep token for offline use
+              console.warn('Token validation failed, using offline mode:', error);
+            }
+          }
+        } catch (error) {
+          // Token parsing failed, assume it's valid for backward compatibility
+          console.warn('Could not parse token, assuming valid:', error);
+          setUser({ token });
+        }
+      }
+      setLoading(false);
+    };
+    
+    initializeAuth();
   }, []);
 
   const login = async (email, password) => {
     try {
       const data = await authAPI.login(email, password);
-      localStorage.setItem('access_token', data.access_token);
-      setUser({ token: data.access_token });
+      
+      // Store token if localStorage is available
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('access_token', data.access_token);
+      }
+      
+      // Store user data including email for persistence
+      const userData = {
+        token: data.access_token,
+        email: email,
+        ...data.user // Include any additional user data from response
+      };
+      
+      setUser(userData);
       return { success: true };
     } catch (error) {
       return { 
@@ -53,7 +108,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('access_token');
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('access_token');
+    }
     setUser(null);
   };
 

@@ -6,6 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware # Import CORSMiddleware
 import logging
 from datetime import datetime
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -24,24 +28,79 @@ app = FastAPI(
     version="0.1.0"
 )
 
-# Add CORS middleware - allow requests from your frontend domain
-origins = [
-    "http://localhost",
-    "http://localhost:3000",  # Allow your React app to access the backend
-    "http://127.0.0.1:3000",  # Alternative localhost
-    "http://localhost:3001",  # Alternative port
-    "https://gensg.tanfamily.cc",  # Your frontend domain
-    "https://gensg-fastapi.tanfamily.cc",  # Your backend API domain
-    "*"  # Allow all origins for development (remove in production)
-]
+# Environment-specific CORS configuration
+def get_cors_origins():
+    environment = os.getenv("ENVIRONMENT", "development")
+    
+    if environment == "production":
+        # In production, allow specific domains plus any custom domain from env var
+        allowed_origins = [
+            "https://gen-capstone.tanfamily.cc",  # Default production domain
+            "https://gensg.tanfamily.cc",         # Legacy domain if needed
+        ]
+        
+        # Allow custom frontend domain via environment variable
+        custom_domain = os.getenv("FRONTEND_DOMAIN")
+        if custom_domain:
+            # Support both http and https for the custom domain
+            allowed_origins.extend([
+                f"https://{custom_domain}",
+                f"http://{custom_domain}",
+            ])
+            
+        return allowed_origins
+    else:
+        # In development, allow local development servers
+        allowed_origins = [
+            "http://localhost:3000",  # React dev server
+            "http://127.0.0.1:3000",  # Alternative localhost
+            "http://localhost:3001",  # Alternative port
+            "http://localhost",       # General localhost
+            "http://127.0.0.1",       # Alternative localhost IP
+        ]
+        
+        # Also include custom frontend domain in development for testing
+        custom_domain = os.getenv("FRONTEND_DOMAIN")
+        if custom_domain:
+            allowed_origins.extend([
+                f"https://{custom_domain}",
+                f"http://{custom_domain}",
+            ])
+            
+        return allowed_origins
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+origins = get_cors_origins()
+logger.info(f"CORS origins configured: {origins}")
+logger.info(f"FRONTEND_DOMAIN env var: {os.getenv('FRONTEND_DOMAIN')}")
+logger.info(f"ENVIRONMENT env var: {os.getenv('ENVIRONMENT', 'development')}")
+
+# Only add CORS middleware in development or for specific production cases
+environment = os.getenv("ENVIRONMENT", "development")
+if environment == "development":
+    # Full CORS support for development
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    # Minimal CORS for production (NGINX handles most CORS)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        allow_headers=[
+            "Authorization",
+            "Content-Type", 
+            "X-Auth-Token",
+            "X-User-Token",
+            "X-API-Key",
+            "X-Requested-With"
+        ],
+    )
 
 # Debug logging middleware removed
 

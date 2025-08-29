@@ -124,7 +124,12 @@ const BrandingManagement = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div style={{ 
+        textAlign: 'center', 
+        padding: '2rem',
+        backgroundColor: 'var(--bg-secondary)',
+        color: 'var(--text-primary)'
+      }}>
         <LoadingSpinner />
         <p>Loading branding settings...</p>
       </div>
@@ -134,20 +139,21 @@ const BrandingManagement = () => {
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '2rem',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--border-primary)'
       }}>
-        <h2 style={{ marginBottom: '2rem', color: '#333' }}>Store Branding</h2>
+        <h2 style={{ marginBottom: '2rem', color: 'var(--text-primary)' }}>Store Branding</h2>
 
         {error && (
           <div style={{
-            color: '#dc3545',
-            backgroundColor: '#f8d7da',
+            color: 'var(--color-danger)',
+            backgroundColor: 'var(--bg-danger-subtle)',
             padding: '0.75rem',
             borderRadius: '4px',
-            border: '1px solid #f5c6cb',
+            border: '1px solid var(--border-danger)',
             marginBottom: '1rem'
           }}>
             {error}
@@ -156,11 +162,11 @@ const BrandingManagement = () => {
 
         {success && (
           <div style={{
-            color: '#155724',
-            backgroundColor: '#d4edda',
+            color: 'var(--color-success)',
+            backgroundColor: 'var(--bg-success-subtle)',
             padding: '0.75rem',
             borderRadius: '4px',
-            border: '1px solid #c3e6cb',
+            border: '1px solid var(--border-success)',
             marginBottom: '1rem'
           }}>
             {success}
@@ -169,13 +175,13 @@ const BrandingManagement = () => {
 
         {/* Company Logo Section */}
         <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem', color: '#333' }}>Company Logo</h3>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Company Logo</h3>
           
           <div style={{
             padding: '1.5rem',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-tertiary)',
             borderRadius: '8px',
-            border: '2px dashed #dee2e6'
+            border: '2px dashed var(--border-secondary)'
           }}>
             {branding.company_logo_url ? (
               <div style={{ textAlign: 'center' }}>
@@ -195,8 +201,8 @@ const BrandingManagement = () => {
                     disabled={uploading}
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#dc3545',
-                      color: 'white',
+                      backgroundColor: 'var(--color-danger)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: uploading ? 'not-allowed' : 'pointer',
@@ -211,12 +217,12 @@ const BrandingManagement = () => {
               <div style={{ textAlign: 'center' }}>
                 <div style={{
                   fontSize: '3rem',
-                  color: '#6c757d',
+                  color: 'var(--text-secondary)',
                   marginBottom: '1rem'
                 }}>
                   🏢
                 </div>
-                <p style={{ color: '#6c757d', marginBottom: '1rem' }}>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>
                   Upload your company logo to personalize your storefront
                 </p>
               </div>
@@ -236,8 +242,8 @@ const BrandingManagement = () => {
                 style={{
                   display: 'inline-block',
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: uploading ? '#6c757d' : '#007bff',
-                  color: 'white',
+                  backgroundColor: uploading ? 'var(--text-secondary)' : 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   borderRadius: '4px',
                   cursor: uploading ? 'not-allowed' : 'pointer',
                   fontSize: '1rem'
@@ -256,7 +262,7 @@ const BrandingManagement = () => {
             
             <p style={{
               fontSize: '0.875rem',
-              color: '#6c757d',
+              color: 'var(--text-secondary)',
               textAlign: 'center',
               marginTop: '0.5rem',
               marginBottom: 0
@@ -268,7 +274,7 @@ const BrandingManagement = () => {
 
         {/* Brand Colors Section */}
         <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem', color: '#333' }}>Brand Colors</h3>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Brand Colors</h3>
           
           <div style={{
             display: 'grid',
@@ -276,7 +282,12 @@ const BrandingManagement = () => {
             gap: '1rem'
           }}>
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>
                 Primary Color
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -287,7 +298,7 @@ const BrandingManagement = () => {
                   style={{
                     width: '50px',
                     height: '40px',
-                    border: '1px solid #dee2e6',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
@@ -299,15 +310,22 @@ const BrandingManagement = () => {
                   style={{
                     flex: 1,
                     padding: '0.5rem',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>
                 Secondary Color
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -318,7 +336,7 @@ const BrandingManagement = () => {
                   style={{
                     width: '50px',
                     height: '40px',
-                    border: '1px solid #dee2e6',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
                     cursor: 'pointer'
                   }}
@@ -330,8 +348,10 @@ const BrandingManagement = () => {
                   style={{
                     flex: 1,
                     padding: '0.5rem',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -341,7 +361,7 @@ const BrandingManagement = () => {
 
         {/* Company Information Section */}
         <div style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem', color: '#333' }}>Company Information</h3>
+          <h3 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>Company Information</h3>
           
           <div style={{ display: 'grid', gap: '1rem' }}>
             <div>
@@ -356,9 +376,11 @@ const BrandingManagement = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #dee2e6',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  resize: 'vertical'
+                  resize: 'vertical',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
@@ -369,7 +391,12 @@ const BrandingManagement = () => {
               gap: '1rem'
             }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem', 
+                  fontWeight: '500',
+                  color: 'var(--text-primary)'
+                }}>
                   Website URL
                 </label>
                 <input
@@ -380,14 +407,21 @@ const BrandingManagement = () => {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
 
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '0.5rem', 
+                  fontWeight: '500',
+                  color: 'var(--text-primary)'
+                }}>
                   Contact Email
                 </label>
                 <input
@@ -398,15 +432,22 @@ const BrandingManagement = () => {
                   style={{
                     width: '100%',
                     padding: '0.75rem',
-                    border: '1px solid #dee2e6',
-                    borderRadius: '4px'
+                    border: '1px solid var(--border-primary)',
+                    borderRadius: '4px',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
             </div>
 
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <label style={{ 
+                display: 'block', 
+                marginBottom: '0.5rem', 
+                fontWeight: '500',
+                color: 'var(--text-primary)'
+              }}>
                 Contact Phone
               </label>
               <input
@@ -417,8 +458,10 @@ const BrandingManagement = () => {
                 style={{
                   width: '100%',
                   padding: '0.75rem',
-                  border: '1px solid #dee2e6',
-                  borderRadius: '4px'
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '4px',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               />
             </div>
@@ -432,8 +475,8 @@ const BrandingManagement = () => {
             disabled={saving}
             style={{
               padding: '0.75rem 2rem',
-              backgroundColor: saving ? '#6c757d' : '#28a745',
-              color: 'white',
+              backgroundColor: saving ? 'var(--text-secondary)' : 'var(--color-success)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: saving ? 'not-allowed' : 'pointer',

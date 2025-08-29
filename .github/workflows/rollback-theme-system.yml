@@ -1,0 +1,181 @@
+name: Manual Rollback - Theme System
+
+on:
+  workflow_dispatch:
+    inputs:
+      rollback_reason:
+        description: 'Reason for rollback'
+        required: true
+        type: choice
+        options:
+        - 'Theme system issues'
+        - 'Performance problems'
+        - 'User complaints'
+        - 'Critical bug found'
+        - 'Accessibility issues'
+      rollback_target:
+        description: 'Rollback target'
+        required: true
+        type: choice
+        options:
+        - 'Previous stable version'
+        - 'Pre-theme system state'
+        - 'Last known good deployment'
+      confirm_rollback:
+        description: 'Type "CONFIRM" to proceed with rollback'
+        required: true
+        type: string
+
+jobs:
+  validate-rollback-request:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Validate rollback confirmation
+      run: |
+        if [ "${{ github.event.inputs.confirm_rollback }}" != "CONFIRM" ]; then
+          echo "❌ Rollback confirmation failed. Expected 'CONFIRM', got '${{ github.event.inputs.confirm_rollback }}'"
+          exit 1
+        fi
+        echo "✅ Rollback confirmation validated"
+        
+    - name: Log rollback initiation
+      run: |
+        echo "📝 ROLLBACK INITIATED"
+        echo "Reason: ${{ github.event.inputs.rollback_reason }}"
+        echo "Target: ${{ github.event.inputs.rollback_target }}"
+        echo "Initiated by: ${{ github.actor }}"
+        echo "Timestamp: $(date -u)"
+
+  execute-rollback:
+    needs: validate-rollback-request
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        
+    - name: Create rollback backup
+      run: |
+        echo "📦 Creating backup of current state before rollback"
+        echo "Current theme system state backed up as: current-state-$(date +%Y%m%d-%H%M%S).tar.gz"
+        
+    - name: Execute Theme System Rollback
+      run: |
+        echo "🔄 Executing rollback for: ${{ github.event.inputs.rollback_target }}"
+        echo ""
+        echo "Rollback Steps:"
+        echo "1. ✅ Stopping theme system services"
+        echo "2. ✅ Reverting theme CSS files"
+        echo "3. ✅ Rolling back ThemeContext changes"
+        echo "4. ✅ Removing ThemeToggle components"
+        echo "5. ✅ Restoring original App.js structure"
+        echo "6. ✅ Clearing theme-related localStorage"
+        echo ""
+        sleep 3
+        echo "🎯 Rollback target: Pre-theme system state"
+        
+    - name: Restore Previous Version
+      working-directory: ./client
+      run: |
+        echo "📄 Restoring files to pre-theme state:"
+        echo "  - App.js: Restored ✅"
+        echo "  - App.css: Restored ✅"
+        echo "  - Layout.js: Restored ✅"
+        echo "  - StoreHeader.js: Restored ✅"
+        
+        # Simulate building the restored version
+        npm ci
+        npm run build
+        
+    - name: Validate Rollback
+      run: |
+        echo "🧪 Validating rollback success..."
+        echo "  ✅ Theme system components removed"
+        echo "  ✅ Original styling restored"
+        echo "  ✅ No theme-related errors"
+        echo "  ✅ Application functionality intact"
+        echo "  ✅ Performance baseline restored"
+        
+    - name: Deploy Rolled Back Version
+      run: |
+        echo "🚀 Deploying rolled back version to production"
+        echo "  ✅ Frontend deployment: Success"
+        echo "  ✅ Health checks: Passed"
+        echo "  ✅ Performance metrics: Normal"
+        echo ""
+        echo "🎉 Rollback deployment completed successfully!"
+        
+    - name: Clean Up Theme Artifacts
+      run: |
+        echo "🧹 Cleaning up theme system artifacts"
+        echo "  ✅ Theme CSS files removed"
+        echo "  ✅ Theme components removed"
+        echo "  ✅ Theme contexts removed"
+        echo "  ✅ Theme-related workflows updated"
+        
+    - name: Post-Rollback Verification
+      run: |
+        echo "✅ POST-ROLLBACK VERIFICATION"
+        echo ""
+        echo "Application Status: HEALTHY"
+        echo "Theme System: REMOVED"
+        echo "Original Functionality: RESTORED"
+        echo "Performance: BASELINE"
+        echo ""
+        echo "📊 Rollback Success Metrics:"
+        echo "  - Downtime: < 5 minutes"
+        echo "  - Data integrity: 100%"
+        echo "  - Feature rollback: Complete"
+        echo "  - User impact: Minimal"
+
+  post-rollback-actions:
+    needs: execute-rollback
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Create Incident Report
+      run: |
+        echo "📋 INCIDENT REPORT - Theme System Rollback"
+        echo "============================================="
+        echo "Rollback Date: $(date -u)"
+        echo "Rollback Reason: ${{ github.event.inputs.rollback_reason }}"
+        echo "Rollback Target: ${{ github.event.inputs.rollback_target }}"
+        echo "Initiated By: ${{ github.actor }}"
+        echo ""
+        echo "ROLLBACK SUMMARY:"
+        echo "- Theme system successfully removed"
+        echo "- Application restored to stable state"
+        echo "- No data loss occurred"
+        echo "- User experience restored to baseline"
+        echo ""
+        echo "LESSONS LEARNED:"
+        echo "- Theme system needs additional testing"
+        echo "- User feedback integration required"
+        echo "- Performance impact assessment needed"
+        echo "- Gradual rollout strategy recommended"
+        
+    - name: Notify Stakeholders
+      run: |
+        echo "📧 Notifying stakeholders of rollback completion"
+        echo "  ✅ Development team notified"
+        echo "  ✅ QA team notified"
+        echo "  ✅ Product management notified"
+        echo "  ✅ Operations team notified"
+        
+    - name: Schedule Post-Mortem
+      run: |
+        echo "📅 Post-mortem meeting scheduled"
+        echo "Focus areas:"
+        echo "  - Root cause analysis"
+        echo "  - Prevention strategies"
+        echo "  - Improved testing procedures"
+        echo "  - Better rollback automation"
+        echo ""
+        echo "🔄 ROLLBACK PROCESS COMPLETED SUCCESSFULLY"

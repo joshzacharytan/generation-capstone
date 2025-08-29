@@ -104,16 +104,16 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
   };
 
   const handleFocus = (e) => {
-    e.target.style.borderColor = '#007bff';
-    e.target.style.backgroundColor = 'white';
+    e.target.style.borderColor = 'var(--color-primary)';
+    e.target.style.backgroundColor = 'var(--input-bg)';
     if (suggestions.length > 0) {
       setShowSuggestions(true);
     }
   };
 
   const handleBlur = (e) => {
-    e.target.style.borderColor = '#e9ecef';
-    e.target.style.backgroundColor = '#f8f9fa';
+    e.target.style.borderColor = 'var(--border-primary)';
+    e.target.style.backgroundColor = 'var(--input-bg)';
     // Delay hiding suggestions to allow clicking on them
     setTimeout(() => {
       if (!suggestionsRef.current?.contains(e.relatedTarget)) {
@@ -131,7 +131,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
     
     return parts.map((part, index) => 
       regex.test(part) ? (
-        <strong key={index} style={{ backgroundColor: '#fff3cd' }}>
+        <strong key={index} style={{ backgroundColor: 'var(--color-warning)', color: 'var(--text-inverse)' }}>
           {part}
         </strong>
       ) : part
@@ -154,12 +154,13 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             width: '100%',
             padding: '0.75rem 1rem',
             paddingRight: '3rem',
-            border: '2px solid #e9ecef',
+            border: '2px solid var(--border-primary)',
             borderRadius: '25px',
             fontSize: '0.9rem',
             outline: 'none',
-            transition: 'border-color 0.2s ease',
-            backgroundColor: '#f8f9fa'
+            transition: 'border-color 0.2s ease, background-color 0.2s ease',
+            backgroundColor: 'var(--input-bg)',
+            color: 'var(--text-primary)'
           }}
         />
         <button
@@ -173,7 +174,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             border: 'none',
             cursor: 'pointer',
             padding: '0.5rem',
-            color: '#6c757d',
+            color: 'var(--text-secondary)',
             fontSize: '1rem'
           }}
         >
@@ -190,10 +191,10 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             top: '100%',
             left: 0,
             right: 0,
-            backgroundColor: 'white',
-            border: '1px solid #dee2e6',
+            backgroundColor: 'var(--bg-elevated)',
+            border: '1px solid var(--border-primary)',
             borderRadius: '8px',
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+            boxShadow: 'var(--shadow-lg)',
             zIndex: 1000,
             maxHeight: '300px',
             overflowY: 'auto',
@@ -204,7 +205,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             <div style={{
               padding: '1rem',
               textAlign: 'center',
-              color: '#6c757d',
+              color: 'var(--text-secondary)',
               fontSize: '0.875rem'
             }}>
               Searching...
@@ -215,7 +216,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             <div style={{
               padding: '1rem',
               textAlign: 'center',
-              color: '#6c757d',
+              color: 'var(--text-secondary)',
               fontSize: '0.875rem'
             }}>
               No suggestions found
@@ -229,8 +230,8 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
               style={{
                 padding: '0.75rem 1rem',
                 cursor: 'pointer',
-                borderBottom: index < suggestions.length - 1 ? '1px solid #f8f9fa' : 'none',
-                backgroundColor: selectedIndex === index ? '#f8f9fa' : 'white',
+                borderBottom: index < suggestions.length - 1 ? '1px solid var(--border-secondary)' : 'none',
+                backgroundColor: selectedIndex === index ? 'var(--bg-tertiary)' : 'transparent',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.75rem',
@@ -240,7 +241,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
             >
               <div style={{
                 fontSize: '0.875rem',
-                color: '#6c757d',
+                color: 'var(--text-secondary)',
                 minWidth: '60px',
                 display: 'flex',
                 alignItems: 'center',
@@ -255,7 +256,7 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
                       height: '40px',
                       objectFit: 'cover',
                       borderRadius: '4px',
-                      backgroundColor: '#f8f9fa'
+                      backgroundColor: 'var(--bg-tertiary)'
                     }}
                     onError={(e) => {
                       e.target.style.display = 'none';
@@ -273,11 +274,11 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
                 <span style={{ fontSize: '0.8rem' }}>{suggestion.type}</span>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '0.9rem', color: '#333' }}>
+                <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
                   {highlightMatch(suggestion.text, query)}
                 </div>
                 {suggestion.subtitle && (
-                  <div style={{ fontSize: '0.8rem', color: '#6c757d' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
                     {suggestion.subtitle}
                   </div>
                 )}
@@ -285,8 +286,8 @@ const SearchBox = ({ tenantDomain, placeholder = "Search products...", initialVa
               {suggestion.count && (
                 <span style={{
                   fontSize: '0.8rem',
-                  color: '#6c757d',
-                  backgroundColor: '#e9ecef',
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'var(--bg-tertiary)',
                   padding: '0.25rem 0.5rem',
                   borderRadius: '12px'
                 }}>

@@ -1,152 +1,180 @@
 # Generation Capstone - Multi-Tenant E-Commerce Platform
 
-A full-stack, multi-tenant e-commerce platform built for DevOps bootcamp capstone demonstration. This whitelabel solution enables multiple independent stores on a single platform instance with comprehensive product management, order processing, and AI-powered features.
+A full-stack e-commerce platform that enables multiple independent stores with customizable branding and AI-powered features. Built with React, FastAPI, and PostgreSQL.
 
-## 🚀 Live Demo
+- **Multi-tenant stores** - Each business gets their own isolated store
+- **Product management** - Full CRUD with image uploads
+- **Guest checkout** - No registration required for customers
+- **AI descriptions** - Auto-generate product descriptions with Google Gemini
+- **Admin dashboard** - Complete store management interface
+- **Theme system** - Light/dark mode support
+>>>>>>> feature/theme-system
+## 🚀 What This Project Does
 
+- **Multi-tenant stores** - Each business gets their own isolated store
+- **Product management** - Full CRUD with image uploads
+- **Guest checkout** - No registration required for customers
+- **AI descriptions** - Auto-generate product descriptions with Google Gemini
+- **Admin dashboard** - Complete store management interface
+- **Theme system** - Light/dark mode support
+- **Sales Analytics** - Interactive dashboard with revenue trends and business insights
+- **Order Processing** - Track and manage customer orders
+- **SuperAdmin Portal** - Monitor all tenants and system health
+
+### Access Points
 - **Admin Dashboard**: `http://localhost:3000/` (Login with tenant admin credentials)
-  - 📊 **Sales Analytics**: Interactive dashboard with revenue trends and business insights
-  - 📦 **Product Management**: Add, edit, and manage inventory
-  - 📋 **Order Processing**: Track and manage customer orders
 - **SuperAdmin Portal**: `http://localhost:3000/` (Login with super admin credentials)
-  - 🏢 **System Overview**: Monitor all tenants and system health
-  - 👥 **User Management**: Manage user roles across all tenants
-  - 🔍 **Tenant Details**: Comprehensive tenant information and analytics
 - **Customer Storefront**: `http://localhost:3000/store/{tenant_domain}` (Public access)
 - **API Documentation**: `http://localhost:8000/docs` (Interactive Swagger UI)
+=======
+- **Multi-tenant stores** - Each business gets their own isolated store
+- **Product management** - Full CRUD with image uploads
+- **Guest checkout** - No registration required for customers
+- **AI descriptions** - Auto-generate product descriptions with Google Gemini
+- **Admin dashboard** - Complete store management interface
+- **Theme system** - Light/dark mode support
+>>>>>>> feature/theme-system
 
-## 📋 Table of Contents
+## 🐳 Quick Installation (Docker)
 
-- [Features](#-features)
-- [Technology Stack](#-technology-stack)
-- [System Architecture](#-system-architecture)
-- [Recent Updates](#-recent-updates)
-- [Prerequisites](#-prerequisites)
-- [Installation & Setup](#-installation--setup)
-- [Usage](#-usage)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Multi-Tenancy](#-multi-tenancy)
-- [Project Structure](#-project-structure)
-- [Contributing](#-contributing)
+### Prerequisites
+- Ubuntu VM with PostgreSQL installed
+- Docker and Docker Compose
+>>>>>>> feature/theme-system
+### Prerequisites
+- Ubuntu VM with PostgreSQL installed
+- Docker and Docker Compose
+=======
+### Prerequisites
+- Ubuntu VM with PostgreSQL installed
+- Docker and Docker Compose
+>>>>>>> feature/theme-system
 
-## ✨ Features
+### Setup Steps
 
-### 🏪 Multi-Tenant Architecture
-- **Independent Stores**: Each tenant operates as a separate storefront
-- **Data Isolation**: Complete separation of tenant data and operations
-- **Custom Domains**: Each tenant can have their own domain mapping
-- **Scalable Design**: Add unlimited tenants without performance degradation
+```bash
+# 1. Clone and setup
+git clone https://github.com/joshzacharytan/generation-capstone.git
+cd generation-capstone
+cp .env.example .env
 
-### 🎨 Tenant Branding & Customization
-- **Logo Upload**: Custom company logos with file management
-- **Brand Colors**: Primary and secondary color customization
-- **Company Information**: Description, website, contact details
-- **Hero Banners**: Dynamic promotional banners with image upload
-- **Flexible Display**: Toggle title visibility and banner ordering
+# 2. Create required directories with proper permissions
+mkdir -p ./uploads/{products,logos,banners} ./logs
+sudo chown -R 1000:1000 ./uploads ./logs
+sudo chmod -R 755 ./uploads ./logs
 
-### 🛍️ E-Commerce Features
-- **Product Management**: Full CRUD operations with categories and inventory
-- **Image Upload**: Product and banner image handling with tenant isolation
-- **Shopping Cart**: Persistent cart with quantity management
-- **Guest Checkout**: Purchase without account creation
-- **Order Management**: Complete order lifecycle with status tracking
-- **Payment Processing**: Mock payment gateway with validation
-- **Inventory Tracking**: Real-time stock updates and low-stock alerts
+# 3. Find your VM IP address
+ip addr show | grep "inet " | grep -v 127.0.0.1
+# Note the IP (e.g., 192.168.1.7)
 
-### 📊 Sales Analytics & Business Intelligence
-- **Comprehensive Dashboard**: Real-time revenue, orders, and performance metrics
-- **Interactive Charts**: Line charts showing revenue and order trends over time
-- **Key Performance Indicators**: Total revenue, order count, average order value, growth percentages
-- **Top Products Analysis**: Sortable table with revenue, quantity, orders, and pricing data
-- **Category Filtering**: Filter analytics by product categories for targeted insights
-- **Multi-Period Analysis**: 7, 30, 90, and 365-day reporting windows
-- **Click-to-Sort**: Interactive column sorting for revenue, quantity, orders, and average price
-- **Growth Tracking**: Period-over-period revenue growth comparisons
+# 4. Configure PostgreSQL for Docker access
+sudo nano /etc/postgresql/*/main/postgresql.conf
+# Change: listen_addresses = '*'
 
-### 🤖 AI Integration
-- **Product Descriptions**: Auto-generate compelling descriptions using Google Gemini AI
-- **Keyword-Based**: Generate content based on product names and keywords
-- **Content Enhancement**: Improve existing product descriptions
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+# Add these lines:
+# host    all    all    172.16.0.0/12    md5
+# host    all    all    192.168.0.0/16   md5
 
-### 👥 User Management & Security
-- **Role-Based Access**: Super Admin, Tenant Admin, and Customer roles
-- **JWT Authentication**: Secure token-based authentication
-- **Password Security**: Bcrypt hashing with salt
-- **Session Management**: Automatic token refresh and logout
+sudo systemctl restart postgresql
 
-### 📱 Responsive Design
-- **Mobile-First**: Optimized for all device sizes
-- **Modern UI**: Clean, professional interface
-- **Touch-Friendly**: Gesture support for mobile interactions
-- **Cross-Browser**: Compatible with all modern browsers
+# 5. Create database
+psql -h localhost -U postgres
+# In PostgreSQL prompt:
+# CREATE DATABASE ecommerce_db;
+# \q
 
-## 🛠 Technology Stack
+# 6. Edit .env file
+nano .env
+# Update with your details:
+# DATABASE_URL=postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db
+# FRONTEND_DOMAIN=192.168.1.7
+# SECRET_KEY=your-secret-key-here
 
-### Backend
-- **Framework**: FastAPI (Python)
-- **Database**: PostgreSQL with SQLAlchemy ORM
-- **Authentication**: JWT tokens with bcrypt hashing
-- **AI Integration**: Google Gemini API
-- **File Upload**: Local storage with tenant isolation
-- **API Documentation**: Automatic OpenAPI/Swagger generation
+# 7. Start containers
+docker-compose up -d
 
-### Frontend
-- **Framework**: React 18 with functional components
-- **Routing**: React Router v6
-- **State Management**: Context API with hooks
-- **HTTP Client**: Axios with interceptors
-- **Styling**: Inline styles with responsive design
-- **Build Tool**: Create React App
+# 8. Access your application
+# Open browser: http://192.168.1.7
+```
 
-### DevOps & Infrastructure
-- **Server**: Uvicorn ASGI server
-- **Environment**: Python virtual environment
-- **Database Backup**: PowerShell automation script
-- **Version Control**: Git with comprehensive .gitignore
-- **Documentation**: Comprehensive API docs and README
+## 🔧 Common Issues & Solutions
 
-## 🏗 System Architecture
+### Issue 1: Database Connection Refused
+**Error:** `connection to server at "192.168.1.7", port 5432 failed: connection refused`
+
+**Solution:**
+```bash
+# Configure PostgreSQL to accept external connections
+sudo nano /etc/postgresql/*/main/postgresql.conf
+# Change: listen_addresses = '*'
+
+sudo nano /etc/postgresql/*/main/pg_hba.conf
+# Add: host all all 192.168.0.0/16 md5
+
+sudo systemctl restart postgresql
+```
+
+### Issue 2: Permission Denied for Upload Directories
+**Error:** `PermissionError: [Errno 13] Permission denied: 'app/static/uploads/products'`
+
+**Solution:**
+```bash
+# Create directories with proper ownership before starting containers
+mkdir -p ./uploads/{products,logos,banners} ./logs
+sudo chown -R 1000:1000 ./uploads ./logs
+sudo chmod -R 755 ./uploads ./logs
+```
+
+### Issue 3: Database Schema Missing
+**Error:** `column users.role does not exist`
+
+**Solution:**
+```bash
+# Recreate database to fix schema
+psql -h localhost -U postgres
+# DROP DATABASE IF EXISTS ecommerce_db;
+# CREATE DATABASE ecommerce_db;
+# \q
+
+# Restart backend to recreate schema
+docker-compose restart backend
+```
+
+### Issue 4: host.docker.internal Not Working
+**Error:** `could not translate host name "host.docker.internal"`
+
+**Solution:**
+```bash
+# Use actual VM IP instead of host.docker.internal
+# Update .env file:
+DATABASE_URL=postgresql://postgres:your_password@192.168.1.7:5432/ecommerce_db
+```
+
+## 🏗️ Architecture
 
 ```mermaid
 graph TB
-    subgraph "Frontend (React)"
-        UI[User Interface]
-        Router[React Router]
-        Context[Context API]
-        Components[Reusable Components]
+    subgraph "Frontend Container"
+        React[React App]
+        Nginx[NGINX Proxy]
     end
     
-    subgraph "Backend (FastAPI)"
-        API[FastAPI Server]
-        Auth[Authentication]
-        Routers[API Routers]
-        Services[Business Logic]
-        CRUD[Database Operations]
-    end
-    
-    subgraph "External Services"
-        AI[Google Gemini AI]
-        Storage[File Storage]
+    subgraph "Backend Container"
+        FastAPI[FastAPI]
     end
     
     subgraph "Database"
         DB[(PostgreSQL)]
-        Tables[Multi-Tenant Tables]
     end
     
-    UI --> API
-    API --> Auth
-    API --> Services
-    Services --> CRUD
-    CRUD --> DB
-    API --> AI
-    API --> Storage
+    React --> Nginx
+    Nginx --> FastAPI
+    FastAPI --> DB
     
-    style UI fill:#61dafb
-    style API fill:#009688
+    style React fill:#61dafb
+    style FastAPI fill:#009688
     style DB fill:#336791
-    style AI fill:#4285f4
 ```
 
 ## 📊 Sales Analytics Dashboard
@@ -389,363 +417,59 @@ graph TB
     
     React --> FastAPI
     FastAPI --> Postgres
+=======
+    React --> Nginx
+    Nginx -->|/api/*| FastAPI
+    FastAPI --> DB
+>>>>>>> feature/theme-system
     
     style React fill:#61dafb
     style FastAPI fill:#009688
-    style Postgres fill:#336791
+    style DB fill:#336791
 ```
 
-### Build Individual Images
+- **Frontend**: React 18 with NGINX reverse proxy
+- **Backend**: FastAPI with Python 3.11
+- **Database**: PostgreSQL with multi-tenant data isolation
+- **Deployment**: Docker containers with pre-built images
 
+## 📊 Tech Stack
+
+- **Frontend:** React 18, Context API, CSS Variables
+- **Backend:** FastAPI, SQLAlchemy, JWT Authentication
+- **Database:** PostgreSQL
+- **AI:** Google Gemini for product descriptions
+- **DevOps:** Docker, NGINX, Docker Hub
+
+## 🚀 Getting Started
+
+1. Follow the **Quick Installation** steps above
+2. Register your first store at `http://your-vm-ip`
+3. Access admin dashboard to add products
+4. Visit your public store at `http://your-vm-ip/store/your-domain`
+5. Test the shopping cart and checkout process
+
+## 🔍 Troubleshooting
+
+**Check container status:**
 ```bash
-# Build backend image
-docker build -f docker/Dockerfile.backend -t generation-capstone-backend:v1.0.0 .
-
-# Build frontend image
-docker build -f docker/Dockerfile.frontend -t generation-capstone-frontend:v1.0.0 .
-
-# Run individual containers
-docker run -d -p 8000:8000 generation-capstone-backend:v1.0.0
-docker run -d -p 3000:80 generation-capstone-frontend:v1.0.0
+docker-compose ps
+docker-compose logs backend
 ```
 
-### Pull from GitHub Container Registry
-
+**Test database connection:**
 ```bash
-# Pull pre-built images from GHCR
-docker pull ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
-docker pull ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
-
-# Run using GHCR images
-docker run -d -p 8000:8000 \
-  -e DATABASE_URL="postgresql://postgres:postgres@host.docker.internal:5432/ecommerce_db" \
-  -e SECRET_KEY="your-secret-key" \
-  ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
-
-docker run -d -p 3000:80 ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
+psql -h 192.168.1.7 -U postgres -d ecommerce_db
 ```
 
-## 🔄 CI/CD Pipeline
-
-Automated pipeline with GitHub Actions:
-
-### Pipeline Stages
-1. **Test Backend**: Run Python tests with PostgreSQL
-2. **Test Frontend**: Run React tests with coverage
-3. **Build Images**: Create optimized Docker images
-4. **Security Scan**: Vulnerability scanning with Trivy
-5. **Deploy**: Push to container registry
-
-### Triggering Deployment
+**Restart everything:**
 ```bash
-# Push to main branch triggers production deployment
-git push origin main
-
-# Create release for tagged deployment
-git tag v1.0.0
-git push origin v1.0.0
+docker-compose down
+docker-compose up -d
 ```
-
-### Container Registry
-Images are available on GitHub Container Registry:
-- `ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0`
-- `ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0`
-
-### Manual Image Push to GHCR
-
-```bash
-# Login to GitHub Container Registry
-echo $GITHUB_TOKEN | docker login ghcr.io -u joshzacharytan --password-stdin
-
-# Tag images for GHCR
-docker tag generation-capstone-backend:v1.0.0 ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
-docker tag generation-capstone-frontend:v1.0.0 ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
-
-# Push to registry
-docker push ghcr.io/joshzacharytan/generation-capstone-backend:v1.0.0
-docker push ghcr.io/joshzacharytan/generation-capstone-frontend:v1.0.0
-```
-
-## 📊 Monitoring & Health Checks
-
-### Health Endpoints
-- **Backend**: `GET /health` - API health status
-- **Database**: Automatic PostgreSQL health checks
-- **Frontend**: `GET /health` - Nginx health status
-
-### Resource Monitoring
-```bash
-# View container resource usage
-docker stats
-
-# View container logs
-docker-compose logs -f [service-name]
-
-# Check container health
-docker ps
-```
-
-### Production Monitoring
-- **Resource Limits**: Memory and CPU limits configured
-- **Restart Policies**: Automatic restart on failure
-- **Health Checks**: Built-in health monitoring
-- **Log Aggregation**: Structured logging for analysis
-
-## 🔒 Security Features
-
-### Container Security
-- **Non-root User**: Containers run as non-privileged users
-- **Minimal Images**: Alpine-based images for reduced attack surface
-- **Security Headers**: CORS, XSS protection, content type validation
-- **Vulnerability Scanning**: Automated security scanning in CI/CD
-
-### Network Security
-- **Internal Networks**: Isolated backend and frontend networks
-- **Port Restriction**: Only necessary ports exposed
-- **Reverse Proxy**: Nginx handles SSL termination and routing
-
-### Data Security
-- **Environment Variables**: Sensitive data via environment variables
-- **Secret Management**: Production secrets via external secret stores
-- **Database Encryption**: PostgreSQL encryption at rest
-- **JWT Security**: Signed tokens with configurable expiration
-
-## 💡 Usage
-
-### Initial Setup
-
-1. **Access Admin Dashboard**: Navigate to `http://localhost:3000`
-2. **Register Tenant**: Create your first tenant account
-3. **Login**: Use your credentials to access the admin dashboard
-4. **Configure Branding**: Upload logo and set brand colors
-5. **Create Products**: Add your first products with images
-6. **Setup Hero Banners**: Create promotional banners for your storefront
-7. **Visit Storefront**: View your store at `http://localhost:3000/store/{your-domain}`
-
-### Admin Workflows
-
-#### Product Management
-```bash
-# Add products via admin dashboard
-1. Navigate to Products tab
-2. Click "Add Product"
-3. Fill in product details
-4. Upload product image
-5. Set pricing and inventory
-6. Save product
-```
-
-#### Hero Banner Management
-```bash
-# Create promotional banners
-1. Navigate to Hero Banners tab
-2. Click "Add Hero Banner"
-3. Upload banner image (1200x400px recommended)
-4. Add title and description (optional)
-5. Set link URL and button text
-6. Toggle title visibility
-7. Save banner
-```
-
-#### Order Management
-```bash
-# Process customer orders
-1. Navigate to Orders tab
-2. View order details
-3. Update order status
-4. Track inventory changes
-5. Manage order lifecycle
-```
-
-### Customer Workflows
-
-#### Shopping Experience
-```bash
-# Customer journey
-1. Visit storefront: /store/{tenant-domain}
-2. Browse products and categories
-3. Add items to cart
-4. Proceed to checkout
-5. Enter shipping information
-6. Complete payment (mock gateway)
-7. Receive order confirmation
-```
-
-## 📚 API Documentation
-
-### Authentication Endpoints
-- `POST /auth/register` - Register new tenant and admin user
-- `POST /auth/token` - Login and get JWT token
-- `GET /profile/me` - Get current user profile
-
-### Product Management
-- `GET /products` - List tenant products with filtering
-- `POST /products` - Create new product
-- `PUT /products/{id}` - Update product
-- `DELETE /products/{id}` - Delete product
-- `POST /products/upload-image` - Upload product image
-
-### Hero Banner Management
-- `GET /hero-banners` - List tenant banners
-- `POST /hero-banners` - Create banner with image upload
-- `PUT /hero-banners/{id}` - Update banner
-- `DELETE /hero-banners/{id}` - Delete banner
-- `GET /hero-banners/public/{domain}` - Get public banners for storefront
-
-### Order Processing
-- `GET /orders` - List tenant orders
-- `GET /orders/{id}` - Get order details
-- `PUT /orders/{id}/status` - Update order status
-- `POST /store/{domain}/orders` - Create customer order
-- `POST /store/{domain}/orders/guest` - Guest checkout
-
-### AI Features
-- `POST /ai/generate-description` - Generate product description
-
-### Public Store API
-- `GET /store/{domain}/products` - Public product catalog
-- `GET /store/{domain}/categories` - Public categories
-- `GET /store/{domain}/info` - Store information
-
-## 🗄 Database Schema
-
-### Core Tables
-- **tenants** - Store information and branding
-- **users** - Admin and customer accounts
-- **products** - Product catalog with inventory
-- **customers** - Customer profiles and addresses
-- **orders** - Purchase orders and items
-- **hero_banners** - Promotional banners
-- **categories** - Product categorization
-
-### Multi-Tenant Isolation
-All tables include `tenant_id` foreign key for data isolation:
-```sql
--- Example: Products are isolated by tenant
-SELECT * FROM products WHERE tenant_id = ?;
-```
-
-## 🏢 Multi-Tenancy
-
-### Tenant Isolation Strategy
-- **Database Level**: All data filtered by tenant_id
-- **File Storage**: Uploads stored in `/static/uploads/{tenant_id}/`
-- **API Security**: All endpoints validate tenant access
-- **Domain Mapping**: Each tenant accessible via unique domain
-
-### Tenant Creation Flow
-1. Register new tenant with domain name
-2. First user becomes Tenant Admin
-3. Tenant gets isolated data space
-4. Custom branding configuration
-5. Independent storefront deployment
-
-## 📁 Project Structure
-
-```
-generation_capstone/
-├── app/                          # Backend (FastAPI)
-│   ├── routers/                  # API route handlers
-│   │   ├── auth.py              # Authentication endpoints
-│   │   ├── products.py          # Product management
-│   │   ├── hero_banners.py      # Banner management
-│   │   ├── orders.py            # Order processing
-│   │   └── ...
-│   ├── services/                # Business logic services
-│   │   ├── file_upload.py       # File handling
-│   │   └── payment.py           # Payment processing
-│   ├── models.py                # SQLAlchemy database models
-│   ├── schemas.py               # Pydantic data validation
-│   ├── crud.py                  # Database operations
-│   ├── security.py              # Authentication & authorization
-│   └── main.py                  # FastAPI application entry
-├── client/                      # Frontend (React)
-│   ├── src/
-│   │   ├── components/          # React components
-│   │   │   ├── AdminDashboard.js
-│   │   │   ├── HeroBannerManagement.js
-│   │   │   ├── CustomerStorefront.js
-│   │   │   └── ...
-│   │   ├── contexts/            # React Context providers
-│   │   ├── services/            # API service layer
-│   │   └── utils/               # Utility functions
-│   └── public/                  # Static assets
-├── backups/                     # Database backups (gitignored)
-├── backup_db.ps1               # Database backup script
-├── requirements.txt            # Python dependencies
-└── README.md                   # This file
-```
-
-## 🚦 Development Workflow
-
-### Database Changes
-```bash
-# Always backup before schema changes
-.\backup_db.ps1
-
-# Make your changes to models.py
-# Restart the server to apply changes
-uvicorn app.main:app --reload
-```
-
-### Adding New Features
-1. Create backup: `.\backup_db.ps1`
-2. Update database models if needed
-3. Add/modify API endpoints
-4. Update frontend components
-5. Test functionality
-6. Commit changes: `git commit -m "feat: description"`
-7. Push to repository: `git push origin main`
-
-### Testing
-```bash
-# Backend testing
-cd app
-python -m pytest
-
-# Frontend testing
-cd client
-npm test
-```
-
-## 🤝 Contributing
-
-### Development Setup
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes
-4. Run tests and ensure they pass
-5. Commit your changes: `git commit -m 'feat: add amazing feature'`
-6. Push to the branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
-
-### Coding Standards
-- **Python**: Follow PEP 8 with Black formatting
-- **JavaScript**: Use ESLint with React best practices
-- **Commits**: Use conventional commit messages
-- **Documentation**: Update README for significant changes
-
-## 📞 Support & Contact
-
-For questions, issues, or contributions:
-- **GitHub Repository**: https://github.com/joshzacharytan/generation-capstone
-- **Gitea Repository**: http://100.66.17.68:3000/joshzacharytan/generation_capstone
-- **Container Registry**: https://github.com/joshzacharytan/generation-capstone/pkgs/container/generation-capstone-backend
-- **Issues**: Submit issues through the GitHub repository issue tracker
-- **Documentation**: API docs available at `/docs` endpoint
-
-## 🎯 Future Enhancements
-
-### Planned Features
-- **Advanced Carousel**: Enhanced hero banner carousel with animations
-- **Docker Containerization**: Full containerized deployment
-- **CI/CD Pipeline**: Automated testing and deployment
-- **Discount System**: Promotional codes and campaigns
-- **Advanced Analytics**: Sales and customer insights
-- **Email Integration**: Order confirmations and notifications
-- **Payment Gateway**: Real payment processor integration
-- **Multi-Language**: Internationalization support
 
 ---
 
-**Built with ❤️ for DevOps Bootcamp Capstone Project**
+**Built for DevOps Bootcamp Capstone** 🎓
+
+*Demonstrates multi-tenant architecture, Docker containerization, and full-stack development.*

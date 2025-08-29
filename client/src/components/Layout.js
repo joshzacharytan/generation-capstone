@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
+import ThemeToggle from './ThemeToggle';
 
 const Layout = ({ children }) => {
   const { logout } = useAuth();
@@ -18,25 +19,26 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-secondary)' }}>
       {/* Header */}
       <header style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '1rem 2rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: 'var(--shadow-md)',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderBottom: '1px solid var(--border-primary)'
       }}>
         <div>
-          <h1 style={{ margin: 0, color: '#333', fontSize: '1.5rem' }}>
+          <h1 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.5rem' }}>
             {getHeaderTitle()}
           </h1>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.25rem' }}>
             {userRole && (
               <span style={{
                 fontSize: '0.75rem',
-                backgroundColor: isSuperAdmin ? '#dc3545' : '#007bff',
+                backgroundColor: isSuperAdmin ? 'var(--color-danger)' : 'var(--color-primary)',
                 color: 'white',
                 padding: '0.25rem 0.5rem',
                 borderRadius: '12px',
@@ -48,33 +50,37 @@ const Layout = ({ children }) => {
             {userProfile?.email && (
               <span style={{
                 fontSize: '0.75rem',
-                color: '#6c757d',
-                backgroundColor: '#e9ecef',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-tertiary)',
                 padding: '0.25rem 0.5rem',
-                borderRadius: '12px'
+                borderRadius: '12px',
+                border: '1px solid var(--border-secondary)'
               }}>
                 {userProfile.email}
               </span>
             )}
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Logout
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <ThemeToggle variant="button" showLabel={false} />
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: 'var(--color-danger)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       {/* Main Content */}
-      <main style={{ padding: '2rem' }}>
+      <main style={{ padding: '2rem', backgroundColor: 'var(--bg-secondary)', minHeight: 'calc(100vh - 100px)' }}>
         {children}
       </main>
     </div>

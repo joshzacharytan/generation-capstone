@@ -21,6 +21,10 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   const [viewMode, setViewMode] = useState('grid'); // grid, list
   const [showFilters, setShowFilters] = useState(false);
   
+  // Special filter states
+  const [showSpecificProducts, setShowSpecificProducts] = useState(null); // 'high-value', 'low-inventory', etc.
+  const [specificProductIds, setSpecificProductIds] = useState([]);
+  
   // Smart Suggestions
   const [suggestions, setSuggestions] = useState({
     lowStock: [],
@@ -45,7 +49,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
     }, 300); // Debounce API calls
 
     return () => clearTimeout(delayedFetch);
-  }, [searchQuery, selectedCategory, stockFilter, priceRange, sortBy, sortOrder]);
+  }, [searchQuery, selectedCategory, stockFilter, priceRange, sortBy, sortOrder, showSpecificProducts, specificProductIds]);
 
   useEffect(() => {
     generateSmartSuggestions();
@@ -66,8 +70,15 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       };
       
       const response = await productsAPI.getAll(params);
-      setProducts(response.data);
-      setFilteredProducts(response.data); // Since backend does the filtering
+      let productsData = response.data;
+      
+      // Apply specific product filtering if active
+      if (showSpecificProducts && specificProductIds.length > 0) {
+        productsData = productsData.filter(product => specificProductIds.includes(product.id));
+      }
+      
+      setProducts(productsData);
+      setFilteredProducts(productsData);
       
       // Update hasAnyProducts if we haven't checked yet or if we got results
       if (!hasAnyProducts && response.data.length > 0) {
@@ -114,15 +125,17 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       if (allProducts.length === 0) return;
 
       const lowStock = allProducts.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0, 5);
+      const lowInventory = allProducts.filter(p => p.quantity > 0 && p.quantity < 20).slice(0, 5);
       const noImage = allProducts.filter(p => !p.image_url).slice(0, 5);
       const noDescription = allProducts.filter(p => !p.description || p.description.trim().length < 10).slice(0, 5);
-      const highValue = allProducts.filter(p => p.price > 100).sort((a, b) => b.price - a.price).slice(0, 5);
+      const highValue = allProducts.filter(p => p.price > 0).sort((a, b) => b.price - a.price).slice(0, 5);
       const recentlyAdded = allProducts
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .slice(0, 5);
 
       setSuggestions({
         lowStock,
+        lowInventory,
         noImage,
         noDescription,
         highValue,
@@ -140,6 +153,8 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
     setPriceRange({ min: '', max: '' });
     setSortBy('name');
     setSortOrder('asc');
+    setShowSpecificProducts(null);
+    setSpecificProductIds([]);
   };
 
   const applyQuickFilter = (filterType) => {
@@ -148,13 +163,24 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       case 'low-stock':
         setStockFilter('low-stock');
         break;
-      case 'no-image':
-        setSearchQuery(''); // Will be handled by smart suggestions
+      case 'low-inventory':
+        // Filter for items with quantity < 20
+        if (suggestions.lowInventory.length > 0) {
+          const lowInventoryIds = suggestions.lowInventory.map(item => item.id);
+          setShowSpecificProducts('low-inventory');
+          setSpecificProductIds(lowInventoryIds);
+        }
         break;
       case 'high-value':
-        setPriceRange({ min: '100', max: '' });
-        setSortBy('price');
-        setSortOrder('desc');
+        // Filter to show only the top 5 most expensive items
+        if (suggestions.highValue.length > 0) {
+          const highValueIds = suggestions.highValue.map(item => item.id);
+          setShowSpecificProducts('high-value');
+          setSpecificProductIds(highValueIds);
+        }
+        break;
+      case 'no-image':
+        setSearchQuery(''); // Will be handled by smart suggestions
         break;
       default:
         break;
@@ -175,7 +201,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-primary)' }}>
         <LoadingSpinner />
         <p>Loading products...</p>
       </div>
@@ -185,11 +211,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   if (error) {
     return (
       <div style={{ 
-        color: '#dc3545', 
-        backgroundColor: '#f8d7da',
+        color: 'var(--color-danger)', 
+        backgroundColor: 'rgba(220, 53, 69, 0.1)',
         padding: '1rem',
         borderRadius: '4px',
-        border: '1px solid #f5c6cb'
+        border: '1px solid rgba(220, 53, 69, 0.3)'
       }}>
         {error}
       </div>
@@ -197,7 +223,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   }
 
   // Check if this is truly an empty database (no products at all) vs filtered results
-  const hasActiveFilters = searchQuery || selectedCategory || stockFilter !== 'all' || priceRange.min || priceRange.max;
+  const hasActiveFilters = searchQuery || selectedCategory || stockFilter !== 'all' || priceRange.min || priceRange.max || showSpecificProducts;
   const isEmptyDatabase = !hasAnyProducts && !hasActiveFilters;
 
   if (isEmptyDatabase) {
@@ -205,12 +231,13 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       <div style={{ 
         textAlign: 'center', 
         padding: '3rem',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
-        border: '1px solid #dee2e6'
+        border: '1px solid var(--border-primary)',
+        boxShadow: 'var(--shadow-md)'
       }}>
-        <h3 style={{ color: '#6c757d' }}>No products yet</h3>
-        <p style={{ color: '#6c757d' }}>Add your first product to get started!</p>
+        <h3 style={{ color: 'var(--text-secondary)' }}>No products yet</h3>
+        <p style={{ color: 'var(--text-secondary)' }}>Add your first product to get started!</p>
       </div>
     );
   }
@@ -220,7 +247,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       {/* Smart Suggestions */}
       {Object.values(suggestions).some(arr => arr.length > 0) && (
         <div style={{ marginBottom: '2rem' }}>
-          <h4 style={{ color: '#333', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             💡 Smart Suggestions
           </h4>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
@@ -241,6 +268,25 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 }}
               >
                 ⚠️ {suggestions.lowStock.length} Low Stock Items
+              </button>
+            )}
+            {suggestions.lowInventory.length > 0 && (
+              <button
+                onClick={() => applyQuickFilter('low-inventory')}
+                style={{
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#ffeaa7',
+                  color: '#856404',
+                  border: '1px solid #ffeaa7',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  fontSize: '0.875rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}
+              >
+                📦 {suggestions.lowInventory.length} Low Inventory (&lt; 20)
               </button>
             )}
             {suggestions.noImage.length > 0 && (
@@ -297,7 +343,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                   gap: '0.25rem'
                 }}
               >
-                💎 {suggestions.highValue.length} High Value Items
+                💎 {suggestions.highValue.length} Most Expensive Items
               </button>
             )}
           </div>
@@ -306,11 +352,12 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
       {/* Search and Filter Header */}
       <div style={{ 
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '1.5rem',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        marginBottom: '1.5rem'
+        boxShadow: 'var(--shadow-md)',
+        marginBottom: '1.5rem',
+        border: '1px solid var(--border-primary)'
       }}>
         {/* Search Bar */}
         <div style={{ marginBottom: '1rem' }}>
@@ -324,10 +371,13 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 width: '100%',
                 padding: '0.75rem 1rem',
                 paddingRight: '3rem',
-                border: '2px solid #e9ecef',
+                border: '2px solid var(--border-primary)',
                 borderRadius: '25px',
                 fontSize: '0.9rem',
-                outline: 'none'
+                outline: 'none',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)',
+                transition: 'var(--theme-transition)'
               }}
             />
             <span style={{
@@ -335,7 +385,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
               right: '1rem',
               top: '50%',
               transform: 'translateY(-50%)',
-              color: '#6c757d'
+              color: 'var(--text-secondary)'
             }}>
               🔍
             </span>
@@ -349,31 +399,33 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
               onClick={() => setShowFilters(!showFilters)}
               style={{
                 padding: '0.5rem 1rem',
-                backgroundColor: showFilters ? '#007bff' : '#f8f9fa',
-                color: showFilters ? 'white' : '#333',
-                border: '1px solid #dee2e6',
+                backgroundColor: showFilters ? 'var(--color-primary)' : 'var(--bg-tertiary)',
+                color: showFilters ? 'var(--text-inverse)' : 'var(--text-primary)',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontSize: '0.875rem',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.5rem'
+                gap: '0.5rem',
+                transition: 'var(--theme-transition)'
               }}
             >
               🎛️ Filters {showFilters ? '▲' : '▼'}
             </button>
 
-            {(searchQuery || selectedCategory || stockFilter !== 'all' || priceRange.min || priceRange.max) && (
+            {(searchQuery || selectedCategory || stockFilter !== 'all' || priceRange.min || priceRange.max || showSpecificProducts) && (
               <button
                 onClick={clearAllFilters}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
+                  backgroundColor: 'var(--color-danger)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  transition: 'var(--theme-transition)'
                 }}
               >
                 Clear All
@@ -385,9 +437,9 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 onClick={() => setViewMode('grid')}
                 style={{
                   padding: '0.5rem',
-                  backgroundColor: viewMode === 'grid' ? '#007bff' : '#f8f9fa',
-                  color: viewMode === 'grid' ? 'white' : '#333',
-                  border: '1px solid #dee2e6',
+                  backgroundColor: viewMode === 'grid' ? 'var(--color-primary)' : 'var(--bg-tertiary)',
+                  color: viewMode === 'grid' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   cursor: 'pointer'
                 }}
@@ -398,9 +450,9 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 onClick={() => setViewMode('list')}
                 style={{
                   padding: '0.5rem',
-                  backgroundColor: viewMode === 'list' ? '#007bff' : '#f8f9fa',
-                  color: viewMode === 'list' ? 'white' : '#333',
-                  border: '1px solid #dee2e6',
+                  backgroundColor: viewMode === 'list' ? 'var(--color-primary)' : 'var(--bg-tertiary)',
+                  color: viewMode === 'list' ? 'var(--text-inverse)' : 'var(--text-primary)',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
                   cursor: 'pointer'
                 }}
@@ -411,7 +463,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
               Showing {filteredProducts.length} of {products.length} products
             </span>
             
@@ -424,9 +476,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
               }}
               style={{
                 padding: '0.5rem',
-                border: '1px solid #dee2e6',
+                border: '1px solid var(--border-primary)',
                 borderRadius: '4px',
-                fontSize: '0.875rem'
+                fontSize: '0.875rem',
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)'
               }}
             >
               <option value="name-asc">Name A-Z</option>
@@ -446,7 +500,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
           <div style={{ 
             marginTop: '1rem',
             padding: '1rem',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-tertiary)',
             borderRadius: '4px',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -454,7 +508,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
           }}>
             {/* Category Filter */}
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-primary)' }}>
                 Category
               </label>
               <select
@@ -463,9 +517,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 style={{
                   width: '100%',
                   padding: '0.5rem',
-                  border: '1px solid #dee2e6',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               >
                 <option value="">All Categories</option>
@@ -479,7 +535,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
             {/* Stock Filter */}
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-primary)' }}>
                 Stock Status
               </label>
               <select
@@ -488,9 +544,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                 style={{
                   width: '100%',
                   padding: '0.5rem',
-                  border: '1px solid #dee2e6',
+                  border: '1px solid var(--border-primary)',
                   borderRadius: '4px',
-                  fontSize: '0.875rem'
+                  fontSize: '0.875rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
                 }}
               >
                 <option value="all">All Stock Levels</option>
@@ -502,7 +560,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
             {/* Price Range */}
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.875rem', color: 'var(--text-primary)' }}>
                 Price Range
               </label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -514,9 +572,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                   style={{
                     flex: 1,
                     padding: '0.5rem',
-                    border: '1px solid #dee2e6',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    fontSize: '0.875rem'
+                    fontSize: '0.875rem',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
                 <input
@@ -527,9 +587,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
                   style={{
                     flex: 1,
                     padding: '0.5rem',
-                    border: '1px solid #dee2e6',
+                    border: '1px solid var(--border-primary)',
                     borderRadius: '4px',
-                    fontSize: '0.875rem'
+                    fontSize: '0.875rem',
+                    backgroundColor: 'var(--input-bg)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -543,12 +605,13 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
         <div style={{ 
           textAlign: 'center', 
           padding: '3rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
-          <h3 style={{ color: '#6c757d' }}>No products found</h3>
-          <p style={{ color: '#6c757d' }}>
+          <h3 style={{ color: 'var(--text-secondary)' }}>No products found</h3>
+          <p style={{ color: 'var(--text-secondary)' }}>
             {searchQuery || selectedCategory || stockFilter !== 'all' || priceRange.min || priceRange.max
               ? 'Try adjusting your search criteria or filters.'
               : 'Add your first product to get started!'
@@ -559,8 +622,8 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
               onClick={clearAllFilters}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#007bff',
-                color: 'white',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -607,11 +670,11 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
   if (viewMode === 'list') {
     return (
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '1rem',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #dee2e6',
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--border-primary)',
         display: 'flex',
         alignItems: 'center',
         gap: '1rem'
@@ -627,7 +690,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
                 height: '80px',
                 objectFit: 'cover',
                 borderRadius: '4px',
-                backgroundColor: '#f8f9fa'
+                backgroundColor: 'var(--bg-tertiary)'
               }}
               onError={(e) => {
                 e.target.style.display = 'none';
@@ -638,12 +701,12 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
           <div style={{
             width: '80px',
             height: '80px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-tertiary)',
             display: product.image_url ? 'none' : 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             borderRadius: '4px',
-            color: '#6c757d',
+            color: 'var(--text-secondary)',
             fontSize: '0.75rem'
           }}>
             No Image
@@ -653,13 +716,13 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
         {/* Product Info */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <h4 style={{ margin: 0, color: '#333', fontSize: '1.1rem' }}>
+            <h4 style={{ margin: 0, color: 'var(--text-primary)', fontSize: '1.1rem' }}>
               {product.name}
             </h4>
             <span style={{
               fontSize: '0.75rem',
-              backgroundColor: '#e9ecef',
-              color: '#495057',
+              backgroundColor: 'var(--bg-tertiary)',
+              color: 'var(--text-secondary)',
               padding: '0.25rem 0.5rem',
               borderRadius: '12px'
             }}>
@@ -667,7 +730,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
             </span>
           </div>
           <p style={{ 
-            color: '#6c757d', 
+            color: 'var(--text-secondary)', 
             fontSize: '0.875rem',
             margin: '0',
             overflow: 'hidden',
@@ -683,7 +746,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
           <div style={{ 
             fontSize: '1.25rem', 
             fontWeight: 'bold',
-            color: '#28a745',
+            color: 'var(--color-success)',
             marginBottom: '0.25rem'
           }}>
             ${product.price.toFixed(2)}
@@ -706,8 +769,8 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
             onClick={() => onEdit(product)}
             style={{
               padding: '0.5rem',
-              backgroundColor: '#007bff',
-              color: 'white',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -720,8 +783,8 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
             onClick={() => onDelete(product.id)}
             style={{
               padding: '0.5rem',
-              backgroundColor: '#dc3545',
-              color: 'white',
+              backgroundColor: 'var(--color-danger)',
+              color: 'var(--text-inverse)',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -738,20 +801,23 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
   // Grid view (default)
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--bg-elevated)',
       padding: '1.5rem',
       borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-      border: '1px solid #dee2e6',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+      boxShadow: 'var(--shadow-md)',
+      border: '1px solid var(--border-primary)',
+      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%' // Ensure all cards take full height of grid cell
     }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        e.currentTarget.style.boxShadow = 'var(--shadow-md)';
       }}
     >
       {/* Product Image */}
@@ -765,7 +831,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
               height: '150px',
               objectFit: 'cover',
               borderRadius: '4px',
-              backgroundColor: '#f8f9fa'
+              backgroundColor: 'var(--bg-tertiary)'
             }}
             onError={(e) => {
               e.target.style.display = 'none';
@@ -776,12 +842,12 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
         <div style={{
           width: '100%',
           height: '150px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-tertiary)',
           display: product.image_url ? 'none' : 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: '4px',
-          color: '#6c757d'
+          color: 'var(--text-secondary)'
         }}>
           📷 No Image
         </div>
@@ -803,115 +869,139 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       </div>
 
       {/* Product Details */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-        <h4 style={{ margin: 0, color: '#333', flex: 1, marginRight: '0.5rem' }}>
-          {product.name}
-        </h4>
-        <span style={{
-          fontSize: '0.75rem',
-          backgroundColor: '#e9ecef',
-          color: '#495057',
-          padding: '0.25rem 0.5rem',
-          borderRadius: '12px',
-          whiteSpace: 'nowrap'
-        }}>
-          {product.category || 'General'}
-        </span>
-      </div>
-
-      <p style={{ 
-        color: '#6c757d', 
-        fontSize: '0.9rem',
-        margin: '0 0 1rem 0',
-        lineHeight: '1.4',
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden'
-      }}>
-        {product.description || 'No description available'}
-      </p>
-
       <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '1rem'
-      }}>
-        <span style={{ 
-          fontSize: '1.25rem', 
-          fontWeight: 'bold',
-          color: '#28a745'
-        }}>
-          ${product.price.toFixed(2)}
-        </span>
-        <span style={{
-          fontSize: '0.875rem',
-          color: stockStatus.color,
-          backgroundColor: stockStatus.bg,
-          padding: '0.25rem 0.5rem',
-          borderRadius: '12px',
-          fontWeight: '500'
-        }}>
-          {stockStatus.text}
-        </span>
-      </div>
-
-      {/* Action Buttons */}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
-        <button
-          onClick={() => onEdit(product)}
-          style={{
-            flex: 1,
-            padding: '0.75rem',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#0056b3'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#007bff'}
-        >
-          ✏️ Edit
-        </button>
-        <button
-          onClick={() => onDelete(product.id)}
-          style={{
-            flex: 1,
-            padding: '0.75rem',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '0.9rem',
-            fontWeight: '500',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#c82333'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#dc3545'}
-        >
-          🗑️ Delete
-        </button>
-      </div>
-
-      {/* Quick Info */}
-      <div style={{
-        marginTop: '0.75rem',
-        padding: '0.5rem',
-        backgroundColor: '#f8f9fa',
-        borderRadius: '4px',
-        fontSize: '0.75rem',
-        color: '#6c757d',
+        flex: 1, // Take up remaining space
         display: 'flex',
-        justifyContent: 'space-between'
+        flexDirection: 'column'
       }}>
-        <span>ID: {product.id}</span>
-        <span>Added: {new Date(product.created_at).toLocaleDateString()}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+          <h4 style={{ 
+            margin: 0, 
+            color: 'var(--text-primary)', 
+            flex: 1, 
+            marginRight: '0.5rem',
+            minHeight: '2.5rem', // Reserve space for 2 lines of text
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            lineHeight: '1.25'
+          }}>
+            {product.name}
+          </h4>
+          <span style={{
+            fontSize: '0.75rem',
+            backgroundColor: 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            whiteSpace: 'nowrap'
+          }}>
+            {product.category || 'General'}
+          </span>
+        </div>
+
+        <p style={{ 
+          color: 'var(--text-secondary)', 
+          fontSize: '0.9rem',
+          margin: '0 0 1rem 0',
+          lineHeight: '1.4',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          minHeight: '2.8rem' // Reserve consistent space for 2 lines
+        }}>
+          {product.description || 'No description available'}
+        </p>
+
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem'
+        }}>
+          <span style={{ 
+            fontSize: '1.25rem', 
+            fontWeight: 'bold',
+            color: 'var(--color-success)'
+          }}>
+            ${product.price.toFixed(2)}
+          </span>
+          <span style={{
+            fontSize: '0.875rem',
+            color: stockStatus.color,
+            backgroundColor: stockStatus.bg,
+            padding: '0.25rem 0.5rem',
+            borderRadius: '12px',
+            fontWeight: '500'
+          }}>
+            {stockStatus.text}
+          </span>
+        </div>
+      </div>
+
+      {/* Action Buttons - Push to bottom */}
+      <div style={{ 
+        marginTop: 'auto', // Push to bottom
+        display: 'flex', 
+        flexDirection: 'column',
+        gap: '0.5rem'
+      }}>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button
+            onClick={() => onEdit(product)}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--text-inverse)',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-primary-dark)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-primary)'}
+          >
+            ✏️ Edit
+          </button>
+          <button
+            onClick={() => onDelete(product.id)}
+            style={{
+              flex: 1,
+              padding: '0.75rem',
+              backgroundColor: 'var(--color-danger)',
+              color: 'var(--text-inverse)',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              fontWeight: '500',
+              transition: 'background-color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--color-danger-dark)'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'var(--color-danger)'}
+          >
+            🗑️ Delete
+          </button>
+        </div>
+
+        {/* Quick Info */}
+        <div style={{
+          padding: '0.5rem',
+          backgroundColor: 'var(--bg-tertiary)',
+          borderRadius: '4px',
+          fontSize: '0.75rem',
+          color: 'var(--text-secondary)',
+          display: 'flex',
+          justifyContent: 'space-between'
+        }}>
+          <span>ID: {product.id}</span>
+          <span>Added: {new Date(product.created_at).toLocaleDateString()}</span>
+        </div>
       </div>
     </div>
   );

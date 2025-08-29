@@ -135,26 +135,26 @@ const SalesAnalytics = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: '#ffc107',
-      confirmed: '#28a745',
-      processing: '#007bff',
-      shipped: '#17a2b8',
-      delivered: '#28a745',
-      cancelled: '#dc3545'
+      pending: 'var(--color-warning)',
+      confirmed: 'var(--color-success)',
+      processing: 'var(--color-primary)',
+      shipped: 'var(--color-info)',
+      delivered: 'var(--color-success)',
+      cancelled: 'var(--color-danger)'
     };
-    return colors[status] || '#6c757d';
+    return colors[status] || 'var(--text-secondary)';
   };
 
   const renderLineChart = () => {
     if (!revenueTrend || revenueTrend.length === 0) {
-      return <p style={{ textAlign: 'center', color: '#6c757d' }}>No revenue data available</p>;
+      return <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No revenue data available</p>;;
     }
 
     const maxRevenue = Math.max(...revenueTrend.map(d => d.revenue));
     const maxOrders = Math.max(...revenueTrend.map(d => d.order_count));
     
     return (
-      <div style={{ position: 'relative', height: '300px', padding: '1rem' }}>
+      <div style={{ position: 'relative', height: '300px', padding: '1rem', color: 'var(--text-primary)' }}>
         <svg width="100%" height="100%" viewBox="0 0 600 250">
           {/* Grid lines */}
           {[0, 1, 2, 3, 4].map(i => (
@@ -164,7 +164,7 @@ const SalesAnalytics = () => {
               y1={50 + i * 40} 
               x2="550" 
               y2={50 + i * 40}
-              stroke="#e9ecef" 
+              stroke="var(--border-primary)" 
               strokeWidth="1"
             />
           ))}
@@ -172,7 +172,7 @@ const SalesAnalytics = () => {
           {/* Revenue line */}
           <polyline
             fill="none"
-            stroke="#28a745"
+            stroke="var(--color-success)"
             strokeWidth="3"
             points={revenueTrend.map((point, index) => {
               const x = 50 + (index * (500 / (revenueTrend.length - 1 || 1)));
@@ -184,7 +184,7 @@ const SalesAnalytics = () => {
           {/* Order count line */}
           <polyline
             fill="none"
-            stroke="#007bff"
+            stroke="var(--color-primary)"
             strokeWidth="2"
             strokeDasharray="5,5"
             points={revenueTrend.map((point, index) => {
@@ -202,8 +202,8 @@ const SalesAnalytics = () => {
             
             return (
               <g key={index}>
-                <circle cx={x} cy={revenueY} r="4" fill="#28a745" />
-                <circle cx={x} cy={orderY} r="3" fill="#007bff" />
+                <circle cx={x} cy={revenueY} r="4" fill="var(--color-success)" />
+                <circle cx={x} cy={orderY} r="3" fill="var(--color-primary)" />
               </g>
             );
           })}
@@ -219,7 +219,7 @@ const SalesAnalytics = () => {
                   y="235" 
                   textAnchor="middle" 
                   fontSize="10" 
-                  fill="#6c757d"
+                  fill="var(--text-secondary)"
                 >
                   {formatDate(point.date)}
                 </text>
@@ -236,7 +236,7 @@ const SalesAnalytics = () => {
               y={215 - i * 40} 
               textAnchor="end" 
               fontSize="10" 
-              fill="#6c757d"
+              fill="var(--text-secondary)"
             >
               ${Math.round(maxRevenue * (i / 4) / 1000)}k
             </text>
@@ -248,22 +248,22 @@ const SalesAnalytics = () => {
           position: 'absolute', 
           top: '1rem', 
           right: '1rem',
-          backgroundColor: 'rgba(255,255,255,0.9)',
+          backgroundColor: 'var(--bg-overlay)',
           padding: '0.5rem',
           borderRadius: '4px',
-          border: '1px solid #e9ecef'
+          border: '1px solid var(--border-primary)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.25rem' }}>
-            <div style={{ width: '20px', height: '3px', backgroundColor: '#28a745', marginRight: '0.5rem' }}></div>
+            <div style={{ width: '20px', height: '3px', backgroundColor: 'var(--color-success)', marginRight: '0.5rem' }}></div>
             <span style={{ fontSize: '0.8rem' }}>Revenue</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <div style={{ 
               width: '20px', 
               height: '2px', 
-              backgroundColor: '#007bff', 
+              backgroundColor: 'var(--color-primary)', 
               marginRight: '0.5rem',
-              backgroundImage: 'repeating-linear-gradient(to right, #007bff 0, #007bff 5px, transparent 5px, transparent 10px)'
+              backgroundImage: 'repeating-linear-gradient(to right, var(--color-primary) 0, var(--color-primary) 5px, transparent 5px, transparent 10px)'
             }}></div>
             <span style={{ fontSize: '0.8rem' }}>Orders</span>
           </div>
@@ -274,9 +274,9 @@ const SalesAnalytics = () => {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem' }}>
+      <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-primary)' }}>
         <LoadingSpinner />
-        <p>Loading sales analytics...</p>
+        <p style={{ color: 'var(--text-primary)' }}>Loading sales analytics...</p>
       </div>
     );
   }
@@ -285,10 +285,10 @@ const SalesAnalytics = () => {
     return (
       <div style={{
         padding: '2rem',
-        backgroundColor: '#f8d7da',
-        border: '1px solid #f5c6cb',
+        backgroundColor: 'var(--bg-elevated)',
+        border: '1px solid var(--border-primary)',
         borderRadius: '4px',
-        color: '#721c24'
+        color: 'var(--text-primary)'
       }}>
         <h3>Error Loading Analytics</h3>
         <p>{error}</p>
@@ -299,8 +299,8 @@ const SalesAnalytics = () => {
           }}
           style={{
             padding: '0.5rem 1rem',
-            backgroundColor: '#dc3545',
-            color: 'white',
+            backgroundColor: 'var(--color-danger)',
+            color: 'var(--text-inverse)',
             border: 'none',
             borderRadius: '4px',
             cursor: 'pointer'
@@ -323,7 +323,7 @@ const SalesAnalytics = () => {
         flexWrap: 'wrap',
         gap: '1rem'
       }}>
-        <h2 style={{ margin: 0 }}>📊 Sales Analytics</h2>
+        <h2 style={{ margin: 0, color: 'var(--text-primary)' }}>📊 Sales Analytics</h2>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <select
             value={selectedCategory}
@@ -331,8 +331,10 @@ const SalesAnalytics = () => {
             style={{
               padding: '0.5rem',
               borderRadius: '4px',
-              border: '1px solid #ddd',
-              fontSize: '1rem'
+              border: '1px solid var(--input-border)',
+              fontSize: '1rem',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
           >
             <option value="all">All Categories</option>
@@ -348,8 +350,10 @@ const SalesAnalytics = () => {
             style={{
               padding: '0.5rem',
               borderRadius: '4px',
-              border: '1px solid #ddd',
-              fontSize: '1rem'
+              border: '1px solid var(--input-border)',
+              fontSize: '1rem',
+              backgroundColor: 'var(--input-bg)',
+              color: 'var(--text-primary)'
             }}
           >
             {periodOptions.map(option => (
@@ -371,22 +375,22 @@ const SalesAnalytics = () => {
         {/* Total Revenue */}
         <div style={{
           padding: '1.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>💰</span>
-            <h4 style={{ margin: 0, color: '#6c757d' }}>Total Revenue</h4>
+            <h4 style={{ margin: 0, color: 'var(--text-secondary)' }}>Total Revenue</h4>
           </div>
-          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#28a745' }}>
+          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: 'var(--color-success)' }}>
             {formatCurrency(analyticsData?.total_revenue || 0)}
           </p>
           <p style={{
             margin: 0,
             fontSize: '0.9rem',
-            color: analyticsData?.revenue_growth_percentage >= 0 ? '#28a745' : '#dc3545'
+            color: analyticsData?.revenue_growth_percentage >= 0 ? 'var(--color-success)' : 'var(--color-danger)'
           }}>
             {analyticsData?.revenue_growth_percentage >= 0 ? '↗️' : '↘️'} 
             {Math.abs(analyticsData?.revenue_growth_percentage || 0).toFixed(1)}% vs previous period
@@ -396,19 +400,19 @@ const SalesAnalytics = () => {
         {/* Total Orders */}
         <div style={{
           padding: '1.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>📦</span>
-            <h4 style={{ margin: 0, color: '#6c757d' }}>Total Orders</h4>
+            <h4 style={{ margin: 0, color: 'var(--text-secondary)' }}>Total Orders</h4>
           </div>
-          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#007bff' }}>
+          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: 'var(--color-primary)' }}>
             {analyticsData?.total_orders || 0}
           </p>
-          <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
             orders in selected period
           </p>
         </div>
@@ -416,19 +420,19 @@ const SalesAnalytics = () => {
         {/* Average Order Value */}
         <div style={{
           padding: '1.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '1.5rem', marginRight: '0.5rem' }}>🛒</span>
-            <h4 style={{ margin: 0, color: '#6c757d' }}>Avg Order Value</h4>
+            <h4 style={{ margin: 0, color: 'var(--text-secondary)' }}>Avg Order Value</h4>
           </div>
-          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: '#17a2b8' }}>
+          <p style={{ fontSize: '2rem', fontWeight: 'bold', margin: '0.5rem 0', color: 'var(--color-info)' }}>
             {formatCurrency(analyticsData?.average_order_value || 0)}
           </p>
-          <p style={{ margin: 0, fontSize: '0.9rem', color: '#6c757d' }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
             per order average
           </p>
         </div>
@@ -438,24 +442,24 @@ const SalesAnalytics = () => {
         {/* Revenue Trend Chart */}
         <div style={{
           padding: '1.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
-          <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>📈 Revenue & Orders Trend</h3>
+          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-primary)' }}>📈 Revenue & Orders Trend</h3>
           {renderLineChart()}
         </div>
 
         {/* Order Status Distribution */}
         <div style={{
           padding: '1.5rem',
-          backgroundColor: 'white',
+          backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          border: '1px solid #e9ecef'
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--border-primary)'
         }}>
-          <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>📋 Order Status</h3>
+          <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-primary)' }}>📋 Order Status</h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
             {analyticsData?.status_distribution?.map(status => (
               <div key={status.status} style={{
@@ -463,7 +467,7 @@ const SalesAnalytics = () => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '0.75rem',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-secondary)',
                 borderRadius: '4px',
                 borderLeft: `4px solid ${getStatusColor(status.status)}`
               }}>
@@ -475,7 +479,7 @@ const SalesAnalytics = () => {
                   }}>
                     {status.status}
                   </span>
-                  <div style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+                  <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                     {status.count} orders
                   </div>
                 </div>
@@ -485,7 +489,7 @@ const SalesAnalytics = () => {
                   </div>
                 </div>
               </div>
-            )) || <p style={{ textAlign: 'center', color: '#6c757d' }}>No status data available</p>}
+            )) || <p style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>No status data available</p>}
           </div>
         </div>
       </div>
@@ -493,23 +497,24 @@ const SalesAnalytics = () => {
       {/* Top Products Table */}
       <div style={{
         padding: '1.5rem',
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        border: '1px solid #e9ecef'
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--border-primary)'
       }}>
-        <h3 style={{ marginTop: 0, marginBottom: '1rem' }}>🏆 Top Performing Products</h3>
+        <h3 style={{ marginTop: 0, marginBottom: '1rem', color: 'var(--text-primary)' }}>🏆 Top Performing Products</h3>
         {topProducts.length > 0 ? (
           <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', color: 'var(--text-primary)' }}>
               <thead>
-                <tr style={{ backgroundColor: '#f8f9fa' }}>
+                <tr style={{ backgroundColor: 'var(--bg-secondary)' }}>
                   <th style={{ 
                     padding: '0.75rem', 
                     textAlign: 'left', 
-                    borderBottom: '2px solid #dee2e6',
+                    borderBottom: '2px solid var(--border-primary)',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    color: 'var(--text-primary)'
                   }}
                   onClick={() => handleSort('product_name')}
                   >
@@ -518,9 +523,10 @@ const SalesAnalytics = () => {
                   <th style={{ 
                     padding: '0.75rem', 
                     textAlign: 'right', 
-                    borderBottom: '2px solid #dee2e6',
+                    borderBottom: '2px solid var(--border-primary)',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    color: 'var(--text-primary)'
                   }}
                   onClick={() => handleSort('total_revenue')}
                   >
@@ -529,9 +535,10 @@ const SalesAnalytics = () => {
                   <th style={{ 
                     padding: '0.75rem', 
                     textAlign: 'right', 
-                    borderBottom: '2px solid #dee2e6',
+                    borderBottom: '2px solid var(--border-primary)',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    color: 'var(--text-primary)'
                   }}
                   onClick={() => handleSort('total_quantity')}
                   >
@@ -540,9 +547,10 @@ const SalesAnalytics = () => {
                   <th style={{ 
                     padding: '0.75rem', 
                     textAlign: 'right', 
-                    borderBottom: '2px solid #dee2e6',
+                    borderBottom: '2px solid var(--border-primary)',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    color: 'var(--text-primary)'
                   }}
                   onClick={() => handleSort('order_count')}
                   >
@@ -551,9 +559,10 @@ const SalesAnalytics = () => {
                   <th style={{ 
                     padding: '0.75rem', 
                     textAlign: 'right', 
-                    borderBottom: '2px solid #dee2e6',
+                    borderBottom: '2px solid var(--border-primary)',
                     cursor: 'pointer',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    color: 'var(--text-primary)'
                   }}
                   onClick={() => handleSort('average_price')}
                   >
@@ -564,13 +573,13 @@ const SalesAnalytics = () => {
               <tbody>
                 {getSortedProducts().map((product, index) => (
                   <tr key={product.product_id} style={{
-                    backgroundColor: index % 2 === 0 ? 'white' : '#f8f9fa'
+                    backgroundColor: index % 2 === 0 ? 'var(--bg-primary)' : 'var(--bg-secondary)'
                   }}>
-                    <td style={{ padding: '0.75rem', borderBottom: '1px solid #dee2e6' }}>
+                    <td style={{ padding: '0.75rem', borderBottom: '1px solid var(--border-primary)' }}>
                       <div style={{ display: 'flex', alignItems: 'center' }}>
                         <span style={{
-                          backgroundColor: '#007bff',
-                          color: 'white',
+                          backgroundColor: 'var(--color-primary)',
+                          color: 'var(--text-inverse)',
                           borderRadius: '50%',
                           width: '24px',
                           height: '24px',
@@ -588,19 +597,19 @@ const SalesAnalytics = () => {
                     <td style={{
                       padding: '0.75rem',
                       textAlign: 'right',
-                      borderBottom: '1px solid #dee2e6',
+                      borderBottom: '1px solid var(--border-primary)',
                       fontWeight: 'bold',
-                      color: '#28a745'
+                      color: 'var(--color-success)'
                     }}>
                       {formatCurrency(product.total_revenue)}
                     </td>
-                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid #dee2e6' }}>
+                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--border-primary)' }}>
                       {product.total_quantity}
                     </td>
-                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid #dee2e6' }}>
+                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--border-primary)' }}>
                       {product.order_count}
                     </td>
-                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid #dee2e6' }}>
+                    <td style={{ padding: '0.75rem', textAlign: 'right', borderBottom: '1px solid var(--border-primary)' }}>
                       {formatCurrency(product.average_price)}
                     </td>
                   </tr>
@@ -609,7 +618,7 @@ const SalesAnalytics = () => {
             </table>
           </div>
         ) : (
-          <p style={{ textAlign: 'center', color: '#6c757d', padding: '2rem' }}>
+          <p style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '2rem' }}>
             No product sales data available for the selected period
           </p>
         )}

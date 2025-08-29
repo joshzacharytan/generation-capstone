@@ -4,6 +4,7 @@ import { useCustomer } from '../contexts/CustomerContext';
 import { storeAPI } from '../services/api';
 import SearchBox from './SearchBox';
 import { getImageUrl } from '../utils/imageUtils';
+import ThemeToggle from './ThemeToggle';
 
 const StoreHeader = ({ 
   tenantDomain, 
@@ -95,12 +96,14 @@ const StoreHeader = ({
   return (
     <>
       <header style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         padding: '1rem 2rem',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        boxShadow: 'var(--shadow-md)',
         position: 'sticky',
         top: 0,
-        zIndex: 100
+        zIndex: 100,
+        borderBottom: '1px solid var(--border-primary)',
+        position: 'relative'
       }}>
         <div style={{
           maxWidth: '1200px',
@@ -117,8 +120,8 @@ const StoreHeader = ({
                 onClick={onBackClick}
                 style={{
                   padding: '0.5rem 1rem',
-                  backgroundColor: '#6c757d',
-                  color: 'white',
+                  backgroundColor: 'var(--text-secondary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -148,7 +151,7 @@ const StoreHeader = ({
             <h1 
               style={{ 
                 margin: 0, 
-                color: tenantBranding?.brand_color_primary || '#333', 
+                color: tenantBranding?.brand_color_primary || 'var(--text-primary)', 
                 textTransform: 'capitalize',
                 fontSize: showBackButton ? '1.2rem' : '1.5rem',
                 cursor: 'pointer'
@@ -162,6 +165,7 @@ const StoreHeader = ({
           {/* Center Section - Search Bar */}
           <div style={{ flex: 1, maxWidth: '400px' }}>
             <SearchBox 
+              key={`${tenantDomain}-${initialSearchQuery || 'empty'}`}
               tenantDomain={tenantDomain}
               initialValue={initialSearchQuery}
               placeholder="Search products, brands, categories..."
@@ -169,20 +173,20 @@ const StoreHeader = ({
           </div>
 
           {/* Right Section */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px', justifyContent: 'flex-end' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '300px', justifyContent: 'flex-end' }}>
             {showAuth && (
               <>
                 {isAuthenticated ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>
+                    <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
                       Welcome, {customer?.first_name ? `${customer.first_name} ${customer.last_name}` : customer?.email}
                     </span>
                     <button
                       onClick={handleAccountClick}
                       style={{
                         padding: '0.5rem 1rem',
-                        backgroundColor: '#17a2b8',
-                        color: 'white',
+                        backgroundColor: 'var(--color-info)',
+                        color: 'var(--text-inverse)',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
@@ -195,8 +199,8 @@ const StoreHeader = ({
                       onClick={logout}
                       style={{
                         padding: '0.5rem 1rem',
-                        backgroundColor: '#6c757d',
-                        color: 'white',
+                        backgroundColor: 'var(--text-secondary)',
+                        color: 'var(--text-inverse)',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
@@ -211,8 +215,8 @@ const StoreHeader = ({
                     onClick={handleAuthClick}
                     style={{
                       padding: '0.5rem 1rem',
-                      backgroundColor: '#28a745',
-                      color: 'white',
+                      backgroundColor: 'var(--color-success)',
+                      color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
@@ -231,8 +235,8 @@ const StoreHeader = ({
                 onClick={handleCartClick}
                 style={{
                   padding: '0.75rem 1.5rem',
-                  backgroundColor: '#007bff',
-                  color: 'white',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',
@@ -250,7 +254,19 @@ const StoreHeader = ({
                 )}
               </button>
             )}
+
           </div>
+        </div>
+        
+        {/* Theme Toggle - positioned at absolute right of viewport */}
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          right: '1rem',
+          transform: 'translateY(-50%)',
+          zIndex: 101
+        }}>
+          <ThemeToggle variant="icon" />
         </div>
       </header>
 

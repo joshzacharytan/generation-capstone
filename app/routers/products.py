@@ -142,6 +142,24 @@ async def upload_product_image(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
+@router.post("/products/upload-image-from-url")
+async def upload_product_image_from_url(
+    request: Request,
+    image_url: str = Form(...),
+    current_user: models.User = Depends(security.get_current_user_alternative)
+):
+    """
+    Download and save a product image from URL.
+    Returns the image URL and filename for use in product creation/update.
+    """
+    try:
+        result = await FileUploadService.save_product_image_from_url(image_url, current_user.tenant_id)
+        return result
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"URL upload failed: {str(e)}")
+
 @router.post("/products/create-with-image", response_model=schemas.Product)
 async def create_product_with_image(
     request: Request,

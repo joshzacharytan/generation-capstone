@@ -137,9 +137,9 @@ const SearchResultsContent = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8f9fa'
+        backgroundColor: 'var(--bg-primary)'
       }}>
-        <div style={{ textAlign: 'center' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-primary)' }}>
           <LoadingSpinner />
           <p>Searching products...</p>
         </div>
@@ -148,7 +148,7 @@ const SearchResultsContent = () => {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg-primary)' }}>
       <NetworkStatus />
       
       <StoreHeader
@@ -168,10 +168,10 @@ const SearchResultsContent = () => {
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
         {/* Search Results Header */}
         <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ color: '#333', marginBottom: '0.5rem' }}>
+          <h2 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
             Search Results for "{searchQuery}"
           </h2>
-          <p style={{ color: '#6c757d', margin: 0 }}>
+          <p style={{ color: 'var(--text-secondary)', margin: 0 }}>
             {products.length} product{products.length !== 1 ? 's' : ''} found
           </p>
         </div>
@@ -179,10 +179,10 @@ const SearchResultsContent = () => {
         {error && (
           <div style={{
             padding: '1rem',
-            backgroundColor: '#f8d7da',
-            color: '#721c24',
+            backgroundColor: 'var(--bg-danger-subtle)',
+            color: 'var(--color-danger)',
             borderRadius: '4px',
-            border: '1px solid #f5c6cb',
+            border: '1px solid var(--border-danger)',
             marginBottom: '2rem'
           }}>
             {error}
@@ -194,20 +194,21 @@ const SearchResultsContent = () => {
           <div style={{
             textAlign: 'center',
             padding: '3rem',
-            backgroundColor: 'white',
+            backgroundColor: 'var(--bg-elevated)',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            boxShadow: 'var(--shadow-md)',
+            border: '1px solid var(--border-primary)'
           }}>
-            <h3 style={{ color: '#6c757d' }}>No products found</h3>
-            <p style={{ color: '#6c757d' }}>
+            <h3 style={{ color: 'var(--text-secondary)' }}>No products found</h3>
+            <p style={{ color: 'var(--text-secondary)' }}>
               Try searching with different keywords or browse our categories.
             </p>
             <button
               onClick={handleBackToStore}
               style={{
                 padding: '0.75rem 1.5rem',
-                backgroundColor: '#007bff',
-                color: 'white',
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--text-inverse)',
                 border: 'none',
                 borderRadius: '4px',
                 cursor: 'pointer',
@@ -301,12 +302,16 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
 
   return (
     <div style={{
-      backgroundColor: 'white',
+      backgroundColor: 'var(--bg-elevated)',
       borderRadius: '8px',
-      boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+      boxShadow: 'var(--shadow-md)',
       overflow: 'hidden',
       transition: 'transform 0.2s ease',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      border: '1px solid var(--border-primary)',
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%' // Ensure all cards take full height of grid cell
     }}
       onClick={handleProductClick}
       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -321,7 +326,7 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
             width: '100%',
             height: '200px',
             objectFit: 'cover',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: 'var(--bg-tertiary)'
           }}
           onError={(e) => {
             e.target.style.display = 'none';
@@ -331,22 +336,27 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
         <div style={{
           width: '100%',
           height: '200px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-tertiary)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#6c757d'
+          color: 'var(--text-secondary)'
         }}>
           No Image
         </div>
       )}
 
-      <div style={{ padding: '1.5rem' }}>
+      <div style={{ 
+        padding: '1.5rem',
+        flex: 1, // Take up remaining space
+        display: 'flex',
+        flexDirection: 'column'
+      }}>
         <div style={{ marginBottom: '0.5rem' }}>
           <span style={{
             fontSize: '0.75rem',
-            backgroundColor: '#e9ecef',
-            color: '#495057',
+            backgroundColor: 'var(--bg-tertiary)',
+            color: 'var(--text-secondary)',
             padding: '0.25rem 0.5rem',
             borderRadius: '12px'
           }}>
@@ -356,22 +366,29 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
 
         <h3 style={{
           margin: '0 0 0.5rem 0',
-          color: '#333',
+          color: 'var(--text-primary)',
           fontSize: '1.1rem',
-          transition: 'color 0.2s ease'
+          transition: 'color 0.2s ease',
+          minHeight: '2.75rem', // Reserve space for 2 lines of text
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          lineHeight: '1.25'
         }}>
           {product.name}
         </h3>
 
         <p style={{
-          color: '#6c757d',
+          color: 'var(--text-secondary)',
           fontSize: '0.9rem',
           margin: '0 0 0.5rem 0',
           lineHeight: '1.4',
           display: '-webkit-box',
           WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          minHeight: '2.8rem' // Reserve consistent space for 2 lines
         }}>
           {product.description || 'No description available'}
         </p>
@@ -385,12 +402,12 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
           <span style={{
             fontSize: '1.5rem',
             fontWeight: 'bold',
-            color: '#28a745'
+            color: 'var(--color-success)'
           }}>
             ${product.price.toFixed(2)}
           </span>
           <span style={{
-            color: product.quantity > 0 ? '#28a745' : '#dc3545',
+            color: product.quantity > 0 ? 'var(--color-success)' : 'var(--color-danger)',
             fontSize: '0.9rem',
             fontWeight: '500'
           }}>
@@ -398,61 +415,67 @@ const ProductCard = ({ product, onAddToCart, tenantDomain }) => {
           </span>
         </div>
 
-        {product.quantity > 0 ? (
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <select
-              value={quantity}
-              onChange={(e) => {
-                e.stopPropagation();
-                setQuantity(parseInt(e.target.value));
-              }}
+        {/* Action Section - Push to bottom */}
+        <div style={{ marginTop: 'auto' }}>
+          {product.quantity > 0 ? (
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <select
+                value={quantity}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  setQuantity(parseInt(e.target.value));
+                }}
+                style={{
+                  padding: '0.5rem',
+                  border: '1px solid var(--border-primary)',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem',
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)'
+                }}
+              >
+                {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
+                  <option key={i + 1} value={i + 1}>
+                    {i + 1}
+                  </option>
+                ))}
+              </select>
+              <button
+                onClick={handleAddToCart}
+                style={{
+                  flex: 1,
+                  padding: '0.75rem',
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--text-inverse)',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  transition: 'var(--theme-transition)'
+                }}
+              >
+                Add to Cart
+              </button>
+            </div>
+          ) : (
+            <button
+              disabled
               style={{
-                padding: '0.5rem',
-                border: '1px solid #ddd',
+                width: '100%',
+                padding: '0.75rem',
+                backgroundColor: 'var(--color-secondary)',
+                color: 'var(--text-inverse)',
+                border: 'none',
                 borderRadius: '4px',
+                cursor: 'not-allowed',
                 fontSize: '0.9rem'
               }}
             >
-              {[...Array(Math.min(product.quantity, 10))].map((_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={handleAddToCart}
-              style={{
-                flex: 1,
-                padding: '0.75rem',
-                backgroundColor: '#007bff',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '0.9rem',
-                fontWeight: '500'
-              }}
-            >
-              Add to Cart
+              Out of Stock
             </button>
-          </div>
-        ) : (
-          <button
-            disabled
-            style={{
-              width: '100%',
-              padding: '0.75rem',
-              backgroundColor: '#6c757d',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'not-allowed',
-              fontSize: '0.9rem'
-            }}
-          >
-            Out of Stock
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 # Multi-stage build for React frontend
 # Stage 1: Build stage
-FROM node:18-alpine as builder
+FROM --platform=$BUILDPLATFORM node:18-alpine as builder
 
 # Set working directory
 WORKDIR /app
@@ -22,16 +22,22 @@ RUN npm run build
 # Stage 2: Production stage with nginx
 FROM nginx:alpine as production
 
-# Install security updates
-RUN apk update && apk upgrade && apk add --no-cache \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
+# Build argument to choose NGINX configuration
+ARG NGINX_CONFIG=prod
+
+# Install security updates with retry logic
+RUN set -ex && \
+    for i in 1 2 3; do \
+        apk update && apk upgrade && apk add --no-cache dumb-init && break || \
+        (echo "Retry $i/3 failed, waiting..." && sleep 5); \
+    done && \
+    rm -rf /var/cache/apk/*
 
 # Copy built assets from builder stage
 COPY --from=builder /app/build /usr/share/nginx/html
 
-# Copy custom nginx configuration
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+# Copy appropriate nginx server configuration based on build arg
+COPY docker/server.${NGINX_CONFIG}.conf /etc/nginx/conf.d/default.conf
 
 # Set permissions for nginx user (user already exists in nginx:alpine)
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
