@@ -10,6 +10,7 @@ import ProductDetail from './components/ProductDetail';
 import SearchResults from './components/SearchResults';
 
 import './App.css';
+import './styles/basic.css';
 
 function App() {
   return (
