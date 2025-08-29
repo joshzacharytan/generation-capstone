@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
-import ThemeToggle from './ThemeToggle';
 
 const Layout = ({ children }) => {
   const { logout } = useAuth();
@@ -62,7 +61,6 @@ const Layout = ({ children }) => {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <ThemeToggle variant="button" showLabel={false} />
           <button
             onClick={handleLogout}
             style={{

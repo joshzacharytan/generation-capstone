@@ -4,7 +4,6 @@ import { useCustomer } from '../contexts/CustomerContext';
 import { storeAPI } from '../services/api';
 import SearchBox from './SearchBox';
 import { getImageUrl } from '../utils/imageUtils';
-import ThemeToggle from './ThemeToggle';
 
 const StoreHeader = ({ 
   tenantDomain, 
@@ -256,17 +255,6 @@ const StoreHeader = ({
             )}
 
           </div>
-        </div>
-        
-        {/* Theme Toggle - positioned at absolute right of viewport */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          right: '1rem',
-          transform: 'translateY(-50%)',
-          zIndex: 101
-        }}>
-          <ThemeToggle variant="icon" />
         </div>
       </header>
 
