@@ -1,17 +1,11 @@
 version: '3.8'
 
 services:
-
-
-  # FastAPI Backend
+  # FastAPI Backend (Containerized)
   backend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.backend
+    image: ghcr.io/joshzacharytan/generation-capstone-backend:latest
     container_name: ecommerce_backend_prod
     restart: always
-    # Use host network to access local PostgreSQL
-    # Alternative: use host.docker.internal on Windows/Mac
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=${SECRET_KEY}
@@ -19,11 +13,10 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       - ENVIRONMENT=production
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN:-gen-capstone.tanfamily.cc}
     volumes:
-      - ./app/static:/app/static
-      - ./logs:/app/logs
-    depends_on: []
-    # No database dependency since using local PostgreSQL
+      - ./app/static/uploads:/app/static/uploads  # Persist uploaded files
+      - ./logs:/app/logs  # Persist application logs
     networks:
       - backend_network
       - frontend_network
@@ -40,18 +33,16 @@ services:
         reservations:
           memory: 512M
 
-  # React Frontend with NGINX
+  # React Frontend with NGINX (Containerized)
   frontend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.frontend
+    image: ghcr.io/joshzacharytan/generation-capstone-frontend:latest
     container_name: ecommerce_frontend_prod
     restart: always
     ports:
       - "80:80"
       - "443:443"  # For SSL termination
-    volumes:
-      - ./docker/nginx.prod.conf:/etc/nginx/nginx.conf:ro  # Use production NGINX config
+    environment:
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN:-gen-capstone.tanfamily.cc}
     depends_on:
       backend:
         condition: service_healthy
@@ -69,38 +60,12 @@ services:
         reservations:
           memory: 128M
 
-
-
-  # Nginx Reverse Proxy (Optional - for advanced load balancing)
-  # This is separate from the frontend NGINX and can be used for additional load balancing
-  nginx:
-    image: nginx:alpine
-    container_name: ecommerce_nginx_prod
-    restart: always
-    ports:
-      - "8080:80"  # Alternative port for advanced proxy
-    volumes:
-      - ./docker/nginx-proxy.conf:/etc/nginx/nginx.conf:ro
-      - ./logs/nginx:/var/log/nginx
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - frontend_network
-    healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-        reservations:
-          memory: 64M
-
-volumes: {}
-  # No volumes needed since using local PostgreSQL
+# Persistent volumes for data and logs
+volumes:
+  uploads_data:
+    driver: local
+  logs_data:
+    driver: local
 
 networks:
   frontend_network:
