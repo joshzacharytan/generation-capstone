@@ -4,20 +4,51 @@ A full-stack e-commerce platform with React frontend, FastAPI backend, and Postg
 
 ## 🚀 Quick Start
 
-### Option 1: Docker (Recommended)
+### 🎯 Production Testing (Ubuntu VM + PostgreSQL)
+
+**For testing with pre-built containers and existing PostgreSQL on Ubuntu VM:**
 
 ```bash
-# Clone and run
+# 1. Setup environment
+git clone https://github.com/joshzacharytan/generation-capstone.git
+cd generation-capstone
+cp .env.example .env
+
+# 2. Edit .env with your VM details
+# DATABASE_URL=postgresql://postgres:your_password@your_vm_ip:5432/ecommerce_db
+# FRONTEND_DOMAIN=your_vm_ip
+# SECRET_KEY=your-secret-key-here
+
+# 3. Run containers (uses ghcr.io pre-built images)
+docker-compose up -d
+
+# 4. Access your store
+# Open browser: http://your_vm_ip
+```
+
+**What this does:**
+- ✅ Uses pre-built images from GitHub Container Registry
+- ✅ Connects to your existing PostgreSQL on Ubuntu VM  
+- ✅ Frontend accessible on port 80 (production-like)
+- ✅ Backend API proxied through NGINX
+- ✅ Persistent file uploads and logs
+
+### 🔧 Local Development
+
+**For development with hot reload:**
+
+```bash
+# Clone and run with local database
 git clone https://github.com/joshzacharytan/generation-capstone.git
 cd generation-capstone
 docker-compose up -d
 ```
 
 **Access:**
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:3000  
 - Backend API: http://localhost:8000/docs
 
-### Option 2: Local Development
+### 💻 Manual Setup (Advanced)
 
 ```bash
 # Backend setup
@@ -34,15 +65,49 @@ npm install
 npm start
 ```
 
+### 🔍 Production Testing Troubleshooting
+
+**Can't connect to database?**
+```bash
+# Check PostgreSQL is running on your VM
+sudo systemctl status postgresql
+
+# Test connection from your machine
+psql -h your_vm_ip -U postgres -d ecommerce_db
+
+# Check PostgreSQL config allows connections
+sudo nano /etc/postgresql/*/main/postgresql.conf  # listen_addresses = '*'
+sudo nano /etc/postgresql/*/main/pg_hba.conf       # Add your IP range
+sudo systemctl restart postgresql
+```
+
+**Frontend not loading?**
+```bash
+# Check containers are running
+docker-compose ps
+
+# Check logs
+docker-compose logs frontend
+docker-compose logs backend
+
+# Verify your .env settings
+cat .env
+```
+
+**Stop everything:**
+```bash
+docker-compose down
+```
+
 ## 🐳 Docker Configuration Explained
 
-### Why This Project Has Special Docker Files
+### Why This Project Uses Custom Docker Setup
 
-Unlike typical Docker projects, this application uses **custom NGINX configurations** because:
+This application uses **custom NGINX configurations** because:
 
 1. **Frontend Routing**: The React app needs NGINX to proxy `/api/*` requests to the backend
 2. **File Serving**: NGINX serves both React static files AND uploaded images from the backend
-3. **Environment Flexibility**: Different configs for development, staging, and production
+3. **Production Ready**: Uses pre-built images from GitHub Container Registry
 4. **Container Communication**: Handles Docker network routing between frontend and backend
 
 ### Key Docker Files:
@@ -51,60 +116,34 @@ Unlike typical Docker projects, this application uses **custom NGINX configurati
 docker/
 ├── Dockerfile.frontend          # React + NGINX multi-stage build
 ├── Dockerfile.backend           # FastAPI with Ubuntu VM support  
-├── server.prod.conf            # NGINX config for production (container-to-container)
-├── server.staging.conf         # NGINX config for development (container-to-host)
-├── nginx.prod.conf             # Full NGINX config (legacy)
-└── nginx.staging.conf          # Full NGINX config (legacy)
+├── server.prod.conf            # NGINX config for production
+├── nginx.prod.conf             # Full NGINX config
+└── nginx.conf                  # Development NGINX config
 ```
 
-### Docker Environments:
+### Single Docker Compose Deployment:
 
 ```bash
-# Development (recommended)
+# Production testing (recommended)
 docker-compose up -d
-
-# Staging (containerized frontend + local backend)
-docker-compose -f docker-compose.staging.yml up -d
-
-# Production (full containerization)
-docker-compose -f docker-compose.prod.yml up -d
 ```
-
-### Staging Environment (Test Production Setup)
-
-The staging environment lets you test production-ready frontend with your local backend:
-
-```bash
-# 1. Start local backend first
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-
-# 2. Start containerized frontend (new terminal)
-docker-compose -f docker-compose.staging.yml up -d
-
-# Access at: http://localhost
-```
-
-**Benefits:**
-- ✅ Test NGINX proxy with real data
-- ✅ Production-like frontend behavior  
-- ✅ Keep existing test data in local PostgreSQL
-- ✅ Debug backend easily (not containerized)
 
 ## ⚙️ Environment Variables
 
-Create `.env` file:
-```env
-DATABASE_URL=postgresql://postgres:password@localhost/ecommerce_db
-SECRET_KEY=your-jwt-secret-key-here
-GEMINI_API_KEY=your_gemini_api_key_here
-FRONTEND_DOMAIN=localhost  # Change for production/VM
+Create `.env` file from the example:
+```bash
+cp .env.example .env
 ```
 
-**Important:** Set `FRONTEND_DOMAIN` correctly:
-- Local: `localhost`
-- Ubuntu VM: `your-vm-ip-address` 
-- Production: `your-domain.com`
+Edit with your details:
+```env
+DATABASE_URL=postgresql://postgres:your_password@your_vm_ip:5432/ecommerce_db
+FRONTEND_DOMAIN=your-domain.com
+SECRET_KEY=your-jwt-secret-key-here
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+**Important:** Set `FRONTEND_DOMAIN` and `DATABASE_URL` correctly for your setup.
 
 ## 🏗️ System Architecture
 
@@ -179,21 +218,19 @@ graph TB
 - **AI**: Google Gemini for product descriptions
 - **DevOps**: Docker, NGINX, GitHub Container Registry
 
-## 🚀 Deployment Options
+## 🚀 Deployment
 
-### Pre-built Images (GitHub Container Registry)
+### Using Pre-built Images (Recommended)
 
 ```bash
-# Pull and run backend
-docker run -d -p 8000:8000 \
-  -e DATABASE_URL="postgresql://postgres:password@host.docker.internal:5432/ecommerce_db" \
-  -e SECRET_KEY="your-secret-key" \
-  -e FRONTEND_DOMAIN="localhost" \
-  ghcr.io/joshzacharytan/generation-capstone-backend:latest
+# Simple one-command deployment
+docker-compose up -d
 
-# Pull and run frontend  
-docker run -d -p 3000:80 \
-  ghcr.io/joshzacharytan/generation-capstone-frontend:latest
+# View logs
+docker-compose logs -f
+
+# Stop
+docker-compose down
 ```
 
 ### Build Your Own Images
@@ -206,69 +243,21 @@ docker build -f docker/Dockerfile.frontend -t my-frontend --build-arg NGINX_CONF
 docker build -f docker/Dockerfile.backend -t my-backend .
 ```
 
-### Ubuntu VM Deployment
-
-```bash
-# Set correct domain for VM
-export FRONTEND_DOMAIN="your-vm-ip-address"
-
-# Use staging config (connects to host)
-docker-compose -f docker-compose.staging.yml up -d
-```
-
-### Ubuntu VM with Custom Domain Testing
-
-To test with your custom domain (example: `gen-capstone.tanfamily.cc`) on Ubuntu VM:
-
-```bash
-# 1. Set up PostgreSQL (if not already installed)
-sudo apt update && sudo apt install postgresql postgresql-contrib
-
-# 2. Create database
-sudo -u postgres createdb ecommerce_db
-sudo -u postgres psql -c "ALTER USER postgres PASSWORD 'password';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ecommerce_db TO postgres;"
-
-# 3. Configure environment (replace with your domain)
-export FRONTEND_DOMAIN=your-domain.com  # e.g., gen-capstone.tanfamily.cc
-cat > .env << EOF
-DATABASE_URL=postgresql://postgres:password@host.docker.internal:5432/ecommerce_db
-SECRET_KEY=your-secret-key-for-testing
-GEMINI_API_KEY=your-gemini-api-key-here
-FRONTEND_DOMAIN=your-domain.com
-EOF
-
-# 4. Add domain to hosts file (replace with your domain)
-sudo bash -c 'echo "127.0.0.1 your-domain.com" >> /etc/hosts'
-
-# 5. Deploy with staging config
-docker-compose -f docker-compose.staging.yml up -d
-
-# 6. Test setup (replace with your domain)
-curl http://your-domain.com/health
-curl http://your-domain.com/api/health
-```
-
-**Access at:** `http://your-domain.com`
-
-**Note:** Replace `your-domain.com` with your actual domain (e.g., `gen-capstone.tanfamily.cc`, `mystore.example.com`, etc.)
-
 ## 💡 Getting Started
 
-**For Local Development:**
-1. **Run with Docker**: `docker-compose up -d`
-2. **Register**: Go to http://localhost:3000 and create your store
-3. **Add Products**: Use the admin dashboard to add products
-4. **Visit Store**: Your public store is at http://localhost:3000/store/your-domain
-5. **Test Shopping**: Add items to cart and complete checkout
+### 🎯 For Production Testing (Ubuntu VM):
+1. **Deploy**: Follow "🎯 Production Testing" section above
+2. **Access**: Go to http://your-domain.com and register your store
+3. **Add Products**: Use the admin dashboard to add products with images
+4. **Visit Store**: Your public store is at http://your-domain.com/store/your-domain
+5. **Test Shopping**: Add items to cart and complete guest checkout
 
-**For Production Testing (Ubuntu VM):**
-1. **Set up environment**: Follow "Ubuntu VM with Custom Domain Testing" section above
-2. **Deploy**: `docker-compose -f docker-compose.staging.yml up -d`
-3. **Register**: Go to http://your-domain.com and create your store
-4. **Add Products**: Use the admin dashboard to add products
-5. **Visit Store**: Your public store is at http://your-domain.com/store/your-domain
-6. **Test Shopping**: Add items to cart and complete checkout
+### 🛠️ For Local Development:
+1. **Run**: `docker-compose up -d`
+2. **Access**: Go to http://localhost:3000 and register your store
+3. **Add Products**: Use the admin dashboard to add products with images
+4. **Visit Store**: Your public store is at http://localhost:3000/store/your-domain
+5. **Test Shopping**: Add items to cart and complete guest checkout
 
 ## 📚 API Documentation
 
@@ -301,20 +290,20 @@ docker-compose build --no-cache
 
 **API calls fail:**
 ```bash
-# Test backend health
-curl http://localhost:8000/health
+# Test backend health directly
+docker-compose exec backend python -c "import requests; print(requests.get('http://localhost:8000/health').text)"
 
 # Test through NGINX proxy
-curl http://localhost:3000/api/health
+curl http://your-domain.com/api/health
 ```
 
-**Staging environment issues:**
+**Database connection issues:**
 ```bash
-# Ensure backend runs on 0.0.0.0 (not 127.0.0.1)
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Check your .env file
+cat .env
 
-# Test container can reach backend
-docker exec generation_capstone-frontend-1 wget -qO- http://host.docker.internal:8000/health
+# Test database connection from your machine
+psql -h your_vm_ip -U postgres -d ecommerce_db
 ```
 
 ## 🤝 Contributing

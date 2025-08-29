@@ -1,49 +1,25 @@
+# Production Testing Docker Compose
+# Uses pre-built images from ghcr.io and connects to external PostgreSQL
+
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  db:
-    image: postgres:15-alpine
-    container_name: ecommerce_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ecommerce_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
-    networks:
-      - ecommerce_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   # FastAPI Backend
   backend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.backend
+    image: ghcr.io/joshzacharytan/generation-capstone-backend:latest
     container_name: ecommerce_backend
     restart: unless-stopped
-    ports:
-      - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/ecommerce_db
-      - SECRET_KEY=your-secret-key-change-in-production
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY=${SECRET_KEY}
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
-      - ENVIRONMENT=development
+      - ENVIRONMENT=production
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}
     volumes:
-      - ./app:/app  # Hot reload for development
-      - ./app/static:/app/static
-    depends_on:
-      db:
-        condition: service_healthy
+      - ./uploads:/app/static/uploads
+      - ./logs:/app/logs
     networks:
       - ecommerce_network
     healthcheck:
@@ -51,33 +27,33 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
   # React Frontend with NGINX
   frontend:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.frontend
+    image: ghcr.io/joshzacharytan/generation-capstone-frontend:latest
     container_name: ecommerce_frontend
     restart: unless-stopped
     ports:
-      - "3000:80"  # Map to port 80 inside container
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro  # Mount NGINX config
+      - "80:80"
+      - "443:443"
+    environment:
+      - FRONTEND_DOMAIN=${FRONTEND_DOMAIN}
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - ecommerce_network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "spider", "http://localhost:80/"]
       interval: 30s
       timeout: 10s
       retries: 3
 
-
-
 volumes:
-  postgres_data:
+  uploads:
+    driver: local
+  logs:
     driver: local
 
 networks:
