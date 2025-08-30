@@ -57,7 +57,7 @@ button:active:not(:disabled) {
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 
-/* Responsive Design */
+/* Mobile-First Responsive Design */
 @media (max-width: 768px) {
   .App {
     padding: 0;
@@ -66,5 +66,75 @@ button:active:not(:disabled) {
   /* Make forms more mobile-friendly */
   input, textarea, select {
     font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px; /* Touch-friendly minimum size */
+  }
+  
+  /* Touch-friendly buttons */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Mobile navigation improvements */
+  .mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-elevated);
+    border-top: 1px solid var(--border-primary);
+    padding: 0.5rem;
+    z-index: 1000;
+  }
+  
+  /* Mobile-friendly spacing */
+  .container {
+    padding: 0 1rem;
+  }
+  
+  /* Responsive text sizes */
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
+  
+  /* Mobile-friendly cards */
+  .card {
+    margin: 0.5rem 0;
+    border-radius: 8px;
+  }
+  
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+  
+  /* Show mobile-only elements */
+  .mobile-only {
+    display: block !important;
+  }
+}
+
+/* Tablet responsive design */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding: 0 2rem;
+  }
+  
+  /* Hide mobile-only elements on tablet+ */
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+/* Desktop responsive design */
+@media (min-width: 1025px) {
+  /* Hide mobile-only elements on desktop */
+  .mobile-only {
+    display: none !important;
+  }
+  
+  .desktop-only {
+    display: block !important;
   }
 }

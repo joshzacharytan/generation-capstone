@@ -640,7 +640,13 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
           display: viewMode === 'grid' ? 'grid' : 'flex',
           flexDirection: viewMode === 'list' ? 'column' : undefined,
           gap: '1rem',
-          gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(300px, 1fr))' : undefined
+          gridTemplateColumns: viewMode === 'grid' 
+            ? window.innerWidth <= 768 
+              ? '1fr' 
+              : window.innerWidth <= 1024 
+                ? 'repeat(auto-fill, minmax(250px, 1fr))' 
+                : 'repeat(auto-fill, minmax(300px, 1fr))'
+            : undefined
         }}>
           {filteredProducts.map((product) => (
             <ProductCard

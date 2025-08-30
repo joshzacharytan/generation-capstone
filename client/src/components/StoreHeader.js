@@ -110,10 +110,17 @@ const StoreHeader = ({
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          gap: '1rem'
+          gap: '1rem',
+          flexWrap: 'wrap'
         }}>
           {/* Left Section - Logo and Store Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            minWidth: '150px',
+            flex: '1 1 auto'
+          }}>
             {showBackButton && (
               <button
                 onClick={onBackClick}
@@ -162,17 +169,30 @@ const StoreHeader = ({
           </div>
 
           {/* Center Section - Search Bar */}
-          <div style={{ flex: 1, maxWidth: '400px' }}>
+          <div style={{ 
+            flex: '2 1 300px', 
+            maxWidth: '400px',
+            minWidth: '200px',
+            order: window.innerWidth <= 768 ? 3 : 0,
+            width: window.innerWidth <= 768 ? '100%' : 'auto'
+          }}>
             <SearchBox 
               key={`${tenantDomain}-${initialSearchQuery || 'empty'}`}
               tenantDomain={tenantDomain}
               initialValue={initialSearchQuery}
-              placeholder="Search products, brands, categories..."
+              placeholder={window.innerWidth <= 768 ? "Search..." : "Search products, brands, categories..."}
             />
           </div>
 
           {/* Right Section */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '300px', justifyContent: 'flex-end' }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '0.5rem', 
+            minWidth: '150px', 
+            justifyContent: 'flex-end',
+            flex: '1 1 auto'
+          }}>
             {showAuth && (
               <>
                 {isAuthenticated ? (
