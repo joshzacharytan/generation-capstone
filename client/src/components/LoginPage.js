@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
-import ThemeToggle from './ThemeToggle';
 
 function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -75,15 +74,7 @@ function LoginPage() {
             backgroundColor: 'var(--bg-secondary)',
             position: 'relative'
         }}>
-            {/* Theme toggle in top-right corner */}
-            <div style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                zIndex: 1000
-            }}>
-                <ThemeToggle variant="icon" />
-            </div>
+
             
             <div style={{ 
                 maxWidth: '400px', 
