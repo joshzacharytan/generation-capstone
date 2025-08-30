@@ -39,11 +39,11 @@ const SuperAdminDashboard = () => {
   if (error) {
     return (
       <div style={{
-        color: '#dc3545',
-        backgroundColor: '#f8f9fa',
+        color: 'var(--color-danger)',
+        backgroundColor: 'var(--bg-secondary)',
         padding: '1rem',
         borderRadius: '4px',
-        border: '1px solid #dee2e6'
+        border: '1px solid var(--border-primary)'
       }}>
         {error}
       </div>
@@ -53,7 +53,7 @@ const SuperAdminDashboard = () => {
   return (
     <div>
       <div style={{ marginBottom: '2rem' }}>
-        <h3 style={{ color: '#333', marginBottom: '1rem' }}>
+        <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>
           System Overview ({tenants.length} tenants)
         </h3>
         
@@ -66,33 +66,39 @@ const SuperAdminDashboard = () => {
             <div
               key={tenant.id}
               style={{
-                backgroundColor: '#ffffff',
+                backgroundColor: 'var(--bg-elevated)',
                 padding: '1.5rem',
                 borderRadius: '8px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                border: '1px solid #dee2e6',
+                boxShadow: 'var(--shadow-md)',
+                border: '1px solid var(--border-primary)',
                 cursor: 'pointer',
-                transition: 'transform 0.2s ease'
+                transition: 'var(--theme-transition), transform 0.2s ease'
               }}
               onClick={() => setSelectedTenant(tenant)}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              }}
             >
-              <h4 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>
                 {tenant.name}
               </h4>
-              <p style={{ color: '#6c757d', fontSize: '0.9rem', margin: '0 0 1rem 0' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 1rem 0' }}>
                 Domain: {tenant.domain}
               </p>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem' }}>
-                <span style={{ color: '#007bff' }}>
+                <span style={{ color: 'var(--color-primary)' }}>
                   👥 {tenant.users?.length || 0} users
                 </span>
-                <span style={{ color: '#28a745' }}>
+                <span style={{ color: 'var(--color-success)' }}>
                   📦 {tenant.products?.length || 0} products
                 </span>
               </div>
-              <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: '#6c757d' }}>
+              <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                 Created: {formatDate(tenant.created_at)}
               </div>
             </div>
@@ -159,7 +165,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'var(--bg-overlay)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -172,7 +178,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
       }}
     >
       <div style={{
-        backgroundColor: 'white',
+        backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
         maxWidth: '800px',
         width: '90%',
@@ -180,15 +186,16 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        border: '1px solid #dee2e6'
+        border: '1px solid var(--border-primary)',
+        boxShadow: 'var(--shadow-lg)'
       }}>
         <div style={{ 
           padding: '2rem 2rem 0 2rem',
-          borderBottom: '1px solid #dee2e6',
+          borderBottom: '1px solid var(--border-primary)',
           flexShrink: 0
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-            <h3 style={{ margin: 0, color: '#333' }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>
               {tenant.name} - Details
             </h3>
             <button
@@ -198,8 +205,11 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
                 border: 'none',
                 fontSize: '1.5rem',
                 cursor: 'pointer',
-                color: '#6c757d'
+                color: 'var(--text-secondary)',
+                transition: 'var(--theme-transition)'
               }}
+              onMouseEnter={(e) => e.target.style.color = 'var(--text-primary)'}
+              onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
             >
               ×
             </button>
@@ -207,12 +217,12 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
 
           {error && (
             <div style={{
-              color: '#dc3545',
-              backgroundColor: '#f8d7da',
+              color: 'var(--color-danger)',
+              backgroundColor: 'var(--bg-secondary)',
               padding: '0.75rem',
               borderRadius: '4px',
               marginBottom: '1rem',
-              border: '1px solid #f5c6cb'
+              border: '1px solid var(--border-secondary)'
             }}>
               {error}
             </div>
@@ -225,23 +235,23 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
           flex: 1
         }}>
           <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ color: '#333', marginBottom: '1rem' }}>Tenant Information</h4>
-            <div style={{ backgroundColor: '#f8f9fa', padding: '1rem', borderRadius: '4px', border: '1px solid #dee2e6' }}>
-              <p><strong>Name:</strong> {tenant.name}</p>
-              <p><strong>Domain:</strong> {tenant.domain}</p>
-              <p><strong>Created:</strong> {formatDateTime(tenant.created_at)}</p>
-              <p><strong>Last Updated:</strong> {formatDateTime(tenant.updated_at)}</p>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Tenant Information</h4>
+            <div style={{ backgroundColor: 'var(--bg-tertiary)', padding: '1rem', borderRadius: '4px', border: '1px solid var(--border-secondary)' }}>
+              <p style={{ color: 'var(--text-primary)' }}><strong>Name:</strong> {tenant.name}</p>
+              <p style={{ color: 'var(--text-primary)' }}><strong>Domain:</strong> {tenant.domain}</p>
+              <p style={{ color: 'var(--text-primary)' }}><strong>Created:</strong> {formatDateTime(tenant.created_at)}</p>
+              <p style={{ color: 'var(--text-primary)' }}><strong>Last Updated:</strong> {formatDateTime(tenant.updated_at)}</p>
             </div>
           </div>
 
           <div style={{ marginBottom: '2rem' }}>
-            <h4 style={{ color: '#333', marginBottom: '1rem' }}>Users ({users.length})</h4>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Users ({users.length})</h4>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '1rem' }}>
                 <LoadingSpinner />
               </div>
             ) : users.length === 0 ? (
-              <p style={{ color: '#6c757d', fontStyle: 'italic' }}>No users found</p>
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No users found</p>
             ) : (
               <div style={{ display: 'grid', gap: '0.5rem' }}>
                 {users.map((user) => (
@@ -252,18 +262,18 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       padding: '0.75rem',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-tertiary)',
                       borderRadius: '4px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid var(--border-secondary)'
                     }}
                   >
                     <div>
-                      <strong>{user.email}</strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>{user.email}</strong>
                       <span style={{ 
                         marginLeft: '0.5rem',
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: user.role === 'super_admin' ? '#dc3545' : '#007bff',
-                        color: 'white',
+                        backgroundColor: user.role === 'super_admin' ? 'var(--color-danger)' : 'var(--color-primary)',
+                        color: 'var(--text-inverse)',
                         borderRadius: '12px',
                         fontSize: '0.75rem'
                       }}>
@@ -275,11 +285,12 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
                       onChange={(e) => updateUserRole(user.id, e.target.value)}
                       style={{
                         padding: '0.25rem 0.5rem',
-                        backgroundColor: 'white',
-                        border: '1px solid #ced4da',
+                        backgroundColor: 'var(--input-bg)',
+                        border: '1px solid var(--input-border)',
                         borderRadius: '4px',
                         fontSize: '0.875rem',
-                        color: '#333'
+                        color: 'var(--text-primary)',
+                        transition: 'var(--theme-transition)'
                       }}
                     >
                       <option value="customer">Customer</option>
@@ -293,7 +304,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
           </div>
 
           <div>
-            <h4 style={{ color: '#333', marginBottom: '1rem' }}>Products ({tenant.products?.length || 0})</h4>
+            <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Products ({tenant.products?.length || 0})</h4>
             {tenant.products && tenant.products.length > 0 ? (
               <div style={{ display: 'grid', gap: '0.5rem' }}>
                 {tenant.products.map((product) => (
@@ -304,22 +315,22 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
                       justifyContent: 'space-between',
                       alignItems: 'center',
                       padding: '0.75rem',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-tertiary)',
                       borderRadius: '4px',
-                      border: '1px solid #dee2e6'
+                      border: '1px solid var(--border-secondary)'
                     }}
                   >
                     <div>
-                      <strong>{product.name}</strong>
-                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: '#6c757d' }}>
+                      <strong style={{ color: 'var(--text-primary)' }}>{product.name}</strong>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                         {product.description?.substring(0, 100)}...
                       </p>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ color: '#28a745', fontWeight: 'bold' }}>
+                      <div style={{ color: 'var(--color-success)', fontWeight: 'bold' }}>
                         ${product.price?.toFixed(2)}
                       </div>
-                      <div style={{ fontSize: '0.875rem', color: '#6c757d' }}>
+                      <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
                         Stock: {product.quantity}
                       </div>
                     </div>
@@ -327,7 +338,7 @@ const TenantDetails = ({ tenant, onClose, onUpdate }) => {
                 ))}
               </div>
             ) : (
-              <p style={{ color: '#6c757d', fontStyle: 'italic' }}>No products found</p>
+              <p style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>No products found</p>
             )}
           </div>
         </div>

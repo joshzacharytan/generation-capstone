@@ -6,8 +6,8 @@ const LoadingSpinner = ({ size = 40 }) => {
       display: 'inline-block',
       width: size,
       height: size,
-      border: '3px solid #f3f3f3',
-      borderTop: '3px solid #007bff',
+      border: '3px solid var(--border-secondary)',
+      borderTop: '3px solid var(--color-primary)',
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     }}>

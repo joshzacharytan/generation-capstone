@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCustomer } from '../contexts/CustomerContext';
 import { storeAPI } from '../services/api';
 import SearchBox from './SearchBox';
+import ThemeToggle from './ThemeToggle';
 import { getImageUrl } from '../utils/imageUtils';
 
 const StoreHeader = ({ 
@@ -193,6 +194,9 @@ const StoreHeader = ({
             justifyContent: 'flex-end',
             flex: '1 1 auto'
           }}>
+            {/* Theme Toggle */}
+            <ThemeToggle variant="icon" showLabel={false} />
+            
             {showAuth && (
               <>
                 {isAuthenticated ? (
