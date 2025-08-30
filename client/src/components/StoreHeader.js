@@ -92,11 +92,23 @@ const StoreHeader = ({
     }
   };
 
+  // Check if mobile
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <>
       <header style={{
         backgroundColor: 'var(--bg-elevated)',
-        padding: '1rem 2rem',
+        padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
         boxShadow: 'var(--shadow-md)',
         position: 'sticky',
         top: 0,
@@ -108,153 +120,256 @@ const StoreHeader = ({
           maxWidth: '1200px',
           margin: '0 auto',
           display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '1rem'
+          alignItems: isMobile ? 'stretch' : 'center',
+          gap: isMobile ? '0.75rem' : '1rem'
         }}>
-          {/* Left Section - Logo and Store Name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '200px' }}>
-            {showBackButton && (
-              <button
-                onClick={onBackClick}
-                style={{
-                  padding: '0.5rem 1rem',
-                  backgroundColor: 'var(--text-secondary)',
-                  color: 'var(--text-inverse)',
-                  border: 'none',
-                  borderRadius: '4px',
+          {/* Top row on mobile: Logo, Store Name, and essential buttons */}
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            gap: '0.5rem',
+            minWidth: isMobile ? 'auto' : '200px' 
+          }}>
+            {/* Left side: Back button and Logo/Store name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+              {showBackButton && (
+                <button
+                  onClick={onBackClick}
+                  style={{
+                    padding: isMobile ? '0.5rem' : '0.5rem 1rem',
+                    backgroundColor: 'var(--text-secondary)',
+                    color: 'var(--text-inverse)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                    minHeight: '44px'
+                  }}
+                >
+                  {isMobile ? '←' : '← Back'}
+                </button>
+              )}
+              
+              {/* Company Logo */}
+              {tenantBranding?.company_logo_url && (
+                <img
+                  src={getImageUrl(tenantBranding.company_logo_url)}
+                  alt={`${tenantDomain} Logo`}
+                  style={{
+                    height: isMobile ? '32px' : '40px',
+                    maxWidth: isMobile ? '80px' : '120px',
+                    objectFit: 'contain',
+                    cursor: 'pointer'
+                  }}
+                  onClick={() => navigate(`/store/${tenantDomain}`)}
+                />
+              )}
+              
+              {/* Store Name */}
+              <h1 
+                style={{ 
+                  margin: 0, 
+                  color: tenantBranding?.brand_color_primary || 'var(--text-primary)', 
+                  textTransform: 'capitalize',
+                  fontSize: isMobile ? '1rem' : (showBackButton ? '1.2rem' : '1.5rem'),
                   cursor: 'pointer',
-                  fontSize: '0.875rem'
-                }}
-              >
-                ← Back
-              </button>
-            )}
-            
-            {/* Company Logo */}
-            {tenantBranding?.company_logo_url && (
-              <img
-                src={getImageUrl(tenantBranding.company_logo_url)}
-                alt={`${tenantDomain} Logo`}
-                style={{
-                  height: '40px',
-                  maxWidth: '120px',
-                  objectFit: 'contain',
-                  cursor: 'pointer'
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
                 }}
                 onClick={() => navigate(`/store/${tenantDomain}`)}
-              />
-            )}
-            
-            {/* Store Name */}
-            <h1 
-              style={{ 
-                margin: 0, 
-                color: tenantBranding?.brand_color_primary || 'var(--text-primary)', 
-                textTransform: 'capitalize',
-                fontSize: showBackButton ? '1.2rem' : '1.5rem',
-                cursor: 'pointer'
-              }}
-              onClick={() => navigate(`/store/${tenantDomain}`)}
-            >
-              {tenantDomain} Store
-            </h1>
-          </div>
+              >
+                {isMobile ? tenantDomain : `${tenantDomain} Store`}
+              </h1>
+            </div>
 
-          {/* Center Section - Search Bar */}
-          <div style={{ flex: 1, maxWidth: '400px' }}>
-            <SearchBox 
-              key={`${tenantDomain}-${initialSearchQuery || 'empty'}`}
-              tenantDomain={tenantDomain}
-              initialValue={initialSearchQuery}
-              placeholder="Search products, brands, categories..."
-            />
-          </div>
-
-          {/* Right Section */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '300px', justifyContent: 'flex-end' }}>
-            {showAuth && (
-              <>
-                {isAuthenticated ? (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                      Welcome, {customer?.first_name ? `${customer.first_name} ${customer.last_name}` : customer?.email}
-                    </span>
-                    <button
-                      onClick={handleAccountClick}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: 'var(--color-info)',
-                        color: 'var(--text-inverse)',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      My Orders
-                    </button>
-                    <button
-                      onClick={logout}
-                      style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: 'var(--text-secondary)',
-                        color: 'var(--text-inverse)',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
+            {/* Right side: Essential buttons only on mobile */}
+            {isMobile && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Cart button - always show on mobile */}
+                {showCart && (
                   <button
-                    onClick={handleAuthClick}
+                    onClick={handleCartClick}
                     style={{
-                      padding: '0.5rem 1rem',
-                      backgroundColor: 'var(--color-success)',
+                      padding: '0.5rem',
+                      backgroundColor: 'var(--color-primary)',
                       color: 'var(--text-inverse)',
                       border: 'none',
                       borderRadius: '4px',
                       cursor: 'pointer',
-                      fontSize: '0.875rem'
+                      fontSize: '1rem',
+                      minHeight: '44px',
+                      minWidth: '44px',
+                      position: 'relative'
                     }}
                   >
-                    Sign In
+                    🛒
+                    {getCartItemCount() > 0 && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-5px',
+                        right: '-5px',
+                        backgroundColor: 'var(--color-danger)',
+                        color: 'white',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        fontSize: '0.75rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {getCartItemCount()}
+                      </span>
+                    )}
                   </button>
                 )}
-              </>
-            )}
-
-            {/* Shopping Cart */}
-            {showCart && (
-              <button
-                onClick={handleCartClick}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  backgroundColor: 'var(--color-primary)',
-                  color: 'var(--text-inverse)',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontSize: '1rem'
-                }}
-              >
-                🛒 Cart ({getCartItemCount()})
-                {getCartItemCount() > 0 && (
-                  <span style={{ fontWeight: 'bold' }}>
-                    ${getCartTotal().toFixed(2)}
-                  </span>
+                
+                {/* Auth button */}
+                {showAuth && (
+                  <>
+                    {isAuthenticated ? (
+                      <button
+                        onClick={handleAccountClick}
+                        style={{
+                          padding: '0.5rem',
+                          backgroundColor: 'var(--color-info)',
+                          color: 'var(--text-inverse)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '1rem',
+                          minHeight: '44px',
+                          minWidth: '44px'
+                        }}
+                      >
+                        👤
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleAuthClick}
+                        style={{
+                          padding: '0.5rem',
+                          backgroundColor: 'var(--color-success)',
+                          color: 'var(--text-inverse)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.75rem',
+                          minHeight: '44px'
+                        }}
+                      >
+                        Sign In
+                      </button>
+                    )}
+                  </>
                 )}
-              </button>
+              </div>
             )}
-
           </div>
+
+          {/* Search Bar - full width on mobile, center on desktop */}
+          <div style={{ 
+            flex: isMobile ? 'none' : 1, 
+            maxWidth: isMobile ? 'none' : '400px',
+            width: isMobile ? '100%' : 'auto'
+          }}>
+            <SearchBox 
+              key={`${tenantDomain}-${initialSearchQuery || 'empty'}`}
+              tenantDomain={tenantDomain}
+              initialValue={initialSearchQuery}
+              placeholder={isMobile ? "Search..." : "Search products, brands, categories..."}
+            />
+          </div>
+
+          {/* Desktop Right Section - Hidden on mobile */}
+          {!isMobile && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: '300px', justifyContent: 'flex-end' }}>
+              {showAuth && (
+                <>
+                  {isAuthenticated ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                        Welcome, {customer?.first_name ? `${customer.first_name} ${customer.last_name}` : customer?.email}
+                      </span>
+                      <button
+                        onClick={handleAccountClick}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: 'var(--color-info)',
+                          color: 'var(--text-inverse)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        My Orders
+                      </button>
+                      <button
+                        onClick={logout}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: 'var(--text-secondary)',
+                          color: 'var(--text-inverse)',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleAuthClick}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        backgroundColor: 'var(--color-success)',
+                        color: 'var(--text-inverse)',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '0.875rem'
+                      }}
+                    >
+                      Sign In
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Shopping Cart */}
+              {showCart && (
+                <button
+                  onClick={handleCartClick}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--text-inverse)',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '1rem'
+                  }}
+                >
+                  🛒 Cart ({getCartItemCount()})
+                  {getCartItemCount() > 0 && (
+                    <span style={{ fontWeight: 'bold' }}>
+                      ${getCartTotal().toFixed(2)}
+                    </span>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </header>
 

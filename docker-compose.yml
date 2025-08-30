@@ -10,6 +10,8 @@ services:
     image: joshzacharytan/generation-capstone-backend:before-theme
     container_name: ecommerce_backend
     restart: unless-stopped
+    ports:
+      - "8000:8000"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=${SECRET_KEY}
@@ -45,6 +47,8 @@ services:
         condition: service_healthy
     networks:
       - ecommerce_network
+
+
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "spider", "http://localhost:80/"]
       interval: 30s

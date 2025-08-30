@@ -57,14 +57,195 @@ button:active:not(:disabled) {
 .mt-3 { margin-top: 1rem; }
 .mt-4 { margin-top: 1.5rem; }
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Mobile-First Responsive Design */
+
+/* Base mobile styles (320px and up) */
+@media (max-width: 767px) {
   .App {
     padding: 0;
   }
   
-  /* Make forms more mobile-friendly */
-  input, textarea, select {
-    font-size: 16px; /* Prevents zoom on iOS */
+  /* Prevent zoom on form inputs on iOS */
+  input, textarea, select, button {
+    font-size: 16px !important;
+  }
+  
+  /* Mobile-friendly touch targets */
+  button, .btn, a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 16px;
+  }
+  
+  /* Mobile typography */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  /* Mobile spacing */
+  .container, .main-content {
+    padding: 0.75rem;
+  }
+  
+  /* Mobile forms */
+  .form-group {
+    margin-bottom: 1rem;
+  }
+  
+  .form-control {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  /* Mobile tables - make them scrollable */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  table {
+    min-width: 600px;
+  }
+  
+  /* Mobile cards */
+  .card {
+    margin-bottom: 1rem;
+    border-radius: 12px;
+  }
+  
+  /* Mobile navigation */
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+  
+  .nav-item {
+    margin: 0.25rem 0;
+  }
+}
+
+/* Tablet styles (768px to 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  /* Tablet-specific adjustments */
+  .col-tablet-6 {
+    width: 50%;
+    float: left;
+  }
+  
+  .col-tablet-12 {
+    width: 100%;
+  }
+}
+
+/* Desktop styles (1024px and up) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Optimize for retina displays */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+  .mobile-landscape-adjust {
+    padding: 0.5rem;
+  }
+  
+  /* Reduce header height in landscape */
+  .header, .navbar {
+    min-height: 50px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  button:hover, .btn:hover {
+    transform: none;
+  }
+  
+  /* Larger touch targets */
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Accessibility - Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}/* Hide scr
+ollbar for mobile tab navigation */
+.mobile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-tabs {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile-specific component styles */
+@media (max-width: 767px) {
+  /* Product grid responsive */
+  .product-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* Form layouts */
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-row > * {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+  
+  /* Modal adjustments */
+  .modal-content {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+  
+  /* Table responsive wrapper */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .table-container table {
+    min-width: 600px;
+  }
+  
+  /* Button groups */
+  .button-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .button-group button {
+    width: 100%;
   }
 }

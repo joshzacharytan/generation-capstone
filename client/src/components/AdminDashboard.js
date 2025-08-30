@@ -19,7 +19,18 @@ const AdminDashboard = () => {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const { loading, isSuperAdmin } = useUser();
+
+  // Handle window resize for mobile detection
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleAddProduct = () => {
     setEditingProduct(null);
@@ -66,12 +77,20 @@ const AdminDashboard = () => {
 
   return (
     <Layout>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '0 auto',
+        padding: isMobile ? '0.5rem' : '0 1rem'
+      }}>
         {/* Tab Navigation */}
         <div style={{
           display: 'flex',
           borderBottom: '2px solid var(--border-primary)',
-          marginBottom: '2rem'
+          marginBottom: isMobile ? '1rem' : '2rem',
+          overflowX: isMobile ? 'auto' : 'visible',
+          WebkitOverflowScrolling: 'touch',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
         }}>
           {tabs.map((tab) => (
             <button
@@ -81,22 +100,25 @@ const AdminDashboard = () => {
                 setShowProductForm(false);
               }}
               style={{
-                padding: '1rem 1.5rem',
+                padding: isMobile ? '0.75rem 1rem' : '1rem 1.5rem',
                 border: 'none',
                 backgroundColor: 'transparent',
                 borderBottom: activeTab === tab.id ? '2px solid var(--color-primary)' : '2px solid transparent',
                 color: activeTab === tab.id ? 'var(--color-primary)' : 'var(--text-secondary)',
                 cursor: 'pointer',
-                fontSize: '1rem',
+                fontSize: isMobile ? '0.875rem' : '1rem',
                 fontWeight: activeTab === tab.id ? '600' : '400',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                transition: 'var(--theme-transition)'
+                transition: 'var(--theme-transition)',
+                whiteSpace: 'nowrap',
+                minWidth: isMobile ? 'auto' : 'unset',
+                flexShrink: isMobile ? 0 : 1
               }}
             >
               <span>{tab.icon}</span>
-              {tab.label}
+              {isMobile ? '' : tab.label}
             </button>
           ))}
         </div>

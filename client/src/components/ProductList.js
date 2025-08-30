@@ -10,7 +10,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -20,11 +20,11 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
   const [sortOrder, setSortOrder] = useState('asc'); // asc, desc
   const [viewMode, setViewMode] = useState('grid'); // grid, list
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Special filter states
   const [showSpecificProducts, setShowSpecificProducts] = useState(null); // 'high-value', 'low-inventory', etc.
   const [specificProductIds, setSpecificProductIds] = useState([]);
-  
+
   // Smart Suggestions
   const [suggestions, setSuggestions] = useState({
     lowStock: [],
@@ -68,23 +68,23 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
         sort_order: sortOrder,
         limit: 1000
       };
-      
+
       const response = await productsAPI.getAll(params);
       let productsData = response.data;
-      
+
       // Apply specific product filtering if active
       if (showSpecificProducts && specificProductIds.length > 0) {
         productsData = productsData.filter(product => specificProductIds.includes(product.id));
       }
-      
+
       setProducts(productsData);
       setFilteredProducts(productsData);
-      
+
       // Update hasAnyProducts if we haven't checked yet or if we got results
       if (!hasAnyProducts && response.data.length > 0) {
         setHasAnyProducts(true);
       }
-      
+
       setError('');
     } catch (err) {
       setError('Failed to fetch products');
@@ -121,7 +121,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       // Fetch all products without filters for suggestions
       const response = await productsAPI.getAll({ limit: 1000 });
       const allProducts = response.data;
-      
+
       if (allProducts.length === 0) return;
 
       const lowStock = allProducts.filter(p => p.quantity > 0 && p.quantity <= 5).slice(0, 5);
@@ -210,8 +210,8 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
   if (error) {
     return (
-      <div style={{ 
-        color: 'var(--color-danger)', 
+      <div style={{
+        color: 'var(--color-danger)',
         backgroundColor: 'rgba(220, 53, 69, 0.1)',
         padding: '1rem',
         borderRadius: '4px',
@@ -228,8 +228,8 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
   if (isEmptyDatabase) {
     return (
-      <div style={{ 
-        textAlign: 'center', 
+      <div style={{
+        textAlign: 'center',
         padding: '3rem',
         backgroundColor: 'var(--bg-elevated)',
         borderRadius: '8px',
@@ -351,7 +351,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
       )}
 
       {/* Search and Filter Header */}
-      <div style={{ 
+      <div style={{
         backgroundColor: 'var(--bg-elevated)',
         padding: '1.5rem',
         borderRadius: '8px',
@@ -393,8 +393,21 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
         </div>
 
         {/* Filter Toggle and Controls */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: window.innerWidth <= 768 ? 'stretch' : 'center',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            flexWrap: 'wrap',
+            justifyContent: window.innerWidth <= 768 ? 'center' : 'flex-start'
+          }}>
             <button
               onClick={() => setShowFilters(!showFilters)}
               style={{
@@ -466,7 +479,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
             <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
               Showing {filteredProducts.length} of {products.length} products
             </span>
-            
+
             <select
               value={`${sortBy}-${sortOrder}`}
               onChange={(e) => {
@@ -497,7 +510,7 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
         {/* Expandable Filters */}
         {showFilters && (
-          <div style={{ 
+          <div style={{
             marginTop: '1rem',
             padding: '1rem',
             backgroundColor: 'var(--bg-tertiary)',
@@ -602,8 +615,8 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 
       {/* Products Display */}
       {filteredProducts.length === 0 ? (
-        <div style={{ 
-          textAlign: 'center', 
+        <div style={{
+          textAlign: 'center',
           padding: '3rem',
           backgroundColor: 'var(--bg-elevated)',
           borderRadius: '8px',
@@ -636,11 +649,17 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
           )}
         </div>
       ) : (
-        <div style={{ 
+        <div style={{
           display: viewMode === 'grid' ? 'grid' : 'flex',
           flexDirection: viewMode === 'list' ? 'column' : undefined,
           gap: '1rem',
-          gridTemplateColumns: viewMode === 'grid' ? 'repeat(auto-fill, minmax(300px, 1fr))' : undefined
+          gridTemplateColumns: viewMode === 'grid'
+            ? window.innerWidth <= 768
+              ? '1fr'
+              : window.innerWidth <= 1024
+                ? 'repeat(auto-fill, minmax(250px, 1fr))'
+                : 'repeat(auto-fill, minmax(300px, 1fr))'
+            : undefined
         }}>
           {filteredProducts.map((product) => (
             <ProductCard
@@ -658,6 +677,17 @@ const ProductList = ({ onEdit, onDelete, refreshTrigger }) => {
 };
 
 const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
+  const [isMobile, setIsMobile] = React.useState(window.innerWidth <= 768);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const getStockStatus = (quantity) => {
     if (quantity === 0) return { text: 'Out of Stock', color: '#dc3545', bg: '#f8d7da' };
     if (quantity <= 5) return { text: 'Low Stock', color: '#856404', bg: '#fff3cd' };
@@ -729,8 +759,8 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
               {product.category || 'General'}
             </span>
           </div>
-          <p style={{ 
-            color: 'var(--text-secondary)', 
+          <p style={{
+            color: 'var(--text-secondary)',
             fontSize: '0.875rem',
             margin: '0',
             overflow: 'hidden',
@@ -743,8 +773,8 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
 
         {/* Price and Stock */}
         <div style={{ textAlign: 'right', minWidth: '120px' }}>
-          <div style={{ 
-            fontSize: '1.25rem', 
+          <div style={{
+            fontSize: '1.25rem',
             fontWeight: 'bold',
             color: 'var(--color-success)',
             marginBottom: '0.25rem'
@@ -851,7 +881,7 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
         }}>
           📷 No Image
         </div>
-        
+
         {/* Stock Status Badge */}
         <div style={{
           position: 'absolute',
@@ -869,16 +899,16 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       </div>
 
       {/* Product Details */}
-      <div style={{ 
+      <div style={{
         flex: 1, // Take up remaining space
         display: 'flex',
         flexDirection: 'column'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-          <h4 style={{ 
-            margin: 0, 
-            color: 'var(--text-primary)', 
-            flex: 1, 
+          <h4 style={{
+            margin: 0,
+            color: 'var(--text-primary)',
+            flex: 1,
             marginRight: '0.5rem',
             minHeight: '2.5rem', // Reserve space for 2 lines of text
             display: '-webkit-box',
@@ -901,8 +931,8 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
           </span>
         </div>
 
-        <p style={{ 
-          color: 'var(--text-secondary)', 
+        <p style={{
+          color: 'var(--text-secondary)',
           fontSize: '0.9rem',
           margin: '0 0 1rem 0',
           lineHeight: '1.4',
@@ -915,14 +945,14 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
           {product.description || 'No description available'}
         </p>
 
-        <div style={{ 
-          display: 'flex', 
+        <div style={{
+          display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '1rem'
         }}>
-          <span style={{ 
-            fontSize: '1.25rem', 
+          <span style={{
+            fontSize: '1.25rem',
             fontWeight: 'bold',
             color: 'var(--color-success)'
           }}>
@@ -942,9 +972,9 @@ const ProductCard = ({ product, viewMode, onEdit, onDelete }) => {
       </div>
 
       {/* Action Buttons - Push to bottom */}
-      <div style={{ 
+      <div style={{
         marginTop: 'auto', // Push to bottom
-        display: 'flex', 
+        display: 'flex',
         flexDirection: 'column',
         gap: '0.5rem'
       }}>
