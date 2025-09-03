@@ -141,3 +141,6 @@ dmypy.json
 
 # pytype static type analyzer
 .pytype/
+
+# kubernetes manifest
+k8s-manifest.yaml

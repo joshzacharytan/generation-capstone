@@ -1,0 +1,406 @@
+# Generation Capstone - Multi-Tenant E-Commerce Platform
+# Kubernetes Deployment Manifest Example
+# 
+# DEPLOYMENT OPTIONS:
+# Option 1: Containerized PostgreSQL (uncomment PostgreSQL resources below)
+# Option 2: Local PostgreSQL (configure DATABASE_URL for local connection)
+# Option 3: Azure Managed PostgreSQL (configure DATABASE_URL for Azure)
+#
+# Copy this file to k8s-manifest.yaml and configure for your deployment option
+# Deploy with: kubectl apply -f k8s-manifest.yaml
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ecommerce-platform
+  labels:
+    app: generation-capstone
+    environment: production
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ecommerce-config
+  namespace: ecommerce-platform
+data:
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  FRONTEND_DOMAIN: "your-domain.com"  # Update with your actual domain (e.g., gen-capstone.tanfamily.cc)
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ecommerce-secrets
+  namespace: ecommerce-platform
+type: Opaque
+stringData:
+  # OPTION 1 - Containerized PostgreSQL:
+  # DATABASE_URL: "postgresql://ecommerce_user:secure_password@postgres-service:5432/ecommerce_db"
+  #
+  # OPTION 2 - Local PostgreSQL (Docker Desktop):
+  # DATABASE_URL: "postgresql://postgres:password@host.docker.internal:5432/ecommerce_db"
+  #
+  # OPTION 2 - Local PostgreSQL (Other K8s):
+  # DATABASE_URL: "postgresql://postgres:password@localhost:5432/ecommerce_db"
+  # DATABASE_URL: "postgresql://postgres:password@192.168.1.100:5432/ecommerce_db"
+  #
+  # OPTION 3 - Azure PostgreSQL Flexible Server:
+  # DATABASE_URL: "postgresql://admin_user:password@server-name.postgres.database.azure.com:5432/ecommerce_db?sslmode=require"
+  #
+  # OPTION 3 - AWS RDS PostgreSQL:
+  # DATABASE_URL: "postgresql://username:password@rds-endpoint.region.rds.amazonaws.com:5432/ecommerce_db"
+  #
+  # OPTION 3 - GCP Cloud SQL PostgreSQL:
+  # DATABASE_URL: "postgresql://username:password@gcp-sql-ip:5432/ecommerce_db"
+  
+  DATABASE_URL: "UPDATE_WITH_YOUR_DATABASE_CONNECTION_STRING"
+  SECRET_KEY: "your-super-secret-key-change-this-in-production"
+  GEMINI_API_KEY: "your-gemini-api-key-here"
+
+---
+# OPTION 1: PostgreSQL PVC (Uncomment if using containerized PostgreSQL)
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: postgres-pvc
+#   namespace: ecommerce-platform
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 10Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: ecommerce-platform
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# OPTION 1: PostgreSQL Deployment (Uncomment if using containerized PostgreSQL)
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: postgres
+#   namespace: ecommerce-platform
+#   labels:
+#     app: postgres
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: postgres
+#   template:
+#     metadata:
+#       labels:
+#         app: postgres
+#     spec:
+#       containers:
+#       - name: postgres
+#         image: postgres:15-alpine
+#         ports:
+#         - containerPort: 5432
+#         env:
+#         - name: POSTGRES_DB
+#           value: "ecommerce_db"
+#         - name: POSTGRES_USER
+#           value: "ecommerce_user"
+#         - name: POSTGRES_PASSWORD
+#           value: "secure_password"  # Use a Secret in production
+#         - name: PGDATA
+#           value: "/var/lib/postgresql/data/pgdata"
+#         volumeMounts:
+#         - name: postgres-storage
+#           mountPath: /var/lib/postgresql/data
+#         resources:
+#           requests:
+#             memory: "256Mi"
+#             cpu: "250m"
+#           limits:
+#             memory: "512Mi"
+#             cpu: "500m"
+#         livenessProbe:
+#           exec:
+#             command:
+#             - pg_isready
+#             - -U
+#             - ecommerce_user
+#             - -d
+#             - ecommerce_db
+#           initialDelaySeconds: 30
+#           periodSeconds: 10
+#         readinessProbe:
+#           exec:
+#             command:
+#             - pg_isready
+#             - -U
+#             - ecommerce_user
+#             - -d
+#             - ecommerce_db
+#           initialDelaySeconds: 5
+#           periodSeconds: 5
+#       volumes:
+#       - name: postgres-storage
+#         persistentVolumeClaim:
+#           claimName: postgres-pvc
+
+---
+# OPTION 1: PostgreSQL Service (Uncomment if using containerized PostgreSQL)
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: postgres-service
+#   namespace: ecommerce-platform
+# spec:
+#   selector:
+#     app: postgres
+#   ports:
+#   - port: 5432
+#     targetPort: 5432
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ecommerce-platform
+  labels:
+    app: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: joshzacharytan/generation-capstone-backend:after-theme
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: ecommerce-secrets
+              key: DATABASE_URL
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ecommerce-secrets
+              key: SECRET_KEY
+        - name: GEMINI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ecommerce-secrets
+              key: GEMINI_API_KEY
+        - name: ALGORITHM
+          valueFrom:
+            configMapKeyRef:
+              name: ecommerce-config
+              key: ALGORITHM
+        - name: ACCESS_TOKEN_EXPIRE_MINUTES
+          valueFrom:
+            configMapKeyRef:
+              name: ecommerce-config
+              key: ACCESS_TOKEN_EXPIRE_MINUTES
+        - name: FRONTEND_DOMAIN
+          valueFrom:
+            configMapKeyRef:
+              name: ecommerce-config
+              key: FRONTEND_DOMAIN
+        volumeMounts:
+        - name: uploads-storage
+          mountPath: /app/static/uploads
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: uploads-storage
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: ecommerce-platform
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8000
+    targetPort: 8000
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ecommerce-platform
+  labels:
+    app: frontend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: joshzacharytan/generation-capstone-frontend:after-theme
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: ecommerce-platform
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ecommerce-ingress
+  namespace: ecommerce-platform
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+spec:
+  rules:
+  - host: your-domain.com  # Update with your actual domain (e.g., gen-capstone.tanfamily.cc)
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8000
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+
+# DEPLOYMENT INSTRUCTIONS:
+#
+# OPTION 1 - Containerized PostgreSQL:
+# 1. Copy this file to k8s-manifest.yaml
+# 2. Uncomment all PostgreSQL resources (PVC, Deployment, Service)
+# 3. Update DATABASE_URL in Secret to: postgresql://ecommerce_user:secure_password@postgres-service:5432/ecommerce_db
+# 4. Update FRONTEND_DOMAIN in ConfigMap with your actual domain
+# 5. Update host in Ingress rules to match your FRONTEND_DOMAIN
+# 6. Update other secrets (SECRET_KEY, GEMINI_API_KEY)
+# 7. Deploy: kubectl apply -f k8s-manifest.yaml
+# 8. Access: kubectl port-forward service/frontend-service 8080:80 -n ecommerce-platform
+#
+# OPTION 2 - Local PostgreSQL:
+# Prerequisites: PostgreSQL running on your local machine with ecommerce_db database created
+# 1. Copy this file to k8s-manifest.yaml
+# 2. Keep PostgreSQL resources commented out
+# 3. Update DATABASE_URL in Secret:
+#    - Docker Desktop: postgresql://postgres:password@host.docker.internal:5432/ecommerce_db
+#    - Other K8s: postgresql://postgres:password@localhost:5432/ecommerce_db or use your machine's IP
+# 4. Update FRONTEND_DOMAIN in ConfigMap with your actual domain
+# 5. Update host in Ingress rules to match your FRONTEND_DOMAIN
+# 6. Update other secrets (SECRET_KEY, GEMINI_API_KEY)
+# 7. Ensure your local PostgreSQL allows connections from Kubernetes pods
+# 8. Deploy: kubectl apply -f k8s-manifest.yaml
+# 9. Access: kubectl port-forward service/frontend-service 8080:80 -n ecommerce-platform
+#
+# OPTION 3 - Azure Managed PostgreSQL:
+# Prerequisites: Azure PostgreSQL Flexible Server provisioned
+# 1. Copy this file to k8s-manifest.yaml
+# 2. Keep PostgreSQL resources commented out
+# 3. Update DATABASE_URL in Secret with your Azure connection string:
+#    postgresql://admin_user:password@server-name.postgres.database.azure.com:5432/ecommerce_db?sslmode=require
+# 4. Update FRONTEND_DOMAIN in ConfigMap with your actual domain
+# 5. Update host in Ingress rules to match your FRONTEND_DOMAIN
+# 6. Update other secrets (SECRET_KEY, GEMINI_API_KEY)
+# 7. Ensure network connectivity between K8s cluster and Azure PostgreSQL
+# 8. Deploy: kubectl apply -f k8s-manifest.yaml
+# 9. Access: kubectl port-forward service/frontend-service 8080:80 -n ecommerce-platform
+#
+# DATABASE CONNECTION STRING FORMATS:
+# - Containerized: postgresql://ecommerce_user:secure_password@postgres-service:5432/ecommerce_db
+# - Local (Docker Desktop): postgresql://postgres:password@host.docker.internal:5432/ecommerce_db
+# - Local (Other K8s): postgresql://postgres:password@localhost:5432/ecommerce_db
+# - Local (Specific IP): postgresql://postgres:password@192.168.1.100:5432/ecommerce_db
+# - Azure PostgreSQL: postgresql://user:pass@server.postgres.database.azure.com:5432/db?sslmode=require
+# - AWS RDS: postgresql://user:pass@endpoint.region.rds.amazonaws.com:5432/db
+# - GCP Cloud SQL: postgresql://user:pass@ip-address:5432/db
+#
+# IMPORTANT CONFIGURATION NOTES:
+# - FRONTEND_DOMAIN in ConfigMap must match the domain you'll use to access the app
+# - Ingress host must match your FRONTEND_DOMAIN for proper routing
+# - For local testing, you can use localhost or your custom domain
+# - Ensure DNS points to your Kubernetes cluster's ingress controller
+# - For local PostgreSQL, ensure firewall allows connections from K8s pods
+# - Azure PostgreSQL requires SSL connections (sslmode=require)
+# - Replace placeholder values with your actual credentials and endpoints
