@@ -1,17 +1,48 @@
 # Production Docker Compose Example
 # Copy this file to docker-compose.yml and configure your environment variables
 # Make sure to create a .env file with the required environment variables
+#
+# DEPLOYMENT OPTIONS:
+# Option 1: Use containerized PostgreSQL (uncomment postgres service below)
+# Option 2: Use external PostgreSQL (Azure, AWS RDS, etc.) - configure DATABASE_URL in .env
 
 version: '3.8'
 
 services:
+  # PostgreSQL Database (OPTION 1: Containerized Database)
+  # Uncomment this service if you want to run PostgreSQL in a container
+  # Comment out if using external/managed PostgreSQL service
+  # postgres:
+  #   image: postgres:15-alpine
+  #   container_name: ecommerce_postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     - POSTGRES_DB=${POSTGRES_DB:-ecommerce_db}
+  #     - POSTGRES_USER=${POSTGRES_USER:-ecommerce_user}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #     - PGDATA=/var/lib/postgresql/data/pgdata
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #     - ./init-scripts:/docker-entrypoint-initdb.d  # Optional: SQL initialization scripts
+  #   ports:
+  #     - "5432:5432"                           # Expose PostgreSQL port (optional for external access)
+  #   networks:
+  #     - ecommerce_network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ecommerce_user} -d ${POSTGRES_DB:-ecommerce_db}"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #     start_period: 30s
   # FastAPI Backend
   backend:
     image: joshzacharytan/generation-capstone-backend:before-theme
     container_name: ecommerce_backend
     restart: unless-stopped
     environment:
-      - DATABASE_URL=${DATABASE_URL}           # postgresql://user:password@host:port/database
+      # OPTION 1 (Containerized DB): DATABASE_URL=postgresql://ecommerce_user:your_password@postgres:5432/ecommerce_db
+      # OPTION 2 (External DB): DATABASE_URL=postgresql://user:password@external-host:5432/database
+      - DATABASE_URL=${DATABASE_URL}           
       - SECRET_KEY=${SECRET_KEY}               # Your JWT secret key (generate a random string)
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
@@ -21,6 +52,10 @@ services:
     volumes:
       - ./uploads:/app/static/uploads          # Mount uploads directory for file uploads
       - ./logs:/app/logs                       # Mount logs directory
+    # Uncomment depends_on if using containerized PostgreSQL (Option 1)
+    # depends_on:
+    #   postgres:
+    #     condition: service_healthy
     networks:
       - ecommerce_network
     healthcheck:
@@ -56,20 +91,45 @@ volumes:
     driver: local
   logs:
     driver: local
+  # Uncomment if using containerized PostgreSQL (Option 1)
+  # postgres_data:
+  #   driver: local
 
 networks:
   ecommerce_network:
     driver: bridge
 
 # Required .env file variables:
-# DATABASE_URL=postgresql://username:password@host:5432/database_name
+#
+# OPTION 1: Containerized PostgreSQL
+# DATABASE_URL=postgresql://ecommerce_user:your_secure_password@postgres:5432/ecommerce_db
+# POSTGRES_DB=ecommerce_db
+# POSTGRES_USER=ecommerce_user
+# POSTGRES_PASSWORD=your_secure_password
+#
+# OPTION 2: External/Managed PostgreSQL (Azure, AWS RDS, etc.)
+# DATABASE_URL=postgresql://username:password@external-host:5432/database_name
+#
+# Common variables for both options:
 # SECRET_KEY=your_jwt_secret_key_here
 # GEMINI_API_KEY=your_gemini_api_key_here
 # FRONTEND_DOMAIN=your-domain.com
 #
 # Setup Instructions:
+#
+# OPTION 1 - Containerized PostgreSQL:
 # 1. Copy this file to docker-compose.yml
-# 2. Create a .env file with the above variables
-# 3. Create uploads and logs directories: mkdir -p uploads logs
-# 4. Set proper permissions: sudo chown -R 999:999 uploads logs
-# 5. Run: docker compose up -d
+# 2. Uncomment the postgres service and related configurations above
+# 3. Create a .env file with OPTION 1 variables
+# 4. Create directories: mkdir -p uploads logs init-scripts
+# 5. Set permissions: sudo chown -R 999:999 uploads logs
+# 6. Run: docker compose up -d
+#
+# OPTION 2 - External PostgreSQL:
+# 1. Copy this file to docker-compose.yml
+# 2. Keep postgres service commented out
+# 3. Create a .env file with OPTION 2 variables
+# 4. Ensure your external PostgreSQL is accessible
+# 5. Create directories: mkdir -p uploads logs
+# 6. Set permissions: sudo chown -R 999:999 uploads logs
+# 7. Run: docker compose up -d
