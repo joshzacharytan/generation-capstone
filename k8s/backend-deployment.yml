@@ -1,0 +1,76 @@
+# Backend API Deployment
+# DEPLOYMENT CONFIGURATION DIFFERENCES:
+# 
+# LOCAL DEVELOPMENT:
+# - FRONTEND_DOMAIN: localhost
+# - Access via: kubectl port-forward service/backend 8000:8000
+# - Single worker override to prevent database schema conflicts
+#
+# EXTERNAL URL DEPLOYMENT:
+# - FRONTEND_DOMAIN: gen-capstone.tanfamily.cc (or your domain)
+# - Access via: ingress controller + domain name
+# - Can use multiple workers for better performance
+# - Requires ingress controller installed in cluster
+# - Requires DNS pointing domain to cluster external IP
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ecommerce-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: joshzacharytan/generation-capstone-backend:before-theme
+        command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+        # LOCAL DEV: --workers 1 (prevents DB schema conflicts during development)
+        # PRODUCTION: --workers 4 (better performance, remove this command override to use Docker default)
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DATABASE_URL
+          value: postgresql://postgres:password@postgres.ecommerce-platform.svc.cluster.local:5432/ecommerce_db
+        - name: SECRET_KEY
+          value: xxxxxxxxxx
+        - name: GEMINI_API_KEY
+          value: "xxxxxxxxxx"
+        - name: ALGORITHM
+          value: HS256
+        - name: ACCESS_TOKEN_EXPIRE_MINUTES
+          value: "30"
+        - name: FRONTEND_DOMAIN
+          value: localhost  # CHANGE TO: gen-capstone.tanfamily.cc for external deployment
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: ecommerce-platform
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8000
+    targetPort: 8000
